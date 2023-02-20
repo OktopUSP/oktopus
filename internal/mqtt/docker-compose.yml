@@ -1,0 +1,7 @@
+services:
+  broker:
+    image: eclipse-mosquitto
+    container_name: mosquittto_broker
+    network_mode: host
+    volumes:
+      - ./mosquitto:/mosquitto/
