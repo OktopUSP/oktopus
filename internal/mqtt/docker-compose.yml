@@ -3,5 +3,8 @@ services:
     image: eclipse-mosquitto
     container_name: mosquittto_broker
     network_mode: host
+    user: 1000:1000
     volumes:
-      - ./mosquitto:/mosquitto/
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
