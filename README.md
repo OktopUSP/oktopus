@@ -8,5 +8,8 @@ Este repositório tem como intuito fomentar o desenvolvimento de uma plataforma 
 <p>
 Com a criação de novas tecnologias mostrou-se necessário criar uma solução mais robusta que abrangesse uma gama maior de nichos, assim surgiu o TR-369, buscando preencher lacunas do seu antecessor (TR-069), que serviu bem ao seu propósito da época, mas agora passa por depreciação. Com isso em vista, buscamos trazer uma alternativa aos integradores de TI, provedores, administradores de sitema, e outros que possam se interessar.
 </p> 
+<p>
+Esta solução tem como inspirações o projeto https://github.com/genieacs/genieacs e outras soluções comerciais encontradas no mercado. Buscamos seguir rigorosamente as especificações do USP TR-369, optando por usar MQTT na camada de MTP (Message Transfer Protocol).
+</p>
 
 
