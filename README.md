@@ -13,6 +13,7 @@ Esta solução tem como inspirações o projeto <a href="https://github.com/geni
 </p>
 <ul><li><h4>Infraestrutura:</h4></li></ul>
 
-![Oktopus-infra](https://user-images.githubusercontent.com/83298718/222586238-ebfedd0e-52fc-4fe1-96dd-6fb5eac3e30a.png)
+![Oktopus-infra](https://user-images.githubusercontent.com/83298718/222589707-58a8786d-d4b7-49c3-a014-e8f4ef95497e.png)
+
 
 
