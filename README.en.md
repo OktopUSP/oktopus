@@ -18,4 +18,5 @@ This solution is inspired by the project <a href="https://github.com/genieacs/ge
 
 <p>Help us to maintain the project:</p>
 <a href="https://www.buymeacoffee.com/leandrofars" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
-
+<br/><br/>
+If you are interested in internal information about the team and our intentions, visit our <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>.
