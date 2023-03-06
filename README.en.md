@@ -16,7 +16,5 @@ This solution is inspired by the project <a href="https://github.com/genieacs/ge
 
 ![Oktopus-infra](https://user-images.githubusercontent.com/83298718/222589707-58a8786d-d4b7-49c3-a014-e8f4ef95497e.png)
 
-<a href="https://github.com/sponsors/leandrofars">
-<img src="https://user-images.githubusercontent.com/83298718/223131285-8cca2df1-4875-46a8-b0d6-9f3bc023889c.png"/>
-</a>
+<br/>
 If you are interested in internal information about the team and our intentions, visit our <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>.

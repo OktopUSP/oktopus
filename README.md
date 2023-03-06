@@ -16,10 +16,6 @@ Esta solução tem como inspirações o projeto <a href="https://github.com/geni
 
 ![Oktopus-infra](https://user-images.githubusercontent.com/83298718/222589707-58a8786d-d4b7-49c3-a014-e8f4ef95497e.png)
 
-<p>Nos ajude a manter o projeto:</p>
-<a href="https://github.com/sponsors/leandrofars">
-<img src="https://user-images.githubusercontent.com/83298718/223131285-8cca2df1-4875-46a8-b0d6-9f3bc023889c.png"/>
-</a>
-<br/><br/>
+<br/>
 Caso você tenha interesse em informações internas sobre o time e nossas pretensões acesse nossa <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>.
 
