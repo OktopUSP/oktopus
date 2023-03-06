@@ -1,4 +1,4 @@
-<p>Read this in other languages: <a href="README.md">Português</a>, <a href="README.es.md">Español</a></p>
+<p>Read in other languages: <a href="README.md">Português</a>, <a href="README.es.md">Español</a></p><br/><br/>
 <p align="center">
 <img src="https://user-images.githubusercontent.com/83298718/220207485-8c2aac78-95eb-4b43-b23e-c4bfa6cd30e6.png"/>
 </p>
@@ -18,4 +18,5 @@ This solution is inspired by the project <a href="https://github.com/genieacs/ge
 
 <p>Help us to maintain the project:</p>
 <a href="https://www.buymeacoffee.com/leandrofars" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
-
+<br/><br/>
+If you are interested in internal information about the team and our intentions, visit our <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>.

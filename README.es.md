@@ -1,4 +1,4 @@
-<p>Lea esto en otros idiomas: <a href="README.en.md">English</a>, <a href="README.md">Português</a></p>
+<p>Lea en otros idiomas: <a href="README.en.md">English</a>, <a href="README.md">Português</a></p><br/><br/>
 <p align="center">
 <img src="https://user-images.githubusercontent.com/83298718/220207485-8c2aac78-95eb-4b43-b23e-c4bfa6cd30e6.png"/>
 </p>
@@ -18,4 +18,6 @@ Esta solución se inspira en el proyecto. <a href="https://github.com/genieacs/g
 
 <p>Ayúdanos a mantener el proyecto:</p>
 <a href="https://www.buymeacoffee.com/leandrofars" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+<br/><br/>
+Si está interesado en información interna sobre el equipo y nuestras intenciones, visite nuestro <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>.
 
