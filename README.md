@@ -1,3 +1,4 @@
+<p>Leia isso em outros idiomas: <a href="README.en.md">English</a>, <a href="README.es.md">Español</a></p>
 <p align="center">
 <img src="https://user-images.githubusercontent.com/83298718/220207485-8c2aac78-95eb-4b43-b23e-c4bfa6cd30e6.png"/>
 </p>
