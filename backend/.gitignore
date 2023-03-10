@@ -1,0 +1,11 @@
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+main
+*.test
+*.out
+go.work
+*.log
+*.db
