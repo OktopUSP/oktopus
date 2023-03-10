@@ -13,11 +13,13 @@ import (
 	"github.com/leandrofars/oktopus/internal/mqtt"
 )
 
+const VERSION = "0.0.1"
+
 func main() {
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
 
-	log.Println("Starting Oktopus Project TR-369 Controller...")
+	log.Println("Starting Oktopus Project TR-369 Controller Version:", VERSION)
 	fl_broker := flag.Bool("mosquitto", false, "Defines if mosquitto container must run or not")
 	// fl_endpointId := flag.String("endpoint_id", "proto::oktopus-controller", "Defines the enpoint id the Agent must trust on.")
 	// fl_sub_topic := flag.String("sub_topic", "oktopus/v1/agent", "That's the topic agent must publish to, and the controller keeps on listening.")
@@ -57,6 +59,6 @@ func main() {
 		}
 	}
 
-	log.Println(" Oktopus is out!")
+	log.Println("Oktopus is out!")
 
 }
