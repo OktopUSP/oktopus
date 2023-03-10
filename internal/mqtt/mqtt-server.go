@@ -10,9 +10,13 @@ import (
 	"os/exec"
 )
 
+// Get Mqtt Broker up and running
 func StartMqttBroker() {
 
 	//TODO: Start Container through Docker SDK for GO, eliminating docker-compose and shell comands.
+	//TODO: Create Broker with user, password and CA certificate.
+	//TODO: Set broker access control list to topics.
+	//TODO: Set MQTTv5 CONNACK packet with topic for agent to use.
 
 	cmd := exec.Command("sudo", "docker", "compose", "-f", "internal/mqtt/docker-compose.yml", "up", "-d")
 
@@ -22,4 +26,6 @@ func StartMqttBroker() {
 		log.Fatal(err.Error())
 		return
 	}
+
+	log.Println("Broker Mqtt Up and Running!")
 }
