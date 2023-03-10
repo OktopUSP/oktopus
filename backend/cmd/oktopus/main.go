@@ -59,6 +59,6 @@ func main() {
 		}
 	}
 
-	log.Println("Oktopus is out!")
+	log.Println("(⌐■_■) Oktopus is out!")
 
 }
