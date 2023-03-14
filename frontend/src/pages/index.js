@@ -17,7 +17,7 @@ const Page = () => (
   <>
     <Head>
       <title>
-        Overview | Devias Kit
+        Oktopus | TR-369
       </title>
     </Head>
     <Box
