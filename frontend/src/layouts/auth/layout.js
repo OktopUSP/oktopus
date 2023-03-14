@@ -59,7 +59,7 @@ export const Layout = (props) => {
           lg={6}
           sx={{
             alignItems: 'center',
-            background: 'radial-gradient(50% 50% at 50% 50%, #122647 0%, #090E23 100%)',
+            background: 'radial-gradient(50% 50% at 50% 50%, #306D6F 0%, #255355 100%)',
             color: 'white',
             display: 'flex',
             justifyContent: 'center',
@@ -69,36 +69,15 @@ export const Layout = (props) => {
           }}
         >
           <Box sx={{ p: 3 }}>
-            <Typography
-              align="center"
-              color="inherit"
-              sx={{
-                fontSize: '24px',
-                lineHeight: '32px',
-                mb: 1
-              }}
-              variant="h1"
-            >
-              Welcome to{' '}
-              <Box
-                component="a"
-                sx={{ color: '#15B79E' }}
-                target="_blank"
-              >
-                Devias Kit
-              </Box>
-            </Typography>
-            <Typography
-              align="center"
-              sx={{ mb: 3 }}
-              variant="subtitle1"
-            >
-              A professional kit that comes with ready-to-use MUI components.
-            </Typography>
             <img
               alt=""
-              src="/assets/auth-illustration.svg"
+              src="/assets/oktopus.png"
             />
+             <Typography
+              align="center"
+              sx={{ mb: 3 }}
+            >
+            </Typography>
           </Box>
         </Grid>
       </Grid>

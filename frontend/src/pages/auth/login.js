@@ -25,7 +25,7 @@ const Page = () => {
   const [method, setMethod] = useState('email');
   const formik = useFormik({
     initialValues: {
-      email: 'demo@devias.io',
+      email: 'demo@oktopus.io',
       password: 'Password123!',
       submit: null
     },
@@ -71,7 +71,7 @@ const Page = () => {
     <>
       <Head>
         <title>
-          Login | Devias Kit
+          Login | Oktopus
         </title>
       </Head>
       <Box
@@ -103,7 +103,7 @@ const Page = () => {
                 color="text.secondary"
                 variant="body2"
               >
-                Don&apos;t have an account?
+                Não possui uma conta?
                 &nbsp;
                 <Link
                   component={NextLink}
@@ -111,11 +111,11 @@ const Page = () => {
                   underline="hover"
                   variant="subtitle2"
                 >
-                  Register
+                  Registre-se
                 </Link>
               </Typography>
             </Stack>
-            <Tabs
+            {/*<Tabs
               onChange={handleMethodChange}
               sx={{ mb: 3 }}
               value={method}
@@ -128,7 +128,7 @@ const Page = () => {
                 label="Phone Number"
                 value="phoneNumber"
               />
-            </Tabs>
+            </Tabs>*/}
             {method === 'email' && (
               <form
                 noValidate
@@ -193,7 +193,7 @@ const Page = () => {
                   sx={{ mt: 3 }}
                 >
                   <div>
-                    You can use <b>demo@devias.io</b> and password <b>Password123!</b>
+                    You can use <b>demo@oktopus.io</b> and password <b>Password123!</b>
                   </div>
                 </Alert>
               </form>
