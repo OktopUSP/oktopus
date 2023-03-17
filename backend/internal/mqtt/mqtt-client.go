@@ -2,18 +2,86 @@ package mqtt
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"io/ioutil"
 	"log"
 	"net"
+	"sync"
 
 	"github.com/eclipse/paho.golang/paho"
 	"github.com/leandrofars/oktopus/internal/utils"
 )
 
-func StartMqttClient(addr, port *string) *paho.Client {
+type Mqtt struct {
+	Addr     string
+	Port     string
+	Id       string
+	User     string
+	Passwd   string
+	Ctx      context.Context
+	QoS      int
+	SubTopic string
+	CA       string
+}
 
-	conn, err := net.Dial("tcp", *addr+":"+*port)
+var c *paho.Client
+
+/* ------------------- Implementations of broker interface ------------------ */
+
+func (m *Mqtt) Connect() {
+	clientConfig := startClient(m.Addr, m.Port, m.CA, m.Ctx)
+	connParameters := startConnection(m.Id, m.User, m.Passwd)
+
+	conn, err := clientConfig.Connect(m.Ctx, &connParameters)
 	if err != nil {
 		log.Fatal(err)
+	}
+	// Sets global client to be used by other mqtt functions
+	c = clientConfig
+
+	if conn.ReasonCode != 0 {
+		log.Fatalf("Failed to connect to %s : %d - %s", m.Addr, conn.ReasonCode, conn.Properties.ReasonString)
+	}
+
+	log.Printf("Connected to broker--> %s:%s", m.Addr, m.Port)
+}
+
+func (m *Mqtt) Disconnect() {
+	d := &paho.Disconnect{ReasonCode: 0}
+	err := c.Disconnect(d)
+	if err != nil {
+		log.Fatalf("failed to send Disconnect: %s", err)
+	}
+}
+
+func (m *Mqtt) Subscribe() {
+	if _, err := c.Subscribe(m.Ctx, &paho.Subscribe{
+		Subscriptions: map[string]paho.SubscribeOptions{
+			m.SubTopic: {QoS: byte(m.QoS), NoLocal: true},
+		},
+	}); err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Printf("Subscribed to %s", m.SubTopic)
+}
+
+/* -------------------------------------------------------------------------- */
+
+func startClient(addr string, port string, tlsCa string, ctx context.Context) *paho.Client {
+
+	if tlsCa != "" {
+		conn := conntWithTls(tlsCa, addr+":"+port, ctx)
+		clientConfig := paho.ClientConfig{
+			Conn: conn,
+		}
+		return paho.NewClient(clientConfig)
+	}
+
+	conn, err := net.Dial("tcp", addr+":"+port)
+	if err != nil {
+		log.Println(err)
 	}
 
 	clientConfig := paho.ClientConfig{
@@ -23,14 +91,57 @@ func StartMqttClient(addr, port *string) *paho.Client {
 	return paho.NewClient(clientConfig)
 }
 
-func StartNewConnection(id, user, pass string) paho.Connect {
+func conntWithTls(tlsCa, address string, ctx context.Context) net.Conn {
+	ca, err := ioutil.ReadFile(tlsCa)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	roots := x509.NewCertPool()
+	ok := roots.AppendCertsFromPEM(ca)
+	if !ok {
+		panic("failed to parse root certificate")
+	}
+
+	config := &tls.Config{
+		// After going to cloud, certificates must match names and we must take this option below
+		InsecureSkipVerify: true,
+		RootCAs:            roots,
+	}
+
+	d := tls.Dialer{
+		Config: config,
+	}
+
+	conn, err := d.DialContext(ctx, "tcp", address)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	conn = newThreadSafeConnection(conn)
+
+	return conn
+}
+
+// Custom net.Conn with thread safety
+func newThreadSafeConnection(c net.Conn) net.Conn {
+	type threadSafeConn struct {
+		net.Conn
+		sync.Locker
+	}
+
+	return &threadSafeConn{
+		Conn:   c,
+		Locker: &sync.Mutex{},
+	}
+}
+
+func startConnection(id, user, pass string) paho.Connect {
 
 	connParameters := paho.Connect{
 		KeepAlive:  30,
 		ClientID:   id,
 		CleanStart: true,
-		Username:   user,
-		Password:   []byte(pass),
 	}
 
 	if id != "" {
@@ -51,16 +162,4 @@ func StartNewConnection(id, user, pass string) paho.Connect {
 	}
 
 	return connParameters
-
-}
-
-func ConnectMqttBroker(c *paho.Client, cp paho.Connect, addr *string) {
-	conn, err := c.Connect(context.Background(), &cp)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if conn.ReasonCode != 0 {
-		log.Fatalf("Failed to connect to %s : %d - %s", *addr, conn.ReasonCode, conn.Properties.ReasonString)
-	}
 }

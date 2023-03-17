@@ -9,3 +9,7 @@ main
 go.work
 *.log
 *.db
+*.crt
+*.key
+*.csr
+*.db.new
