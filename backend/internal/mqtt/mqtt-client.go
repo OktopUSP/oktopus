@@ -30,12 +30,14 @@ var c *paho.Client
 /* ------------------- Implementations of broker interface ------------------ */
 
 func (m *Mqtt) Connect() {
-	clientConfig := startClient(m.Addr, m.Port, m.CA, m.Ctx)
+	msgChan := make(chan *paho.Publish)
+	go messageHandler(msgChan)
+	clientConfig := startClient(m.Addr, m.Port, m.CA, m.Ctx, msgChan)
 	connParameters := startConnection(m.Id, m.User, m.Passwd)
 
 	conn, err := clientConfig.Connect(m.Ctx, &connParameters)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	// Sets global client to be used by other mqtt functions
 	c = clientConfig
@@ -69,12 +71,16 @@ func (m *Mqtt) Subscribe() {
 
 /* -------------------------------------------------------------------------- */
 
-func startClient(addr string, port string, tlsCa string, ctx context.Context) *paho.Client {
+func startClient(addr string, port string, tlsCa string, ctx context.Context, msgChan chan *paho.Publish) *paho.Client {
+	singleHandler := paho.NewSingleHandlerRouter(func(m *paho.Publish) {
+		msgChan <- m
+	})
 
 	if tlsCa != "" {
-		conn := conntWithTls(tlsCa, addr+":"+port, ctx)
+		conn := connWithTls(tlsCa, addr+":"+port, ctx)
 		clientConfig := paho.ClientConfig{
-			Conn: conn,
+			Conn:   conn,
+			Router: singleHandler,
 		}
 		return paho.NewClient(clientConfig)
 	}
@@ -85,13 +91,14 @@ func startClient(addr string, port string, tlsCa string, ctx context.Context) *p
 	}
 
 	clientConfig := paho.ClientConfig{
-		Conn: conn,
+		Conn:   conn,
+		Router: singleHandler,
 	}
 
 	return paho.NewClient(clientConfig)
 }
 
-func conntWithTls(tlsCa, address string, ctx context.Context) net.Conn {
+func connWithTls(tlsCa, address string, ctx context.Context) net.Conn {
 	ca, err := ioutil.ReadFile(tlsCa)
 	if err != nil {
 		log.Fatal(err)
@@ -104,7 +111,7 @@ func conntWithTls(tlsCa, address string, ctx context.Context) net.Conn {
 	}
 
 	config := &tls.Config{
-		// After going to cloud, certificates must match names and we must take this option below
+		// After going to cloud, certificates must match names, and we must take this option below
 		InsecureSkipVerify: true,
 		RootCAs:            roots,
 	}
@@ -155,11 +162,19 @@ func startConnection(id, user, pass string) paho.Connect {
 	}
 
 	if user != "" {
+		connParameters.Username = user
 		connParameters.UsernameFlag = true
 	}
 	if pass != "" {
+		connParameters.Password = []byte(pass)
 		connParameters.PasswordFlag = true
 	}
 
 	return connParameters
+}
+
+func messageHandler(msg chan *paho.Publish) {
+	for m := range msg {
+		log.Println("Received message:", string(m.Payload))
+	}
 }

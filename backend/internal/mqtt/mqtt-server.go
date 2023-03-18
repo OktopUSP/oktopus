@@ -18,7 +18,7 @@ func StartMqttBroker() {
 	//TODO: Set broker access control list to topics.
 	//TODO: Set MQTTv5 CONNACK packet with topic for agent to use.
 
-	cmd := exec.Command("sudo", "docker", "compose", "-f", "internal/mqtt/docker-compose.yml", "up", "-d")
+	cmd := exec.Command("sudo", "docker", "compose", "-f", "internal/mosquitto/docker-compose.yml", "up", "-d")
 
 	err := cmd.Run()
 

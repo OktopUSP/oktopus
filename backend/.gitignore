@@ -13,3 +13,6 @@ go.work
 *.key
 *.csr
 *.db.new
+*.txt
+*.pwd
+*.acl
