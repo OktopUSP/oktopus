@@ -1,0 +1,16 @@
+services:
+  broker:
+    image: eclipse-mosquitto
+    container_name: mosquittto_broker
+    network_mode: host
+    user: 1000:1000
+    volumes:
+      - ./config:/mosquitto/config
+      - ./data:/mosquitto/data
+      - ./log:/mosquitto/log
+      - ./creds:/mosquitto/creds
+      - ./passwd:/mosquitto/passwd
+      - ./acl:/mosquitto/acl
+    ports:
+      - 8883:8883
+      - 1883:1883
