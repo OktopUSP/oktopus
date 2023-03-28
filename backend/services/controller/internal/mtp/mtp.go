@@ -13,7 +13,7 @@ import (
 type Broker interface {
 	Connect()
 	Disconnect()
-	// Publish()
+	Publish(msg []byte, topic, respTopic string)
 	Subscribe()
 }
 
