@@ -16,12 +16,12 @@ export const neutral = {
   100: '#F3F4F6',
   200: '#E5E7EB',
   300: '#D2D6DB',
-  400: '#9DA4AE',
+  400: '#FFFFFF',
   500: '#6C737F',
   600: '#4D5761',
-  700: '#2F3746',
-  800: '#1C2536',
-  900: '#111927'
+  700: '#FFFFFF',
+  800: '#306d6f',
+  900: '#30596f'
 };
 
 export const indigo = withAlphas({
