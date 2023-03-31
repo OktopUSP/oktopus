@@ -12,7 +12,7 @@ const withAlphas = (color) => {
 };
 
 export const neutral = {
-  50: '#F8F9FA',
+  50: '#306d6f',
   100: '#F3F4F6',
   200: '#E5E7EB',
   300: '#D2D6DB',

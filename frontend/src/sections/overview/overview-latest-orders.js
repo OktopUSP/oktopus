@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 import PropTypes from 'prop-types';
 import ArrowRightIcon from '@heroicons/react/24/solid/ArrowRightIcon';
+import ArrowTopRightOnSquareIcon from '@heroicons/react/24/solid/ArrowTopRightOnSquareIcon';
 import {
   Box,
   Button,
@@ -19,9 +20,9 @@ import { Scrollbar } from 'src/components/scrollbar';
 import { SeverityPill } from 'src/components/severity-pill';
 
 const statusMap = {
-  pending: 'warning',
-  delivered: 'success',
-  refunded: 'error'
+  Associando: 'warning',
+  Online: 'success',
+  Offline: 'error'
 };
 
 export const OverviewLatestOrders = (props) => {
@@ -29,23 +30,26 @@ export const OverviewLatestOrders = (props) => {
 
   return (
     <Card sx={sx}>
-      <CardHeader title="Latest Orders" />
+      <CardHeader title="Devices" />
       <Scrollbar sx={{ flexGrow: 1 }}>
         <Box sx={{ minWidth: 800 }}>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell>
-                  Order
+                  Model
                 </TableCell>
                 <TableCell>
                   Customer
                 </TableCell>
                 <TableCell sortDirection="desc">
-                  Date
+                  Vendor
                 </TableCell>
                 <TableCell>
                   Status
+                </TableCell>
+                <TableCell>
+                  Acessar
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -72,6 +76,11 @@ export const OverviewLatestOrders = (props) => {
                         {order.status}
                       </SeverityPill>
                     </TableCell>
+                    <TableCell>
+                    <SvgIcon fontSize="small" sx={{cursor:'pointer'}}>
+                      <ArrowTopRightOnSquareIcon />
+                    </SvgIcon>
+                    </TableCell>
                   </TableRow>
                 );
               })}
@@ -79,21 +88,21 @@ export const OverviewLatestOrders = (props) => {
           </Table>
         </Box>
       </Scrollbar>
-      <Divider />
-      <CardActions sx={{ justifyContent: 'flex-end' }}>
-        <Button
-          color="inherit"
-          endIcon={(
-            <SvgIcon fontSize="small">
-              <ArrowRightIcon />
-            </SvgIcon>
-          )}
-          size="small"
-          variant="text"
-        >
-          View all
-        </Button>
-      </CardActions>
+      {/*<Divider />
+        <CardActions sx={{ justifyContent: 'flex-end' }}>
+          <Button
+            color="inherit"
+            endIcon={(
+              <SvgIcon fontSize="small">
+                <ArrowRightIcon />
+              </SvgIcon>
+            )}
+            size="small"
+            variant="text"
+          >
+            View all
+          </Button>
+            </CardActions>*/}
     </Card>
   );
 };

@@ -5,6 +5,7 @@ import ShoppingBagIcon from '@heroicons/react/24/solid/ShoppingBagIcon';
 import UserIcon from '@heroicons/react/24/solid/UserIcon';
 import UserPlusIcon from '@heroicons/react/24/solid/UserPlusIcon';
 import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
+import CpuChip from '@heroicons/react/24/solid/CpuChipIcon';
 import XCircleIcon from '@heroicons/react/24/solid/XCircleIcon';
 import { SvgIcon } from '@mui/material';
 
@@ -19,29 +20,11 @@ export const items = [
     )
   },
   {
-    title: 'Customers',
-    path: '/customers',
+    title: 'Devices',
+    path: '/devices',
     icon: (
       <SvgIcon fontSize="small">
-        <UsersIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Companies',
-    path: '/companies',
-    icon: (
-      <SvgIcon fontSize="small">
-        <ShoppingBagIcon />
-      </SvgIcon>
-    )
-  },
-  {
-    title: 'Account',
-    path: '/account',
-    icon: (
-      <SvgIcon fontSize="small">
-        <UserIcon />
+       <CpuChip/>
       </SvgIcon>
     )
   },
@@ -54,12 +37,24 @@ export const items = [
       </SvgIcon>
     )
   },
+];
+
+/*
   {
-    title: 'Login',
-    path: '/auth/login',
+    title: 'Customers',
+    path: '/customers',
     icon: (
       <SvgIcon fontSize="small">
-        <LockClosedIcon />
+        <UsersIcon />
+      </SvgIcon>
+    )
+  },
+    {
+    title: 'Account',
+    path: '/account',
+    icon: (
+      <SvgIcon fontSize="small">
+        <UserIcon />
       </SvgIcon>
     )
   },
@@ -73,6 +68,24 @@ export const items = [
     )
   },
   {
+    title: 'Login',
+    path: '/auth/login',
+    icon: (
+      <SvgIcon fontSize="small">
+        <LockClosedIcon />
+      </SvgIcon>
+    )
+  },
+  {
+    title: 'Companies',
+    path: '/companies',
+    icon: (
+      <SvgIcon fontSize="small">
+        <ShoppingBagIcon />
+      </SvgIcon>
+    )
+  },
+  {
     title: 'Error',
     path: '/404',
     icon: (
@@ -81,4 +94,4 @@ export const items = [
       </SvgIcon>
     )
   }
-];
+*/ 

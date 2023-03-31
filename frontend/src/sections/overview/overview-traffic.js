@@ -14,18 +14,12 @@ import {
 } from '@mui/material';
 import { Chart } from 'src/components/chart';
 
-const useChartOptions = (labels) => {
+const useChartOptions = (labels,title) => {
   const theme = useTheme();
-
-  return {
+  let options =  {
     chart: {
       background: 'transparent'
     },
-    colors: [
-      theme.palette.primary.main,
-      theme.palette.success.main,
-      theme.palette.warning.main
-    ],
     dataLabels: {
       enabled: false
     },
@@ -60,6 +54,19 @@ const useChartOptions = (labels) => {
       fillSeriesColor: false
     }
   };
+  if(title === "Status"){
+    options.colors = [
+      theme.palette.success.main,
+      theme.palette.error.main,
+    ]
+  }else{
+    options.colors = [
+      theme.palette.primary.main,
+      theme.palette.info.main,
+      theme.palette.warning.main
+    ]
+  }
+  return options
 };
 
 const iconMap = {
@@ -81,12 +88,14 @@ const iconMap = {
 };
 
 export const OverviewTraffic = (props) => {
-  const { chartSeries, labels, sx } = props;
-  const chartOptions = useChartOptions(labels);
+  const { chartSeries, labels, sx, title } = props;
+  const chartOptions = useChartOptions(labels,title);
 
   return (
     <Card sx={sx}>
-      <CardHeader title="Traffic Source" />
+      <div style={{display:'flex',justifyContent:'center'}}>
+      <CardHeader title={title} />
+      </div>
       <CardContent>
         <Chart
           height={300}
@@ -117,7 +126,7 @@ export const OverviewTraffic = (props) => {
                 {iconMap[label]}
                 <Typography
                   sx={{ my: 1 }}
-                  variant="h6"
+                  variant="h8"
                 >
                   {label}
                 </Typography>

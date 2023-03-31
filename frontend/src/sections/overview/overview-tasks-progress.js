@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import ListBulletIcon from '@heroicons/react/24/solid/ListBulletIcon';
+import Signal from '@heroicons/react/24/solid/SignalIcon';
 import {
   Avatar,
   Box,
@@ -25,25 +26,25 @@ export const OverviewTasksProgress = (props) => {
         >
           <Stack spacing={1}>
             <Typography
-              color="text.secondary"
+              color="sucess.main"
               gutterBottom
               variant="overline"
             >
-              Task Progress
+              Conexão MQTT
             </Typography>
             <Typography variant="h4">
-              {value}%
+              {value}ms
             </Typography>
           </Stack>
           <Avatar
             sx={{
-              backgroundColor: 'warning.main',
+              backgroundColor: '#f28950',
               height: 56,
               width: 56
             }}
           >
             <SvgIcon>
-              <ListBulletIcon />
+              <Signal />
             </SvgIcon>
           </Avatar>
         </Stack>
