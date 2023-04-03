@@ -18,15 +18,18 @@ import {
 } from '@mui/material';
 import { Scrollbar } from 'src/components/scrollbar';
 import { SeverityPill } from 'src/components/severity-pill';
+import { useRouter } from 'next/router';
 
 const statusMap = {
-  Associando: 'warning',
+  Associating: 'warning',
   Online: 'success',
   Offline: 'error'
 };
 
 export const OverviewLatestOrders = (props) => {
   const { orders = [], sx } = props;
+
+  const router = useRouter()
 
   return (
     <Card sx={sx}>
@@ -49,7 +52,7 @@ export const OverviewLatestOrders = (props) => {
                   Status
                 </TableCell>
                 <TableCell>
-                  Acessar
+                  Access
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -77,7 +80,7 @@ export const OverviewLatestOrders = (props) => {
                       </SeverityPill>
                     </TableCell>
                     <TableCell>
-                    <SvgIcon fontSize="small" sx={{cursor:'pointer'}}>
+                    <SvgIcon fontSize="small" sx={{cursor:'pointer'}} onClick={()=>router.push("devices/"+order.id)}>
                       <ArrowTopRightOnSquareIcon />
                     </SvgIcon>
                     </TableCell>

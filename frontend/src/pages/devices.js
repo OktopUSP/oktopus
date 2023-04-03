@@ -43,7 +43,7 @@ const Page = () => (
                                 name: 'Ekaterina Tankova'
                             },
                             createdAt: 1555016400000,
-                            status: 'Associando'
+                            status: 'Associating'
                         },
                         {
                             id: '9eaa1c7dd4433f413c308ce2',
@@ -73,7 +73,7 @@ const Page = () => (
                                 name: 'Anje Keizer'
                             },
                             createdAt: 1554757200000,
-                            status: 'Associando'
+                            status: 'Associating'
                         },
                         {
                             id: '9f974f239d29ede969367103',
