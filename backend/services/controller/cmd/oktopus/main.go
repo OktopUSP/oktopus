@@ -5,6 +5,7 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/leandrofars/oktopus/internal/db"
 	"log"
 	"os"
 	"os/signal"
@@ -35,6 +36,7 @@ func main() {
 	flBrokerPassword := flag.String("P", "", "Mqtt broker password")
 	flBrokerClientId := flag.String("i", "", "A clientid for the Mqtt connection")
 	flBrokerQos := flag.Int("q", 2, "Quality of service of mqtt messages delivery")
+	flAddrDB := flag.String("mongo", "mongodb://localhost:27017/", "MongoDB URI")
 	flHelp := flag.Bool("help", false, "Help")
 
 	flag.Parse()
@@ -47,8 +49,8 @@ func main() {
 		This context suppress our needs, but we can use a more sofisticate
 		approach with cancel and timeout options passing it through paho mqtt functions.
 	*/
-	ctx := context.Background()
-
+	ctx, cancel := context.WithCancel(context.Background())
+	database := db.NewDatabase(ctx, *flAddrDB)
 	/*
 	 If you want to use another message protocol just make it implement Broker interface.
 	*/
@@ -63,11 +65,13 @@ func main() {
 		SubTopic:     *flSubTopic,
 		DevicesTopic: *flDevicesTopic,
 		CA:           *flTlsCert,
+		DB:           database,
 	}
 
 	mtp.MtpService(&mqttClient, done)
 
 	<-done
+	cancel()
 
 	log.Println("(⌐■_■) Oktopus is out!")
 
