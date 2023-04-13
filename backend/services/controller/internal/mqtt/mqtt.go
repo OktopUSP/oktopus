@@ -4,18 +4,17 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"github.com/eclipse/paho.golang/paho"
+	"github.com/leandrofars/oktopus/internal/db"
 	usp_msg "github.com/leandrofars/oktopus/internal/usp_message"
 	"github.com/leandrofars/oktopus/internal/usp_record"
+	"github.com/leandrofars/oktopus/internal/utils"
 	"google.golang.org/protobuf/proto"
 	"io/ioutil"
 	"log"
 	"net"
 	"strings"
 	"sync"
-	"time"
-
-	"github.com/eclipse/paho.golang/paho"
-	"github.com/leandrofars/oktopus/internal/utils"
 )
 
 type Mqtt struct {
@@ -29,6 +28,7 @@ type Mqtt struct {
 	SubTopic     string
 	DevicesTopic string
 	CA           string
+	DB           db.Database
 }
 
 var c *paho.Client
@@ -52,10 +52,6 @@ func (m *Mqtt) Connect() {
 
 	// Sets global client to be used by other mqtt functions
 	c = clientConfig
-
-	if conn.ReasonCode != 0 {
-		log.Fatalf("Failed to connect to %s : %d - %s", m.Addr, conn.ReasonCode, conn.Properties.ReasonString)
-	}
 
 	log.Printf("Connected to broker--> %s:%s", m.Addr, m.Port)
 }
@@ -238,8 +234,12 @@ func (m *Mqtt) handleNewDevice(deviceMac string) {
 				Request: &usp_msg.Request{
 					ReqType: &usp_msg.Request_Get{
 						Get: &usp_msg.Get{
-							ParamPaths: []string{"Device.DeviceInfo."},
-							MaxDepth:   1,
+							ParamPaths: []string{
+								"Device.DeviceInfo.Manufacturer",
+								"Device.DeviceInfo.ModelName",
+								"Device.DeviceInfo.SoftwareVersion",
+							},
+							MaxDepth: 1,
 						},
 					},
 				},
@@ -263,7 +263,6 @@ func (m *Mqtt) handleNewDevice(deviceMac string) {
 	if err != nil {
 		log.Fatalln("Failed to encode address book:", err)
 	}
-	time.Sleep(5 * time.Second)
 	m.Publish(tr369Message, "oktopus/v1/agent/"+deviceMac, "oktopus/v1/controller/"+deviceMac)
 }
 
@@ -280,5 +279,17 @@ func (m *Mqtt) handleDevicesResponse(p []byte) {
 		log.Fatal(err)
 	}
 
-	log.Printf("Received a usp_message: %s\n", message.String())
+	var device db.Device
+	msg := message.Body.MsgBody.(*usp_msg.Body_Response).Response.GetGetResp()
+
+	device.Vendor = msg.ReqPathResults[0].ResolvedPathResults[0].ResultParams["Manufacturer"]
+	device.Model = msg.ReqPathResults[1].ResolvedPathResults[0].ResultParams["ModelName"]
+	device.Version = msg.ReqPathResults[2].ResolvedPathResults[0].ResultParams["SoftwareVersion"]
+
+	err = m.DB.CreateDevice(device)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("New device saved at database")
 }
