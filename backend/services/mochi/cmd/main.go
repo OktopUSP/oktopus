@@ -12,6 +12,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/mochi-co/mqtt/v2"
@@ -121,7 +122,7 @@ func (h *MyHook) ID() string {
 
 func (h *MyHook) Provides(b byte) bool {
 	return bytes.Contains([]byte{
-		mqtt.OnConnect,
+		mqtt.OnSubscribed,
 	}, []byte{b})
 }
 
@@ -130,18 +131,22 @@ func (h *MyHook) Init(config any) error {
 	return nil
 }
 
-func (h *MyHook) OnConnect(cl *mqtt.Client, pk packets.Packet) {
-	log.Println("new connection")
-	var clUser string
-	if len(cl.Properties.Props.User) > 0 {
-		clUser = cl.Properties.Props.User[0].Val
-	}
-	if clUser != "" {
-		log.Println("new device:", clUser)
-		err := server.Publish("oktopus/devices", []byte(clUser), false, 1)
-		if err != nil {
-			log.Println("server publish error: ", err)
-		}
-	}
+func (h *MyHook) OnSubscribed(cl *mqtt.Client, pk packets.Packet, reasonCodes []byte) {
+	// Verifies if it's a device who is subscribed
+	if strings.Contains(pk.Filters[0].Filter, "oktopus/v1/agent") {
+		var clUser string
 
+		if len(cl.Properties.Props.User) > 0 {
+			clUser = cl.Properties.Props.User[0].Val
+		}
+
+		if clUser != "" {
+			log.Println("new device:", clUser)
+			err := server.Publish("oktopus/devices", []byte(clUser), false, 1)
+			if err != nil {
+				log.Println("server publish error: ", err)
+			}
+		}
+
+	}
 }
