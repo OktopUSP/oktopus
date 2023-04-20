@@ -7,6 +7,7 @@ import { DevicesRPC } from 'src/sections/devices/devices-rpc';
 const Page = () => {
     const router = useRouter()
     const { id } = router.query
+  
 
     return(
     <>
@@ -19,7 +20,7 @@ const Page = () => {
             component="main"
             sx={{
                 flexGrow: 1,
-                py: 8,
+                py: 0,
             }}
         >
             <Container maxWidth="lg" >
@@ -28,7 +29,7 @@ const Page = () => {
                     RPC
                 </Typography>
                 {/*<SettingsNotifications />*/}
-                < DevicesRPC/>
+                < DevicesRPC />
                 </Stack>
             </Container>
         </Box>

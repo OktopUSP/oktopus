@@ -15,8 +15,21 @@ import {
   SvgIcon
 } from '@mui/material';
 import PaperAirplane from '@heroicons/react/24/solid/PaperAirplaneIcon';
+import CircularProgress from '@mui/material/CircularProgress';
+import Backdrop from '@mui/material/Backdrop';
+
 
 export const DevicesRPC = () => {
+
+const [open, setOpen] = useState(false);
+
+const handleClose = () => {
+  setOpen(false);
+};
+const handleOpen = () => {
+  setOpen(true);
+};
+
   const [value, setValue] = useState(`
   {opa, 
     teste123:goiaba}`
@@ -80,10 +93,17 @@ export const DevicesRPC = () => {
         </CardContent>
         <Divider />
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button variant="contained" endIcon={<SvgIcon><PaperAirplane /></SvgIcon>}>
+          <Button variant="contained" endIcon={<SvgIcon><PaperAirplane /></SvgIcon>} onClick={handleOpen}>
             Send
           </Button>
         </CardActions>
+        <Backdrop
+            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={open}
+            onClick={handleClose}
+            >
+            <CircularProgress color="inherit" />
+        </Backdrop>
       </Card>
     </form>
   );
