@@ -5,17 +5,32 @@
 package main
 
 import (
+	"bytes"
 	"flag"
+	"github.com/mochi-co/mqtt/v2/packets"
 	"github.com/rs/zerolog"
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/mochi-co/mqtt/v2"
 	"github.com/mochi-co/mqtt/v2/hooks/auth"
 	"github.com/mochi-co/mqtt/v2/listeners"
 )
+
+var server = mqtt.New(&mqtt.Options{
+	//Capabilities: &mqtt.Capabilities{
+	//	ServerKeepAlive:              10000,
+	//	ReceiveMaximum:               math.MaxUint16,
+	//	MaximumMessageExpiryInterval: math.MaxUint32,
+	//	MaximumSessionExpiryInterval: math.MaxUint32, // maximum number of seconds to keep disconnected sessions
+	//	MaximumClientWritesPending:   65536,
+	//	MaximumPacketSize:            0,
+	//	MaximumQos:                   2,
+	//},
+})
 
 func main() {
 	tcpAddr := flag.String("tcp", ":1883", "network address for TCP listener")
@@ -32,17 +47,6 @@ func main() {
 		done <- true
 	}()
 
-	server := mqtt.New(&mqtt.Options{
-		//Capabilities: &mqtt.Capabilities{
-		//	ServerKeepAlive:              10000,
-		//	ReceiveMaximum:               math.MaxUint16,
-		//	MaximumMessageExpiryInterval: math.MaxUint32,
-		//	MaximumSessionExpiryInterval: math.MaxUint32, // maximum number of seconds to keep disconnected sessions
-		//	MaximumClientWritesPending:   65536,
-		//	MaximumPacketSize:            0,
-		//	MaximumQos:                   2,
-		//},
-	})
 	l := server.Log.Level(zerolog.DebugLevel)
 	server.Log = &l
 
@@ -89,6 +93,11 @@ func main() {
 		}
 	}
 
+	err := server.AddHook(new(MyHook), map[string]any{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	go func() {
 		err := server.Serve()
 		if err != nil {
@@ -100,4 +109,44 @@ func main() {
 	server.Log.Warn().Msg("caught signal, stopping...")
 	server.Close()
 	server.Log.Info().Msg("main.go finished")
+
+}
+
+type MyHook struct {
+	mqtt.HookBase
+}
+
+func (h *MyHook) ID() string {
+	return "events-controller"
+}
+
+func (h *MyHook) Provides(b byte) bool {
+	return bytes.Contains([]byte{
+		mqtt.OnSubscribed,
+	}, []byte{b})
+}
+
+func (h *MyHook) Init(config any) error {
+	h.Log.Info().Msg("initialised")
+	return nil
+}
+
+func (h *MyHook) OnSubscribed(cl *mqtt.Client, pk packets.Packet, reasonCodes []byte) {
+	// Verifies if it's a device who is subscribed
+	if strings.Contains(pk.Filters[0].Filter, "oktopus/v1/agent") {
+		var clUser string
+
+		if len(cl.Properties.Props.User) > 0 {
+			clUser = cl.Properties.Props.User[0].Val
+		}
+
+		if clUser != "" {
+			log.Println("new device:", clUser)
+			err := server.Publish("oktopus/devices", []byte(clUser), false, 1)
+			if err != nil {
+				log.Println("server publish error: ", err)
+			}
+		}
+
+	}
 }

@@ -14,108 +14,99 @@ import { OverviewTraffic } from 'src/sections/overview/overview-traffic';
 const now = new Date();
 
 const Page = () => (
-  <>
-    <Head>
-      <title>
-        Oktopus | TR-369
-      </title>
-    </Head>
-    <Box
-      component="main"
-      sx={{
-        flexGrow: 1,
-        py: 8
-      }}
-    >
-      <Container maxWidth="xl">
-        <Grid
-          container
-          spacing={3}
+    <>
+        <Head>
+            <title>
+                Oktopus | TR-369
+            </title>
+        </Head>
+        <Box
+            component="main"
+            sx={{
+                flexGrow: 1,
+                py: 8,
+            }}
         >
-          <Grid
-            xs={12}
-            sm={6}
-            lg={3}
-          >
-          </Grid>
-          <Grid
-            xs={12}
-            sm={6}
-            lg={3}
-          >
-            <OverviewTotalCustomers
-              difference={16}
-              positive={false}
-              sx={{ height: '100%' }}
-              value="1.6k"
-            />
-          </Grid>
-          <Grid
-            xs={12}
-            sm={6}
-            lg={3}
-          >
-            <OverviewTasksProgress
-              sx={{ height: '100%' }}
-              value={75.5}
-            />
-          </Grid>
-          <Grid
-            xs={12}
-            sm={6}
-            lg={3}
-          >
-          </Grid>
-          <Grid
-            xs={12}
-            lg={4}
-          >
-          <OverviewTraffic
-          chartSeries={[63, 15, 22]}
-          labels={['Cameras', 'Routers', 'Sensors']}
-          sx={{ height: '100%' }}
-          title={'Vendors'}
-          />
-          </Grid>
-          <Grid
-            xs={12}
-            lg={4}
-          >
-          <OverviewTraffic
-          chartSeries={[88, 22]}
-          labels={['Online', 'Offline']}
-          sx={{ height: '100%' }}
-          title={'Status'}
-          />
-          </Grid>
-          <Grid
-            xs={12}
-            //md={6}
-            lg={4}
-          >
-            <OverviewTraffic
-              chartSeries={[63, 15, 22]}
-              labels={['Cameras', 'Routers', 'Sensors']}
-              sx={{ height: '100%' }}
-              title={'Devices Type'}
-            />
-          </Grid>
-          <Grid
-            xs={12}
-            md={6}
-            lg={4}
-          >
-          </Grid>
-        </Grid>
-      </Container>
-    </Box>
-  </>
+            <Container maxWidth="xl" >
+                <Grid
+                    container
+                    spacing={3}
+                >
+                </Grid>
+                <OverviewLatestOrders
+                    orders={[
+                        {
+                            id: 'f69f88012978187a6c12897f',
+                            ref: 'DEV1049',
+                            amount: 30.5,
+                            customer: {
+                                name: 'Ekaterina Tankova'
+                            },
+                            createdAt: 1555016400000,
+                            status: 'Associating'
+                        },
+                        {
+                            id: '9eaa1c7dd4433f413c308ce2',
+                            ref: 'DEV1048',
+                            amount: 25.1,
+                            customer: {
+                                name: 'Cao Yu'
+                            },
+                            createdAt: 1555016400000,
+                            status: 'Online'
+                        },
+                        {
+                            id: '01a5230c811bd04996ce7c13',
+                            ref: 'DEV1047',
+                            amount: 10.99,
+                            customer: {
+                                name: 'Alexa Richardson'
+                            },
+                            createdAt: 1554930000000,
+                            status: 'Offline'
+                        },
+                        {
+                            id: '1f4e1bd0a87cea23cdb83d18',
+                            ref: 'DEV1046',
+                            amount: 96.43,
+                            customer: {
+                                name: 'Anje Keizer'
+                            },
+                            createdAt: 1554757200000,
+                            status: 'Associating'
+                        },
+                        {
+                            id: '9f974f239d29ede969367103',
+                            ref: 'DEV1045',
+                            amount: 32.54,
+                            customer: {
+                                name: 'Clarke Gillebert'
+                            },
+                            createdAt: 1554670800000,
+                            status: 'Online'
+                        },
+                        {
+                            id: 'ffc83c1560ec2f66a1c05596',
+                            ref: 'DEV1044',
+                            amount: 16.76,
+                            customer: {
+                                name: 'Adam Denisov'
+                            },
+                            createdAt: 1554670800000,
+                            status: 'Online'
+                        }
+                    ]}
+                    sx={{ height: '100%' }}
+                />
+            </Container>
+        </Box>
+    </>
 );
 
 Page.getLayout = (page) => (
-  <DashboardLayout>
-    {page}
-  </DashboardLayout>
+    <DashboardLayout>
+        {page}
+    </DashboardLayout>
 );
 
 export default Page;
@@ -195,7 +186,7 @@ export default Page;
                     name: 'Cao Yu'
                   },
                   createdAt: 1555016400000,
-                  status: 'delivered'
+                  status: 'Online'
                 },
                 {
                   id: '01a5230c811bd04996ce7c13',
@@ -225,7 +216,7 @@ export default Page;
                     name: 'Clarke Gillebert'
                   },
                   createdAt: 1554670800000,
-                  status: 'delivered'
+                  status: 'Online'
                 },
                 {
                   id: 'ffc83c1560ec2f66a1c05596',
@@ -235,9 +226,9 @@ export default Page;
                     name: 'Adam Denisov'
                   },
                   createdAt: 1554670800000,
-                  status: 'delivered'
+                  status: 'Online'
                 }
               ]}
               sx={{ height: '100%' }}
             />
-*/ 
+*/

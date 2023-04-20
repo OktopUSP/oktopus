@@ -66,25 +66,13 @@ export const SideNav = (props) => {
               p: '12px'
             }}
           >
-            <div>
-              <Typography
-                color="inherit"
-                variant="subtitle1"
-              >
-                Devias
-              </Typography>
-              <Typography
-                color="neutral.400"
-                variant="body2"
-              >
-                Production
-              </Typography>
+            <div style={{display:'flex',justifyContent:'center'}}>
+              <img src="/assets/oktopus.png" width={'60%'}></img>
             </div>
             <SvgIcon
               fontSize="small"
               sx={{ color: 'neutral.500' }}
             >
-              <ChevronUpDownIcon />
             </SvgIcon>
           </Box>
         </Box>

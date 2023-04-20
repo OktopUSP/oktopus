@@ -103,7 +103,7 @@ const Page = () => {
                 color="text.secondary"
                 variant="body2"
               >
-                Não possui uma conta?
+                Don't have an account?
                 &nbsp;
                 <Link
                   component={NextLink}
@@ -111,7 +111,7 @@ const Page = () => {
                   underline="hover"
                   variant="subtitle2"
                 >
-                  Registre-se
+                  Register
                 </Link>
               </Typography>
             </Stack>

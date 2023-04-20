@@ -23,7 +23,7 @@ const Page = () => (
           <Typography variant="h4">
             Settings
           </Typography>
-          <SettingsNotifications />
+          {/*<SettingsNotifications />*/}
           <SettingsPassword />
         </Stack>
       </Container>
