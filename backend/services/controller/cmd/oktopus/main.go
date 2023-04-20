@@ -5,6 +5,7 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/leandrofars/oktopus/internal/api"
 	"github.com/leandrofars/oktopus/internal/db"
 	"log"
 	"os"
@@ -37,6 +38,7 @@ func main() {
 	flBrokerClientId := flag.String("i", "", "A clientid for the Mqtt connection")
 	flBrokerQos := flag.Int("q", 2, "Quality of service of mqtt messages delivery")
 	flAddrDB := flag.String("mongo", "mongodb://localhost:27017/", "MongoDB URI")
+	flApiPort := flag.String("ap", "8000", "Rest api port")
 	flHelp := flag.Bool("help", false, "Help")
 
 	flag.Parse()
@@ -69,6 +71,8 @@ func main() {
 	}
 
 	mtp.MtpService(&mqttClient, done)
+	a := api.NewApi(*flApiPort, database)
+	api.StartApi(a)
 
 	<-done
 	cancel()
