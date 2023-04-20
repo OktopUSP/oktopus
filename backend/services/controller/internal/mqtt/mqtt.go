@@ -238,6 +238,7 @@ func (m *Mqtt) handleNewDevice(deviceMac string) {
 								"Device.DeviceInfo.Manufacturer",
 								"Device.DeviceInfo.ModelName",
 								"Device.DeviceInfo.SoftwareVersion",
+								"Device.DeviceInfo.SerialNumber",
 							},
 							MaxDepth: 1,
 						},
@@ -285,11 +286,10 @@ func (m *Mqtt) handleDevicesResponse(p []byte) {
 	device.Vendor = msg.ReqPathResults[0].ResolvedPathResults[0].ResultParams["Manufacturer"]
 	device.Model = msg.ReqPathResults[1].ResolvedPathResults[0].ResultParams["ModelName"]
 	device.Version = msg.ReqPathResults[2].ResolvedPathResults[0].ResultParams["SoftwareVersion"]
+	device.SN = msg.ReqPathResults[3].ResolvedPathResults[0].ResultParams["SerialNumber"]
 
 	err = m.DB.CreateDevice(device)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	log.Printf("New device saved at database")
 }
