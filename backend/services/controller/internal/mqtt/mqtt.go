@@ -18,17 +18,18 @@ import (
 )
 
 type Mqtt struct {
-	Addr         string
-	Port         string
-	Id           string
-	User         string
-	Passwd       string
-	Ctx          context.Context
-	QoS          int
-	SubTopic     string
-	DevicesTopic string
-	CA           string
-	DB           db.Database
+	Addr            string
+	Port            string
+	Id              string
+	User            string
+	Passwd          string
+	Ctx             context.Context
+	QoS             int
+	SubTopic        string
+	DevicesTopic    string
+	DisconnectTopic string
+	CA              string
+	DB              db.Database
 }
 
 var c *paho.Client
@@ -38,8 +39,9 @@ var c *paho.Client
 func (m *Mqtt) Connect() {
 	devices := make(chan *paho.Publish)
 	controller := make(chan *paho.Publish)
-	go m.messageHandler(devices, controller)
-	clientConfig := m.startClient(devices, controller)
+	disconnect := make(chan *paho.Publish)
+	go m.messageHandler(devices, controller, disconnect)
+	clientConfig := m.startClient(devices, controller, disconnect)
 	connParameters := startConnection(m.Id, m.User, m.Passwd)
 
 	conn, err := clientConfig.Connect(m.Ctx, &connParameters)
@@ -67,8 +69,9 @@ func (m *Mqtt) Disconnect() {
 func (m *Mqtt) Subscribe() {
 	if _, err := c.Subscribe(m.Ctx, &paho.Subscribe{
 		Subscriptions: map[string]paho.SubscribeOptions{
-			m.SubTopic:     {QoS: byte(m.QoS), NoLocal: true},
-			m.DevicesTopic: {QoS: byte(m.QoS), NoLocal: true},
+			m.SubTopic:        {QoS: byte(m.QoS), NoLocal: true},
+			m.DevicesTopic:    {QoS: byte(m.QoS), NoLocal: true},
+			m.DisconnectTopic: {QoS: byte(m.QoS), NoLocal: true},
 		},
 	}); err != nil {
 		log.Fatalln(err)
@@ -76,6 +79,8 @@ func (m *Mqtt) Subscribe() {
 
 	log.Printf("Subscribed to %s", m.SubTopic)
 	log.Printf("Subscribed to %s", m.DevicesTopic)
+	log.Printf("Subscribed to %s", m.DisconnectTopic)
+
 }
 
 func (m *Mqtt) Publish(msg []byte, topic, respTopic string) {
@@ -96,12 +101,14 @@ func (m *Mqtt) Publish(msg []byte, topic, respTopic string) {
 
 /* -------------------------------------------------------------------------- */
 
-func (m *Mqtt) startClient(devices, controller chan *paho.Publish) *paho.Client {
+func (m *Mqtt) startClient(devices, controller, disconnect chan *paho.Publish) *paho.Client {
 	singleHandler := paho.NewSingleHandlerRouter(func(p *paho.Publish) {
 		if p.Topic == m.DevicesTopic {
 			devices <- p
 		} else if strings.Contains(p.Topic, "controller") {
 			controller <- p
+		} else if p.Topic == m.DisconnectTopic {
+			disconnect <- p
 		} else {
 			log.Println("No handler for topic: ", p.Topic)
 		}
@@ -210,7 +217,7 @@ func startConnection(id, user, pass string) paho.Connect {
 	return connParameters
 }
 
-func (m *Mqtt) messageHandler(devices, controller chan *paho.Publish) {
+func (m *Mqtt) messageHandler(devices, controller, disconnect chan *paho.Publish) {
 	for {
 		select {
 		case d := <-devices:
@@ -219,6 +226,10 @@ func (m *Mqtt) messageHandler(devices, controller chan *paho.Publish) {
 			m.handleNewDevice(payload)
 		case c := <-controller:
 			m.handleDevicesResponse(c.Payload)
+		case dis := <-disconnect:
+			payload := string(dis.Payload)
+			log.Println("Device disconnected: ", payload)
+			m.handleDevicesDisconnect(payload)
 		}
 	}
 }
@@ -287,8 +298,17 @@ func (m *Mqtt) handleDevicesResponse(p []byte) {
 	device.Model = msg.ReqPathResults[1].ResolvedPathResults[0].ResultParams["ModelName"]
 	device.Version = msg.ReqPathResults[2].ResolvedPathResults[0].ResultParams["SoftwareVersion"]
 	device.SN = msg.ReqPathResults[3].ResolvedPathResults[0].ResultParams["SerialNumber"]
+	device.Status = utils.Online
 
 	err = m.DB.CreateDevice(device)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (m *Mqtt) handleDevicesDisconnect(p string) {
+	// Update status of device at database
+	err := m.DB.UpdateStatus(p, utils.Offline)
 	if err != nil {
 		log.Fatal(err)
 	}

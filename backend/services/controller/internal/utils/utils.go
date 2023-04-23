@@ -4,6 +4,13 @@ import (
 	"net"
 )
 
+//Status are saved at database as numbers
+const (
+	Online = iota
+	Associating
+	Offline
+)
+
 // Get interfaces MACs, and the first interface MAC is gonna be used as mqtt clientId
 func GetMacAddr() ([]string, error) {
 	ifas, err := net.Interfaces()

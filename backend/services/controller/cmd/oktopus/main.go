@@ -29,6 +29,7 @@ func main() {
 	log.Println("Starting Oktopus Project TR-369 Controller Version:", VERSION)
 	// fl_endpointId := flag.String("endpoint_id", "proto::oktopus-controller", "Defines the enpoint id the Agent must trust on.")
 	flDevicesTopic := flag.String("d", "oktopus/devices", "That's the topic mqtt broker end new devices info.")
+	flDisconTopic := flag.String("dis", "oktopus/disconnect", "It's where disconnected IoTs are known.")
 	flSubTopic := flag.String("sub", "oktopus/+/controller/+", "That's the topic agent must publish to, and the controller keeps on listening.")
 	flBrokerAddr := flag.String("a", "localhost", "Mqtt broker adrress")
 	flBrokerPort := flag.String("p", "1883", "Mqtt broker port")
@@ -57,17 +58,18 @@ func main() {
 	 If you want to use another message protocol just make it implement Broker interface.
 	*/
 	mqttClient := mqtt.Mqtt{
-		Addr:         *flBrokerAddr,
-		Port:         *flBrokerPort,
-		Id:           *flBrokerClientId,
-		User:         *flBrokerUsername,
-		Passwd:       *flBrokerPassword,
-		Ctx:          ctx,
-		QoS:          *flBrokerQos,
-		SubTopic:     *flSubTopic,
-		DevicesTopic: *flDevicesTopic,
-		CA:           *flTlsCert,
-		DB:           database,
+		Addr:            *flBrokerAddr,
+		Port:            *flBrokerPort,
+		Id:              *flBrokerClientId,
+		User:            *flBrokerUsername,
+		Passwd:          *flBrokerPassword,
+		Ctx:             ctx,
+		QoS:             *flBrokerQos,
+		SubTopic:        *flSubTopic,
+		DevicesTopic:    *flDevicesTopic,
+		DisconnectTopic: *flDisconTopic,
+		CA:              *flTlsCert,
+		DB:              database,
 	}
 
 	mtp.MtpService(&mqttClient, done)

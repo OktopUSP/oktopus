@@ -13,6 +13,7 @@ type Device struct {
 	Customer string
 	Vendor   string
 	Version  string
+	Status   uint8
 }
 
 func (d *Database) CreateDevice(device Device) error {
