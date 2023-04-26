@@ -18,17 +18,20 @@ import (
 )
 
 type Mqtt struct {
-	Addr         string
-	Port         string
-	Id           string
-	User         string
-	Passwd       string
-	Ctx          context.Context
-	QoS          int
-	SubTopic     string
-	DevicesTopic string
-	CA           string
-	DB           db.Database
+	Addr            string
+	Port            string
+	Id              string
+	User            string
+	Passwd          string
+	Ctx             context.Context
+	QoS             int
+	SubTopic        string
+	DevicesTopic    string
+	DisconnectTopic string
+	CA              string
+	DB              db.Database
+	MsgQueue        map[string](chan usp_msg.Msg)
+	QMutex          *sync.Mutex
 }
 
 var c *paho.Client
@@ -38,8 +41,10 @@ var c *paho.Client
 func (m *Mqtt) Connect() {
 	devices := make(chan *paho.Publish)
 	controller := make(chan *paho.Publish)
-	go m.messageHandler(devices, controller)
-	clientConfig := m.startClient(devices, controller)
+	disconnect := make(chan *paho.Publish)
+	apiMsg := make(chan *paho.Publish)
+	go m.messageHandler(devices, controller, disconnect, apiMsg)
+	clientConfig := m.startClient(devices, controller, disconnect, apiMsg)
 	connParameters := startConnection(m.Id, m.User, m.Passwd)
 
 	conn, err := clientConfig.Connect(m.Ctx, &connParameters)
@@ -67,8 +72,10 @@ func (m *Mqtt) Disconnect() {
 func (m *Mqtt) Subscribe() {
 	if _, err := c.Subscribe(m.Ctx, &paho.Subscribe{
 		Subscriptions: map[string]paho.SubscribeOptions{
-			m.SubTopic:     {QoS: byte(m.QoS), NoLocal: true},
-			m.DevicesTopic: {QoS: byte(m.QoS), NoLocal: true},
+			m.SubTopic:        {QoS: byte(m.QoS), NoLocal: true},
+			m.DevicesTopic:    {QoS: byte(m.QoS), NoLocal: true},
+			m.DisconnectTopic: {QoS: byte(m.QoS), NoLocal: true},
+			"oktopus/+/api/+": {QoS: byte(m.QoS), NoLocal: true},
 		},
 	}); err != nil {
 		log.Fatalln(err)
@@ -76,6 +83,8 @@ func (m *Mqtt) Subscribe() {
 
 	log.Printf("Subscribed to %s", m.SubTopic)
 	log.Printf("Subscribed to %s", m.DevicesTopic)
+	log.Printf("Subscribed to %s", m.DisconnectTopic)
+
 }
 
 func (m *Mqtt) Publish(msg []byte, topic, respTopic string) {
@@ -96,12 +105,16 @@ func (m *Mqtt) Publish(msg []byte, topic, respTopic string) {
 
 /* -------------------------------------------------------------------------- */
 
-func (m *Mqtt) startClient(devices, controller chan *paho.Publish) *paho.Client {
+func (m *Mqtt) startClient(devices, controller, disconnect, apiMsg chan *paho.Publish) *paho.Client {
 	singleHandler := paho.NewSingleHandlerRouter(func(p *paho.Publish) {
 		if p.Topic == m.DevicesTopic {
 			devices <- p
 		} else if strings.Contains(p.Topic, "controller") {
 			controller <- p
+		} else if p.Topic == m.DisconnectTopic {
+			disconnect <- p
+		} else if strings.Contains(p.Topic, "api") {
+			apiMsg <- p
 		} else {
 			log.Println("No handler for topic: ", p.Topic)
 		}
@@ -210,7 +223,7 @@ func startConnection(id, user, pass string) paho.Connect {
 	return connParameters
 }
 
-func (m *Mqtt) messageHandler(devices, controller chan *paho.Publish) {
+func (m *Mqtt) messageHandler(devices, controller, disconnect, apiMsg chan *paho.Publish) {
 	for {
 		select {
 		case d := <-devices:
@@ -218,8 +231,40 @@ func (m *Mqtt) messageHandler(devices, controller chan *paho.Publish) {
 			log.Println("New device: ", payload)
 			m.handleNewDevice(payload)
 		case c := <-controller:
-			m.handleDevicesResponse(c.Payload)
+			topic := c.Topic
+			sn := strings.Split(topic, "/")
+			m.handleNewDevicesResponse(c.Payload, sn[3])
+		case dis := <-disconnect:
+			payload := string(dis.Payload)
+			log.Println("Device disconnected: ", payload)
+			m.handleDevicesDisconnect(payload)
+		case api := <-apiMsg:
+			log.Println("Handle api request")
+			m.handleApiRequest(api.Payload)
 		}
+	}
+}
+
+func (m *Mqtt) handleApiRequest(api []byte) {
+	var record usp_record.Record
+	err := proto.Unmarshal(api, &record)
+	if err != nil {
+		log.Println(err)
+	}
+
+	//TODO: verify record operation type
+	var msg usp_msg.Msg
+	err = proto.Unmarshal(record.GetNoSessionContext().Payload, &msg)
+	if err != nil {
+		log.Println(err)
+	}
+
+	if _, ok := m.MsgQueue[msg.Header.MsgId]; ok {
+		//m.QMutex.Lock()
+		m.MsgQueue[msg.Header.MsgId] <- msg
+		//m.QMutex.Unlock()
+	} else {
+		log.Printf("Message answer to request %s arrived too late", msg.Header.MsgId)
 	}
 }
 
@@ -248,26 +293,16 @@ func (m *Mqtt) handleNewDevice(deviceMac string) {
 		},
 	}
 	teste, _ := proto.Marshal(&payload)
-	record := usp_record.Record{
-		Version:         "0.1",
-		ToId:            deviceMac,
-		FromId:          "leleco",
-		PayloadSecurity: usp_record.Record_PLAINTEXT,
-		RecordType: &usp_record.Record_NoSessionContext{
-			NoSessionContext: &usp_record.NoSessionContextRecord{
-				Payload: teste,
-			},
-		},
-	}
+	record := utils.NewUspRecord(teste, deviceMac)
 
 	tr369Message, err := proto.Marshal(&record)
 	if err != nil {
-		log.Fatalln("Failed to encode address book:", err)
+		log.Fatalln("Failed to encode tr369 record:", err)
 	}
 	m.Publish(tr369Message, "oktopus/v1/agent/"+deviceMac, "oktopus/v1/controller/"+deviceMac)
 }
 
-func (m *Mqtt) handleDevicesResponse(p []byte) {
+func (m *Mqtt) handleNewDevicesResponse(p []byte, sn string) {
 	var record usp_record.Record
 	var message usp_msg.Msg
 
@@ -286,10 +321,24 @@ func (m *Mqtt) handleDevicesResponse(p []byte) {
 	device.Vendor = msg.ReqPathResults[0].ResolvedPathResults[0].ResultParams["Manufacturer"]
 	device.Model = msg.ReqPathResults[1].ResolvedPathResults[0].ResultParams["ModelName"]
 	device.Version = msg.ReqPathResults[2].ResolvedPathResults[0].ResultParams["SoftwareVersion"]
-	device.SN = msg.ReqPathResults[3].ResolvedPathResults[0].ResultParams["SerialNumber"]
+	device.SN = sn
+	device.Status = utils.Online
 
 	err = m.DB.CreateDevice(device)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
+
+func (m *Mqtt) handleDevicesDisconnect(p string) {
+	// Update status of device at database
+	err := m.DB.UpdateStatus(p, utils.Offline)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+/*
+func (m *Mqtt) Request(msg []byte, msgType usp_msg.Header_MsgType, pubTopic string, respTopic string) {
+	m.Publish(msg, pubTopic, respTopic)
+}*/

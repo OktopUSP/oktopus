@@ -15,8 +15,10 @@ import (
 	"strings"
 	"syscall"
 
+	rv8 "github.com/go-redis/redis/v8"
 	"github.com/mochi-co/mqtt/v2"
 	"github.com/mochi-co/mqtt/v2/hooks/auth"
+	"github.com/mochi-co/mqtt/v2/hooks/storage/redis"
 	"github.com/mochi-co/mqtt/v2/listeners"
 )
 
@@ -34,6 +36,7 @@ var server = mqtt.New(&mqtt.Options{
 
 func main() {
 	tcpAddr := flag.String("tcp", ":1883", "network address for TCP listener")
+	redisAddr := flag.String("redis", "172.17.0.2:6379", "host address of redis db")
 	wsAddr := flag.String("ws", "", "network address for Websocket listener")
 	infoAddr := flag.String("info", "", "network address for web info dashboard listener")
 	path := flag.String("path", "", "path to data auth file")
@@ -98,6 +101,17 @@ func main() {
 		log.Fatal(err)
 	}
 
+	err = server.AddHook(new(redis.Hook), &redis.Options{
+		Options: &rv8.Options{
+			Addr:     *redisAddr, // default redis address
+			Password: "",         // your password
+			DB:       0,          // your redis db
+		},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	go func() {
 		err := server.Serve()
 		if err != nil {
@@ -123,12 +137,33 @@ func (h *MyHook) ID() string {
 func (h *MyHook) Provides(b byte) bool {
 	return bytes.Contains([]byte{
 		mqtt.OnSubscribed,
+		mqtt.OnDisconnect,
 	}, []byte{b})
 }
 
 func (h *MyHook) Init(config any) error {
 	h.Log.Info().Msg("initialised")
 	return nil
+}
+
+func (h *MyHook) Red(config any) error {
+	h.Log.Info().Msg("initialised")
+	return nil
+}
+
+func (h *MyHook) OnDisconnect(cl *mqtt.Client, err error, expire bool) {
+	var clUser string
+	if len(cl.Properties.Props.User) > 0 {
+		clUser = cl.Properties.Props.User[0].Val
+	}
+
+	if clUser != "" {
+		sn := strings.Split(clUser, "-")
+		err := server.Publish("oktopus/disconnect", []byte(sn[1]), false, 1)
+		if err != nil {
+			log.Println("server publish error: ", err)
+		}
+	}
 }
 
 func (h *MyHook) OnSubscribed(cl *mqtt.Client, pk packets.Packet, reasonCodes []byte) {

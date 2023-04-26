@@ -15,6 +15,11 @@ type Broker interface {
 	Disconnect()
 	Publish(msg []byte, topic, respTopic string)
 	Subscribe()
+	/*
+		At request method we're able to send a message to a topic
+		and wait until we have a response (in the same topic).
+	*/
+	//Request(msg []byte, msgType usp_msg.Header_MsgType, pubTopic string, subTopic string)
 }
 
 // Not used, since we are using a broker solution with MQTT.

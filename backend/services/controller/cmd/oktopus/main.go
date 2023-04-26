@@ -7,9 +7,11 @@ import (
 	"flag"
 	"github.com/leandrofars/oktopus/internal/api"
 	"github.com/leandrofars/oktopus/internal/db"
+	usp_msg "github.com/leandrofars/oktopus/internal/usp_message"
 	"log"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"github.com/leandrofars/oktopus/internal/mqtt"
@@ -29,6 +31,7 @@ func main() {
 	log.Println("Starting Oktopus Project TR-369 Controller Version:", VERSION)
 	// fl_endpointId := flag.String("endpoint_id", "proto::oktopus-controller", "Defines the enpoint id the Agent must trust on.")
 	flDevicesTopic := flag.String("d", "oktopus/devices", "That's the topic mqtt broker end new devices info.")
+	flDisconTopic := flag.String("dis", "oktopus/disconnect", "It's where disconnected IoTs are known.")
 	flSubTopic := flag.String("sub", "oktopus/+/controller/+", "That's the topic agent must publish to, and the controller keeps on listening.")
 	flBrokerAddr := flag.String("a", "localhost", "Mqtt broker adrress")
 	flBrokerPort := flag.String("p", "1883", "Mqtt broker port")
@@ -53,25 +56,30 @@ func main() {
 	*/
 	ctx, cancel := context.WithCancel(context.Background())
 	database := db.NewDatabase(ctx, *flAddrDB)
+	apiMsgQueue := make(map[string](chan usp_msg.Msg))
+	var m sync.Mutex
 	/*
 	 If you want to use another message protocol just make it implement Broker interface.
 	*/
 	mqttClient := mqtt.Mqtt{
-		Addr:         *flBrokerAddr,
-		Port:         *flBrokerPort,
-		Id:           *flBrokerClientId,
-		User:         *flBrokerUsername,
-		Passwd:       *flBrokerPassword,
-		Ctx:          ctx,
-		QoS:          *flBrokerQos,
-		SubTopic:     *flSubTopic,
-		DevicesTopic: *flDevicesTopic,
-		CA:           *flTlsCert,
-		DB:           database,
+		Addr:            *flBrokerAddr,
+		Port:            *flBrokerPort,
+		Id:              *flBrokerClientId,
+		User:            *flBrokerUsername,
+		Passwd:          *flBrokerPassword,
+		Ctx:             ctx,
+		QoS:             *flBrokerQos,
+		SubTopic:        *flSubTopic,
+		DevicesTopic:    *flDevicesTopic,
+		DisconnectTopic: *flDisconTopic,
+		CA:              *flTlsCert,
+		DB:              database,
+		MsgQueue:        apiMsgQueue,
+		QMutex:          &m,
 	}
 
 	mtp.MtpService(&mqttClient, done)
-	a := api.NewApi(*flApiPort, database)
+	a := api.NewApi(*flApiPort, database, &mqttClient, apiMsgQueue, &m)
 	api.StartApi(a)
 
 	<-done

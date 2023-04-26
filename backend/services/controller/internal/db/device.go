@@ -13,6 +13,7 @@ type Device struct {
 	Customer string
 	Vendor   string
 	Version  string
+	Status   uint8
 }
 
 func (d *Database) CreateDevice(device Device) error {
@@ -43,6 +44,16 @@ func (d *Database) RetrieveDevices() ([]Device, error) {
 		return nil, err
 	}
 	return results, nil
+}
+
+func (d *Database) RetrieveDevice(sn string) (Device, error) {
+	var result Device
+	//TODO: filter devices by user ownership
+	err := d.devices.FindOne(d.ctx, bson.D{{"sn", sn}}, nil).Decode(&result)
+	if err != nil {
+		log.Println(err)
+	}
+	return result, err
 }
 
 func (d *Database) DeleteDevice() {
