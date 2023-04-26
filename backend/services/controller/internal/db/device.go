@@ -46,6 +46,16 @@ func (d *Database) RetrieveDevices() ([]Device, error) {
 	return results, nil
 }
 
+func (d *Database) RetrieveDevice(sn string) (Device, error) {
+	var result Device
+	//TODO: filter devices by user ownership
+	err := d.devices.FindOne(d.ctx, bson.D{{"sn", sn}}, nil).Decode(&result)
+	if err != nil {
+		log.Println(err)
+	}
+	return result, err
+}
+
 func (d *Database) DeleteDevice() {
 
 }

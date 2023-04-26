@@ -7,9 +7,11 @@ import (
 	"flag"
 	"github.com/leandrofars/oktopus/internal/api"
 	"github.com/leandrofars/oktopus/internal/db"
+	usp_msg "github.com/leandrofars/oktopus/internal/usp_message"
 	"log"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"github.com/leandrofars/oktopus/internal/mqtt"
@@ -54,6 +56,8 @@ func main() {
 	*/
 	ctx, cancel := context.WithCancel(context.Background())
 	database := db.NewDatabase(ctx, *flAddrDB)
+	apiMsgQueue := make(map[string](chan usp_msg.Msg))
+	var m sync.Mutex
 	/*
 	 If you want to use another message protocol just make it implement Broker interface.
 	*/
@@ -70,10 +74,12 @@ func main() {
 		DisconnectTopic: *flDisconTopic,
 		CA:              *flTlsCert,
 		DB:              database,
+		MsgQueue:        apiMsgQueue,
+		QMutex:          &m,
 	}
 
 	mtp.MtpService(&mqttClient, done)
-	a := api.NewApi(*flApiPort, database)
+	a := api.NewApi(*flApiPort, database, &mqttClient, apiMsgQueue, &m)
 	api.StartApi(a)
 
 	<-done
