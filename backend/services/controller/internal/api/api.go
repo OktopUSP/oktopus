@@ -116,11 +116,11 @@ func (a *Api) deviceCreateMsg(w http.ResponseWriter, r *http.Request) {
 
 	select {
 	case msg := <-a.MsgQueue[msg.Header.MsgId]:
-		log.Printf("Received Msg")
+		log.Printf("Received Msg: %s", msg.Header.MsgId)
 		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetAddResp())
 		return
 	case <-time.After(time.Second * 5):
-		log.Printf("Request Timed Out")
+		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		json.NewEncoder(w).Encode("Request Timed Out")
 		return
@@ -161,11 +161,11 @@ func (a *Api) deviceGetMsg(w http.ResponseWriter, r *http.Request) {
 
 	select {
 	case msg := <-a.MsgQueue[msg.Header.MsgId]:
-		log.Printf("Received Msg")
+		log.Printf("Received Msg: %s", msg.Header.MsgId)
 		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetGetResp())
 		return
 	case <-time.After(time.Second * 5):
-		log.Printf("Request Timed Out")
+		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		json.NewEncoder(w).Encode("Request Timed Out")
 		return
@@ -206,11 +206,11 @@ func (a *Api) deviceDeleteMsg(w http.ResponseWriter, r *http.Request) {
 
 	select {
 	case msg := <-a.MsgQueue[msg.Header.MsgId]:
-		log.Printf("Received Msg")
+		log.Printf("Received Msg: %s", msg.Header.MsgId)
 		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetDeleteResp())
 		return
 	case <-time.After(time.Second * 5):
-		log.Printf("Request Timed Out")
+		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		json.NewEncoder(w).Encode("Request Timed Out")
 		return
@@ -251,11 +251,11 @@ func (a *Api) deviceUpdateMsg(w http.ResponseWriter, r *http.Request) {
 
 	select {
 	case msg := <-a.MsgQueue[msg.Header.MsgId]:
-		log.Printf("Received Msg")
+		log.Printf("Received Msg: %s", msg.Header.MsgId)
 		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetSetResp())
 		return
 	case <-time.After(time.Second * 5):
-		log.Printf("Request Timed Out")
+		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		json.NewEncoder(w).Encode("Request Timed Out")
 		return
