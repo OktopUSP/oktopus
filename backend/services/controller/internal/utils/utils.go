@@ -44,6 +44,24 @@ func NewUspRecord(p []byte, toId string) usp_record.Record {
 	}
 }
 
+func NewCreateMsg(createStuff usp_msg.Add) usp_msg.Msg {
+	return usp_msg.Msg{
+		Header: &usp_msg.Header{
+			MsgId:   uuid.NewString(),
+			MsgType: usp_msg.Header_ADD,
+		},
+		Body: &usp_msg.Body{
+			MsgBody: &usp_msg.Body_Request{
+				Request: &usp_msg.Request{
+					ReqType: &usp_msg.Request_Add{
+						Add: &createStuff,
+					},
+				},
+			},
+		},
+	}
+}
+
 func NewGetMsg(getStuff usp_msg.Get) usp_msg.Msg {
 	return usp_msg.Msg{
 		Header: &usp_msg.Header{
@@ -55,6 +73,42 @@ func NewGetMsg(getStuff usp_msg.Get) usp_msg.Msg {
 				Request: &usp_msg.Request{
 					ReqType: &usp_msg.Request_Get{
 						Get: &getStuff,
+					},
+				},
+			},
+		},
+	}
+}
+
+func NewDelMsg(getStuff usp_msg.Delete) usp_msg.Msg {
+	return usp_msg.Msg{
+		Header: &usp_msg.Header{
+			MsgId:   uuid.NewString(),
+			MsgType: usp_msg.Header_DELETE,
+		},
+		Body: &usp_msg.Body{
+			MsgBody: &usp_msg.Body_Request{
+				Request: &usp_msg.Request{
+					ReqType: &usp_msg.Request_Delete{
+						Delete: &getStuff,
+					},
+				},
+			},
+		},
+	}
+}
+
+func NewSetMsg(updateStuff usp_msg.Set) usp_msg.Msg {
+	return usp_msg.Msg{
+		Header: &usp_msg.Header{
+			MsgId:   uuid.NewString(),
+			MsgType: usp_msg.Header_SET,
+		},
+		Body: &usp_msg.Body{
+			MsgBody: &usp_msg.Body_Request{
+				Request: &usp_msg.Request{
+					ReqType: &usp_msg.Request_Set{
+						Set: &updateStuff,
 					},
 				},
 			},

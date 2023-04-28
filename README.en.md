@@ -16,5 +16,19 @@ This solution is inspired by the project <a href="https://github.com/genieacs/ge
 
 ![Oktopus-infra](https://user-images.githubusercontent.com/83298718/222589707-58a8786d-d4b7-49c3-a014-e8f4ef95497e.png)
 
+<ul>
+    <li>
+        <h4>API:</h4>
+        <ul>
+            <li> 
+            <a href="https://documenter.getpostman.com/view/18932104/2s93eR3vQY#10c46751-ede9-4ea1-8ea4-264ebf539e5e">Documentation </a>
+            </li>
+            <li> 
+            <a href="https://www.postman.com/docking-module-astronomer-46169629/workspace/oktopus">Testing and development workspace</a>
+            </li>
+        </ul>
+    </li>
+</ul>
+
 <br/>
 If you are interested in internal information about the team and our intentions, visit our <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>.
