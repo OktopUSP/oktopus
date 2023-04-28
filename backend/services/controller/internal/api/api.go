@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/leandrofars/oktopus/internal/api/middleware"
 	"github.com/leandrofars/oktopus/internal/db"
 	"github.com/leandrofars/oktopus/internal/mtp"
 	usp_msg "github.com/leandrofars/oktopus/internal/usp_message"
@@ -44,6 +45,10 @@ func StartApi(a Api) {
 	r.HandleFunc("/device/{sn}/add", a.deviceCreateMsg).Methods("PUT")
 	r.HandleFunc("/device/{sn}/del", a.deviceDeleteMsg).Methods("PUT")
 	r.HandleFunc("/device/{sn}/set", a.deviceUpdateMsg).Methods("PUT")
+
+	r.Use(func(handler http.Handler) http.Handler {
+		return middleware.Middleware(handler)
+	})
 
 	srv := &http.Server{
 		Addr: "0.0.0.0:" + a.Port,
