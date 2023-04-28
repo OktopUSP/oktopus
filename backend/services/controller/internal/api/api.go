@@ -43,6 +43,7 @@ func StartApi(a Api) {
 	r.HandleFunc("/device/{sn}/get", a.deviceGetMsg).Methods("PUT")
 	r.HandleFunc("/device/{sn}/add", a.deviceCreateMsg).Methods("PUT")
 	r.HandleFunc("/device/{sn}/del", a.deviceDeleteMsg).Methods("PUT")
+	r.HandleFunc("/device/{sn}/set", a.deviceUpdateMsg).Methods("PUT")
 
 	srv := &http.Server{
 		Addr: "0.0.0.0:" + a.Port,
@@ -83,7 +84,7 @@ func (a *Api) deviceCreateMsg(w http.ResponseWriter, r *http.Request) {
 
 	var receiver usp_msg.Add
 
-	err := json.NewDecoder(r.Body).Decode(&receiver)
+	err := json.NewDecoder(r.Body).Decode(receiver)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -202,6 +203,51 @@ func (a *Api) deviceDeleteMsg(w http.ResponseWriter, r *http.Request) {
 	case msg := <-a.MsgQueue[msg.Header.MsgId]:
 		log.Printf("Received Msg")
 		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetDeleteResp())
+		return
+	case <-time.After(time.Second * 5):
+		log.Printf("Request Timed Out")
+		w.WriteHeader(http.StatusGatewayTimeout)
+		json.NewEncoder(w).Encode("Request Timed Out")
+		return
+	}
+}
+
+func (a *Api) deviceUpdateMsg(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	sn := vars["sn"]
+	a.deviceExists(sn, w)
+
+	var receiver usp_msg.Set
+
+	err := json.NewDecoder(r.Body).Decode(&receiver)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	msg := utils.NewSetMsg(receiver)
+	encodedMsg, err := proto.Marshal(&msg)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	record := utils.NewUspRecord(encodedMsg, sn)
+	tr369Message, err := proto.Marshal(&record)
+	if err != nil {
+		log.Fatalln("Failed to encode tr369 record:", err)
+	}
+
+	//a.Broker.Request(tr369Message, usp_msg.Header_GET, "oktopus/v1/agent/"+sn, "oktopus/v1/get/"+sn)
+	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
+	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn)
+
+	select {
+	case msg := <-a.MsgQueue[msg.Header.MsgId]:
+		log.Printf("Received Msg")
+		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetSetResp())
 		return
 	case <-time.After(time.Second * 5):
 		log.Printf("Request Timed Out")
