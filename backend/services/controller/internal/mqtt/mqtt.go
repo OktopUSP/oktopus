@@ -252,7 +252,6 @@ func (m *Mqtt) handleApiRequest(api []byte) {
 		log.Println(err)
 	}
 
-	//TODO: verify record operation type
 	var msg usp_msg.Msg
 	err = proto.Unmarshal(record.GetNoSessionContext().Payload, &msg)
 	if err != nil {
