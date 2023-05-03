@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/leandrofars/oktopus/internal/api/auth"
 	"github.com/leandrofars/oktopus/internal/api/middleware"
 	"github.com/leandrofars/oktopus/internal/db"
 	"github.com/leandrofars/oktopus/internal/mtp"
@@ -36,17 +37,19 @@ func NewApi(port string, db db.Database, b mtp.Broker, msgQueue map[string](chan
 
 func StartApi(a Api) {
 	r := mux.NewRouter()
+	authentication := r.PathPrefix("/auth").Subrouter()
+	authentication.HandleFunc("/login", a.generateToken).Methods("PUT")
+	authentication.HandleFunc("/register", a.registerUser).Methods("POST")
+	iot := r.PathPrefix("/device").Subrouter()
+	iot.HandleFunc("/", a.retrieveDevices).Methods("GET")
+	iot.HandleFunc("/{sn}/get", a.deviceGetMsg).Methods("PUT")
+	iot.HandleFunc("/{sn}/add", a.deviceCreateMsg).Methods("PUT")
+	iot.HandleFunc("/{sn}/del", a.deviceDeleteMsg).Methods("PUT")
+	iot.HandleFunc("/{sn}/set", a.deviceUpdateMsg).Methods("PUT")
+	//TODO: Create operation action handler
+	iot.HandleFunc("/device/{sn}/act", a.deviceUpdateMsg).Methods("PUT")
 
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		return
-	})
-	r.HandleFunc("/devices", a.retrieveDevices).Methods("GET")
-	r.HandleFunc("/device/{sn}/get", a.deviceGetMsg).Methods("PUT")
-	r.HandleFunc("/device/{sn}/add", a.deviceCreateMsg).Methods("PUT")
-	r.HandleFunc("/device/{sn}/del", a.deviceDeleteMsg).Methods("PUT")
-	r.HandleFunc("/device/{sn}/set", a.deviceUpdateMsg).Methods("PUT")
-
-	r.Use(func(handler http.Handler) http.Handler {
+	iot.Use(func(handler http.Handler) http.Handler {
 		return middleware.Middleware(handler)
 	})
 
@@ -273,4 +276,62 @@ func (a *Api) deviceExists(sn string, w http.ResponseWriter) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+}
+
+func (a *Api) registerUser(w http.ResponseWriter, r *http.Request) {
+	var user db.User
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := user.HashPassword(user.Password); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if err := a.Db.RegisterUser(user); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+type TokenRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+func (a *Api) generateToken(w http.ResponseWriter, r *http.Request) {
+	var tokenReq TokenRequest
+
+	err := json.NewDecoder(r.Body).Decode(&tokenReq)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	user, err := a.Db.FindUser(tokenReq.Email)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Invalid Credentials")
+		return
+	}
+
+	credentialError := user.CheckPassword(tokenReq.Password)
+	if credentialError != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Invalid Credentials")
+		return
+	}
+
+	token, err := auth.GenerateJWT(user.Email, user.Name)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(token)
+	return
 }

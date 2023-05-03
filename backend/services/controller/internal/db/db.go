@@ -9,6 +9,7 @@ import (
 
 type Database struct {
 	devices *mongo.Collection
+	users   *mongo.Collection
 	ctx     context.Context
 }
 
@@ -22,7 +23,9 @@ func NewDatabase(ctx context.Context, mongoUri string) Database {
 
 	log.Println("Connected to MongoDB-->", mongoUri)
 	devices := client.Database("oktopus").Collection("devices")
+	users := client.Database("oktopus").Collection("users")
 	db.devices = devices
+	db.users = users
 	db.ctx = ctx
 	return db
 }
