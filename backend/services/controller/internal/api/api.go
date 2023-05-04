@@ -39,7 +39,7 @@ func StartApi(a Api) {
 	r := mux.NewRouter()
 	authentication := r.PathPrefix("/auth").Subrouter()
 	authentication.HandleFunc("/login", a.generateToken).Methods("PUT")
-	authentication.HandleFunc("/register", a.registerUser).Methods("POST")
+	//authentication.HandleFunc("/register", a.registerUser).Methods("POST")
 	iot := r.PathPrefix("/device").Subrouter()
 	iot.HandleFunc("/", a.retrieveDevices).Methods("GET")
 	iot.HandleFunc("/{sn}/get", a.deviceGetMsg).Methods("PUT")
