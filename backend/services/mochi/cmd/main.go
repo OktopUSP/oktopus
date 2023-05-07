@@ -38,7 +38,7 @@ func main() {
 	tcpAddr := flag.String("tcp", ":1883", "network address for TCP listener")
 	redisAddr := flag.String("redis", "172.17.0.2:6379", "host address of redis db")
 	wsAddr := flag.String("ws", "", "network address for Websocket listener")
-	infoAddr := flag.String("info", "", "network address for web info dashboard listener")
+	infoAddr := flag.String("info", ":8080", "network address for web info dashboard listener")
 	path := flag.String("path", "", "path to data auth file")
 	flag.Parse()
 
@@ -158,8 +158,7 @@ func (h *MyHook) OnDisconnect(cl *mqtt.Client, err error, expire bool) {
 	}
 
 	if clUser != "" {
-		sn := strings.Split(clUser, "-")
-		err := server.Publish("oktopus/disconnect", []byte(sn[1]), false, 1)
+		err := server.Publish("oktopus/disconnect", []byte(clUser), false, 1)
 		if err != nil {
 			log.Println("server publish error: ", err)
 		}
