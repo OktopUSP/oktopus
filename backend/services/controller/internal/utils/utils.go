@@ -34,7 +34,7 @@ func NewUspRecord(p []byte, toId string) usp_record.Record {
 	return usp_record.Record{
 		Version:         "0.1",
 		ToId:            toId,
-		FromId:          "leleco",
+		FromId:          "oktopusController",
 		PayloadSecurity: usp_record.Record_PLAINTEXT,
 		RecordType: &usp_record.Record_NoSessionContext{
 			NoSessionContext: &usp_record.NoSessionContextRecord{
