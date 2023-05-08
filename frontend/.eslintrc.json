@@ -4,6 +4,7 @@
     "@next/next/no-img-element": "off",
     "jsx-a11y/alt-text": "off",
     "react/display-name": "off",
+    "react/no-unescaped-entities": 0,
     "react/jsx-max-props-per-line": [
       1,
       {
