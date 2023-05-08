@@ -80,7 +80,11 @@ export const OverviewLatestOrders = (props) => {
                       </SeverityPill>
                     </TableCell>
                     <TableCell>
-                    <SvgIcon fontSize="small" sx={{cursor:'pointer'}} onClick={()=>router.push("devices/"+order.id)}>
+                    <SvgIcon 
+                      fontSize="small" 
+                      sx={{cursor:'pointer'}} 
+                      onClick={()=>router.push("devices/"+order.id)}
+                    >
                       <ArrowTopRightOnSquareIcon />
                     </SvgIcon>
                     </TableCell>

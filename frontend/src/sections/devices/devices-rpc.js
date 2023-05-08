@@ -93,7 +93,11 @@ const handleOpen = () => {
         </CardContent>
         <Divider />
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button variant="contained" endIcon={<SvgIcon><PaperAirplane /></SvgIcon>} onClick={handleOpen}>
+          <Button 
+          variant="contained" 
+          endIcon={<SvgIcon><PaperAirplane /></SvgIcon>} 
+          onClick={handleOpen}
+          >
             Send
           </Button>
         </CardActions>

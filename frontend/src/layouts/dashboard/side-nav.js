@@ -67,7 +67,9 @@ export const SideNav = (props) => {
             }}
           >
             <div style={{display:'flex',justifyContent:'center'}}>
-              <img src="/assets/oktopus.png" width={'60%'}></img>
+              <img src="/assets/oktopus.png" 
+              width={'60%'}
+              />
             </div>
             <SvgIcon
               fontSize="small"
