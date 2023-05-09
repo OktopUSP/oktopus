@@ -507,7 +507,8 @@ func (s *Server) sendConnack(cl *Client, reason packets.Code, present bool) erro
 		ServerKeepAliveFlag: true,
 		ReceiveMaximum:      s.Options.Capabilities.ReceiveMaximum, // 3.2.2.3.3 Receive Maximum
 		User:                []packets.UserProperty{{Key: "subscribe-topic", Val: "oktopus/v1/agent/" + clUser}},
-		AssignedClientID:    clUser,
+		//AssignedClientID:    clUser,
+		//Device doesn't recognize assigned client id in an attempt of reconnection
 	}
 
 	if reason.Code >= packets.ErrUnspecifiedError.Code {
