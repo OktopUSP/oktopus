@@ -40,53 +40,50 @@ export const OverviewLatestOrders = (props) => {
             <TableHead>
               <TableRow>
                 <TableCell>
-                  Model
+                  SN
                 </TableCell>
                 <TableCell>
-                  Customer
+                  MODEL
                 </TableCell>
                 <TableCell sortDirection="desc">
-                  Vendor
+                  CUSTOMER
                 </TableCell>
                 <TableCell>
-                  Status
+                  VENDOR
                 </TableCell>
                 <TableCell>
-                  Access
+                  VERSION
+                </TableCell>
+                <TableCell>
+                  STATUS
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {orders.map((order) => {
-                const createdAt = format(order.createdAt, 'dd/MM/yyyy');
 
                 return (
                   <TableRow
                     hover
-                    key={order.id}
+                    key={order.SN}
                   >
                     <TableCell>
-                      {order.ref}
+                      {order.SN}
                     </TableCell>
                     <TableCell>
-                      {order.customer.name}
+                      {order.Model}
                     </TableCell>
                     <TableCell>
-                      {createdAt}
+                      {order.Customer}
                     </TableCell>
                     <TableCell>
-                      <SeverityPill color={statusMap[order.status]}>
-                        {order.status}
-                      </SeverityPill>
+                      {order.Vendor}
                     </TableCell>
                     <TableCell>
-                    <SvgIcon 
-                      fontSize="small" 
-                      sx={{cursor:'pointer'}} 
-                      onClick={()=>router.push("devices/"+order.id)}
-                    >
-                      <ArrowTopRightOnSquareIcon />
-                    </SvgIcon>
+                      {order.Version}
+                    </TableCell>
+                    <TableCell>
+                      {order.Status}
                     </TableCell>
                   </TableRow>
                 );
