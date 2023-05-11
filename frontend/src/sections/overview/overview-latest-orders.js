@@ -21,10 +21,22 @@ import { SeverityPill } from 'src/components/severity-pill';
 import { useRouter } from 'next/router';
 
 const statusMap = {
-  Associating: 'warning',
-  Online: 'success',
-  Offline: 'error'
+  1: 'warning',
+  0: 'success',
+  2: 'error'
 };
+
+const status = (s)=>{
+  if (s == 0){
+    return "Online"
+  } else if (s == 1){
+    return "Associating"
+  }else if (s==2){
+    return "Offline"
+  }else {
+    return "Unknown"
+  }
+}
 
 export const OverviewLatestOrders = (props) => {
   const { orders = [], sx } = props;
@@ -39,23 +51,23 @@ export const OverviewLatestOrders = (props) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>
-                  SN
+                <TableCell align="center">
+                  Serial Number
                 </TableCell>
                 <TableCell>
-                  MODEL
-                </TableCell>
-                <TableCell sortDirection="desc">
-                  CUSTOMER
+                  Model
                 </TableCell>
                 <TableCell>
-                  VENDOR
+                  Vendor
                 </TableCell>
                 <TableCell>
-                  VERSION
+                  Version
                 </TableCell>
                 <TableCell>
-                  STATUS
+                  Status
+                </TableCell>
+                <TableCell>
+                  Access
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -67,14 +79,11 @@ export const OverviewLatestOrders = (props) => {
                     hover
                     key={order.SN}
                   >
-                    <TableCell>
+                    <TableCell TableCell align="center">
                       {order.SN}
                     </TableCell>
                     <TableCell>
                       {order.Model}
-                    </TableCell>
-                    <TableCell>
-                      {order.Customer}
                     </TableCell>
                     <TableCell>
                       {order.Vendor}
@@ -83,7 +92,18 @@ export const OverviewLatestOrders = (props) => {
                       {order.Version}
                     </TableCell>
                     <TableCell>
-                      {order.Status}
+                    <SeverityPill color={statusMap[order.Status]}>
+                        {status(order.Status)}
+                    </SeverityPill>
+                    </TableCell>
+                    <TableCell>
+                    <SvgIcon 
+                      fontSize="small" 
+                      sx={{cursor:'pointer'}} 
+                      onClick={()=>router.push("devices/"+order.id)}
+                    >
+                      <ArrowTopRightOnSquareIcon />
+                    </SvgIcon>
                     </TableCell>
                   </TableRow>
                 );
