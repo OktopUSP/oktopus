@@ -41,7 +41,7 @@ func StartApi(a Api) {
 	authentication.HandleFunc("/login", a.generateToken).Methods("PUT")
 	//authentication.HandleFunc("/register", a.registerUser).Methods("POST")
 	iot := r.PathPrefix("/device").Subrouter()
-	iot.HandleFunc("/", a.retrieveDevices).Methods("GET")
+	iot.HandleFunc("", a.retrieveDevices).Methods("GET")
 	iot.HandleFunc("/{sn}/get", a.deviceGetMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/add", a.deviceCreateMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/del", a.deviceDeleteMsg).Methods("PUT")
@@ -68,6 +68,7 @@ func StartApi(a Api) {
 			log.Println(err)
 		}
 	}()
+	log.Println("Running Api at port", a.Port)
 }
 
 func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
