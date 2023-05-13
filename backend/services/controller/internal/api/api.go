@@ -92,7 +92,7 @@ func (a *Api) deviceCreateMsg(w http.ResponseWriter, r *http.Request) {
 
 	var receiver usp_msg.Add
 
-	err := json.NewDecoder(r.Body).Decode(receiver)
+	err := json.NewDecoder(r.Body).Decode(&receiver)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
