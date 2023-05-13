@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/leandrofars/oktopus/internal/api/auth"
+	"github.com/leandrofars/oktopus/internal/api/cors"
 	"github.com/leandrofars/oktopus/internal/api/middleware"
 	"github.com/leandrofars/oktopus/internal/db"
 	"github.com/leandrofars/oktopus/internal/mtp"
@@ -49,9 +50,13 @@ func StartApi(a Api) {
 	//TODO: Create operation action handler
 	iot.HandleFunc("/device/{sn}/act", a.deviceUpdateMsg).Methods("PUT")
 
+	// Middleware for requests which requires user to be authenticated
 	iot.Use(func(handler http.Handler) http.Handler {
 		return middleware.Middleware(handler)
 	})
+
+	// Verifies CORS configs for requests
+	corsOpts := cors.GetCorsConfig()
 
 	srv := &http.Server{
 		Addr: "0.0.0.0:" + a.Port,
@@ -59,7 +64,7 @@ func StartApi(a Api) {
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
-		Handler:      r, // Pass our instance of gorilla/mux in.
+		Handler:      corsOpts.Handler(r), // Pass our instance of gorilla/mux in.
 	}
 
 	// Run our server in a goroutine so that it doesn't block.
