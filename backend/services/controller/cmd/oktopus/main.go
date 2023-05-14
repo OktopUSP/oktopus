@@ -5,6 +5,7 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/joho/godotenv"
 	"github.com/leandrofars/oktopus/internal/api"
 	"github.com/leandrofars/oktopus/internal/db"
 	usp_msg "github.com/leandrofars/oktopus/internal/usp_message"
@@ -22,6 +23,20 @@ const VERSION = "0.0.1"
 
 func main() {
 	done := make(chan os.Signal, 1)
+
+	err := godotenv.Load()
+
+	localEnv := ".env.local"
+	if _, err := os.Stat(localEnv); err == nil {
+		_ = godotenv.Overload(localEnv)
+		log.Println("Loaded variables from '.env.local'")
+	} else {
+		log.Println("Loaded variables from '.env'")
+	}
+
+	if err != nil {
+		log.Println("Error to load environment variables:", err)
+	}
 
 	// Locks app running until it receives a stop command as Ctrl+C.
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)

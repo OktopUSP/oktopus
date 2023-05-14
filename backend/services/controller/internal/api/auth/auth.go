@@ -3,10 +3,17 @@ package auth
 import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"os"
 	"time"
 )
 
-var jwtKey = []byte("supersecretkey")
+func getJwtKey() []byte {
+	jwtKey, ok := os.LookupEnv("SECRET_API_KEY")
+	if !ok || jwtKey == "" {
+		return []byte("supersecretkey")
+	}
+	return []byte(jwtKey)
+}
 
 type JWTClaim struct {
 	Username string `json:"username"`
@@ -24,15 +31,16 @@ func GenerateJWT(email string, username string) (tokenString string, err error) 
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err = token.SignedString(jwtKey)
+	tokenString, err = token.SignedString(getJwtKey())
 	return
 }
+
 func ValidateToken(signedToken string) (email string, err error) {
 	token, err := jwt.ParseWithClaims(
 		signedToken,
 		&JWTClaim{},
 		func(token *jwt.Token) (interface{}, error) {
-			return []byte(jwtKey), nil
+			return getJwtKey(), nil
 		},
 	)
 	if err != nil {
