@@ -83,9 +83,9 @@ export const AuthProvider = (props) => {
     if (isAuthenticated) {
       const user = {
         id: '5e86809283e28b96d2d38537',
-        avatar: '/assets/avatars/avatar-anika-visser.png',
+        avatar: '/assets/avatars/default-avatar.png',
         name: 'Anika Visser',
-        email: 'anika.visser@devias.io'
+        email: 'anika.visser@devias.io',
       };
 
       dispatch({
@@ -116,9 +116,9 @@ export const AuthProvider = (props) => {
 
     const user = {
       id: '5e86809283e28b96d2d38537',
-      avatar: '/assets/avatars/avatar-anika-visser.png',
+      avatar: '/assets/avatars/default-avatar.png',
       name: 'Anika Visser',
-      email: 'anika.visser@devias.io'
+      email: 'anika.visser@devias.io',
     };
 
     dispatch({
@@ -128,9 +128,30 @@ export const AuthProvider = (props) => {
   };
 
   const signIn = async (email, password) => {
-    if (email !== 'demo@oktopus.io' || password !== 'Password123!') {
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    var raw = JSON.stringify({
+      "email": email,
+      "password": password
+    });
+
+    var requestOptions = {
+      method: 'PUT',
+      headers: myHeaders,
+      body: raw,
+      redirect: 'follow'
+    };
+
+    let result = await fetch(process.env.NEXT_PUBLIC_REST_ENPOINT+"/auth/login", requestOptions)
+    
+    if (result.status != 200) {
       throw new Error('Please check your email and password');
     }
+
+    const token = await result.json()
+    
 
     try {
       window.sessionStorage.setItem('authenticated', 'true');
@@ -140,10 +161,13 @@ export const AuthProvider = (props) => {
 
     const user = {
       id: '5e86809283e28b96d2d38537',
-      avatar: '/assets/avatars/avatar-anika-visser.png',
+      avatar: '/assets/avatars/default-avatar.png',
       name: 'Anika Visser',
-      email: 'anika.visser@devias.io'
+      email: 'anika.visser@devias.io',
+      token: token
     };
+
+    localStorage.setItem("token", token)
 
     dispatch({
       type: HANDLERS.SIGN_IN,
@@ -168,7 +192,7 @@ export const AuthProvider = (props) => {
         skip,
         signIn,
         signUp,
-        signOut
+        signOut,
       }}
     >
       {children}
