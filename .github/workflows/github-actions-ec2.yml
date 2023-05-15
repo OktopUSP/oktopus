@@ -24,8 +24,8 @@ jobs:
         script: |
             cd ~/oktopus/frontend
             git pull origin main
-            yarn install &&
-            yarn build &&
+            yarn install
+            yarn build
             pm2 restart oktopus
 
         
