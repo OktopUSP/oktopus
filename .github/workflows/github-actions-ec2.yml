@@ -22,7 +22,10 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-            whoami
-            ls -al
+            cd ~/oktopus/frontend
+            git pull origin main
+            yarn install
+            yarn build
+            pm2 restart oktopus
 
         
