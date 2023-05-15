@@ -23,7 +23,7 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
             cd ~/oktopus/frontend
-            git pull origin master
+            git pull origin main
             yarn install &&
             yarn build &&
             pm2 restart oktopus
