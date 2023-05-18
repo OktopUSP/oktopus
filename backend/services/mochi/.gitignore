@@ -3,3 +3,4 @@ cmd/mqtt
 *.db
 auth.prod.json
 run.prod.sh
+mochi
