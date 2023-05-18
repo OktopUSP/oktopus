@@ -21,10 +21,22 @@ import { SeverityPill } from 'src/components/severity-pill';
 import { useRouter } from 'next/router';
 
 const statusMap = {
-  Associating: 'warning',
-  Online: 'success',
-  Offline: 'error'
+  1: 'warning',
+  0: 'success',
+  2: 'error'
 };
+
+const status = (s)=>{
+  if (s == 0){
+    return "Online"
+  } else if (s == 1){
+    return "Associating"
+  }else if (s==2){
+    return "Offline"
+  }else {
+    return "Unknown"
+  }
+}
 
 export const OverviewLatestOrders = (props) => {
   const { orders = [], sx } = props;
@@ -39,14 +51,17 @@ export const OverviewLatestOrders = (props) => {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell align="center">
+                  Serial Number
+                </TableCell>
                 <TableCell>
                   Model
                 </TableCell>
                 <TableCell>
-                  Customer
-                </TableCell>
-                <TableCell sortDirection="desc">
                   Vendor
+                </TableCell>
+                <TableCell>
+                  Version
                 </TableCell>
                 <TableCell>
                   Status
@@ -58,26 +73,28 @@ export const OverviewLatestOrders = (props) => {
             </TableHead>
             <TableBody>
               {orders.map((order) => {
-                const createdAt = format(order.createdAt, 'dd/MM/yyyy');
 
                 return (
                   <TableRow
                     hover
-                    key={order.id}
+                    key={order.SN}
                   >
-                    <TableCell>
-                      {order.ref}
+                    <TableCell TableCell align="center">
+                      {order.SN}
                     </TableCell>
                     <TableCell>
-                      {order.customer.name}
+                      {order.Model}
                     </TableCell>
                     <TableCell>
-                      {createdAt}
+                      {order.Vendor}
                     </TableCell>
                     <TableCell>
-                      <SeverityPill color={statusMap[order.status]}>
-                        {order.status}
-                      </SeverityPill>
+                      {order.Version}
+                    </TableCell>
+                    <TableCell>
+                    <SeverityPill color={statusMap[order.Status]}>
+                        {status(order.Status)}
+                    </SeverityPill>
                     </TableCell>
                     <TableCell>
                     <SvgIcon 
