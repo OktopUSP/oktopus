@@ -8,6 +8,8 @@ import (
 	"bytes"
 	"crypto/tls"
 	"flag"
+	rv8 "github.com/go-redis/redis/v8"
+	"github.com/mochi-co/mqtt/v2/hooks/storage/redis"
 	"github.com/mochi-co/mqtt/v2/packets"
 	"github.com/rs/zerolog"
 	"io/ioutil"
@@ -17,10 +19,8 @@ import (
 	"strings"
 	"syscall"
 
-	rv8 "github.com/go-redis/redis/v8"
 	"github.com/mochi-co/mqtt/v2"
 	"github.com/mochi-co/mqtt/v2/hooks/auth"
-	"github.com/mochi-co/mqtt/v2/hooks/storage/redis"
 	"github.com/mochi-co/mqtt/v2/listeners"
 )
 
@@ -115,12 +115,12 @@ func main() {
 			log.Fatal(err)
 		}
 
-		priv, err := ioutil.ReadFile(*fullchain)
+		pv, err := ioutil.ReadFile(*privkey)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		cert, err := tls.X509KeyPair(chain, priv)
+		cert, err := tls.X509KeyPair(chain, pv)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -176,15 +176,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = server.AddHook(new(redis.Hook), &redis.Options{
-		Options: &rv8.Options{
-			Addr:     *redisAddr, // default redis address
-			Password: "",         // your password
-			DB:       0,          // your redis db
-		},
-	})
-	if err != nil {
-		log.Fatal(err)
+	if *redisAddr != "" {
+		err = server.AddHook(new(redis.Hook), &redis.Options{
+			Options: &rv8.Options{
+				Addr:     *redisAddr, // default redis address
+				Password: "",         // your password
+				DB:       0,          // your redis db
+			},
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	go func() {
