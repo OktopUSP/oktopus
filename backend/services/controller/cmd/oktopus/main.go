@@ -50,7 +50,7 @@ func main() {
 	flSubTopic := flag.String("sub", "oktopus/+/controller/+", "That's the topic agent must publish to, and the controller keeps on listening.")
 	flBrokerAddr := flag.String("a", "localhost", "Mqtt broker adrress")
 	flBrokerPort := flag.String("p", "1883", "Mqtt broker port")
-	flTlsCert := flag.String("ca", "", "TLS ca certificate")
+	flTlsCert := flag.Bool("tls", false, "Connect to broker over TLS")
 	flBrokerUsername := flag.String("u", "", "Mqtt broker username")
 	flBrokerPassword := flag.String("P", "", "Mqtt broker password")
 	flBrokerClientId := flag.String("i", "", "A clientid for the Mqtt connection")
@@ -87,7 +87,7 @@ func main() {
 		SubTopic:        *flSubTopic,
 		DevicesTopic:    *flDevicesTopic,
 		DisconnectTopic: *flDisconTopic,
-		CA:              *flTlsCert,
+		TLS:             *flTlsCert,
 		DB:              database,
 		MsgQueue:        apiMsgQueue,
 		QMutex:          &m,
