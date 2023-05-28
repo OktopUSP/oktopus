@@ -20,6 +20,11 @@ func NewDatabase(ctx context.Context, mongoUri string) Database {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Println("Trying to ping Mongo database...")
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		log.Fatal("Couldn't connect to MongoDB --> ", err)
+	}
 
 	log.Println("Connected to MongoDB-->", mongoUri)
 	devices := client.Database("oktopus").Collection("devices")
