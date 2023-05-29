@@ -140,20 +140,19 @@ func main() {
 			}
 		}
 
-		log.Println("Mqtt Broker is running with TLS")
-	} else {
-		if *tcpAddr != "" {
-			//tcp := listeners.NewTCP("t1", *tcpAddr, &listeners.Config{
-			//	TLSConfig: tlsConfig,
-			//})
-			tcp := listeners.NewTCP("t1", *tcpAddr, nil)
-			err := server.AddListener(tcp)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
-		log.Println("Mqtt Broker is running without TLS, (it's dangerous)")
+		log.Println("Mqtt Broker is running with TLS at port 8883")
 	}
+	if *tcpAddr != "" {
+		//tcp := listeners.NewTCP("t1", *tcpAddr, &listeners.Config{
+		//	TLSConfig: tlsConfig,
+		//})
+		tcp := listeners.NewTCP("t1", *tcpAddr, nil)
+		err := server.AddListener(tcp)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	log.Println("Mqtt Broker is running without TLS at port 1883")
 
 	if *wsAddr != "" {
 		ws := listeners.NewWebsocket("ws1", *wsAddr, nil)
