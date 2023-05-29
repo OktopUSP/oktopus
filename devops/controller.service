@@ -1,0 +1,11 @@
+[Unit]
+Description=TR-369 Controller
+
+[Service]
+ExecStart=/usr/bin/controller -u 'root' -P '<password to broker>' -mongo '<mongoDB address>' -p 8883 -tls
+
+Restart=always
+RestartSec=4
+
+[Install]
+WantedBy=multi-user.target
