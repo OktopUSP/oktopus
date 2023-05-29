@@ -131,7 +131,7 @@ func main() {
 		}
 
 		if *tcpAddr != "" {
-			tcp := listeners.NewTCP("t1", *tcpAddr, &listeners.Config{
+			tcp := listeners.NewTCP("t1", ":8883", &listeners.Config{
 				TLSConfig: tlsConfig,
 			})
 			err := server.AddListener(tcp)
@@ -146,7 +146,7 @@ func main() {
 		//tcp := listeners.NewTCP("t1", *tcpAddr, &listeners.Config{
 		//	TLSConfig: tlsConfig,
 		//})
-		tcp := listeners.NewTCP("t1", *tcpAddr, nil)
+		tcp := listeners.NewTCP("t1", ":1883", nil)
 		err := server.AddListener(tcp)
 		if err != nil {
 			log.Fatal(err)
