@@ -1,0 +1,11 @@
+[Unit]
+Description=Mochi broker
+
+[Service]
+ExecStart=/usr/bin/mochi -path /home/ec2-user/oktopus/backend/services/mochi/cmd/auth.prod.json -full_chain_path /etc/letsencrypt/live/oktopus.ifsc.digital/fullchain.pem -private_key_path /etc/letsencrypt/live/oktopus.ifsc.digital/privkey.pem -redis ""
+
+Restart=always
+RestartSec=4
+
+[Install]
+WantedBy=multi-user.target
