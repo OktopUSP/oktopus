@@ -1,7 +1,3 @@
-// SPDX-License-Identifier: MIT
-// SPDX-FileCopyrightText: 2022 mochi-co
-// SPDX-FileContributor: mochi-co
-
 package main
 
 import (
@@ -87,6 +83,8 @@ func main() {
 		done <- true
 	}()
 
+	serverForTLS := mqtt.New(&mqtt.Options{})
+
 	l := server.Log.Level(zerolog.DebugLevel)
 	server.Log = &l
 
@@ -134,10 +132,15 @@ func main() {
 			tcp := listeners.NewTCP("t1", ":8883", &listeners.Config{
 				TLSConfig: tlsConfig,
 			})
-			err := server.AddListener(tcp)
+			err := serverForTLS.AddListener(tcp)
 			if err != nil {
 				log.Fatal(err)
 			}
+		}
+
+		err = serverForTLS.AddHook(new(MyHook), map[string]any{})
+		if err != nil {
+			log.Fatal(err)
 		}
 
 		log.Println("Mqtt Broker is running with TLS at port 8883")
