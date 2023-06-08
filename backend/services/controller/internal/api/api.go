@@ -38,10 +38,10 @@ func NewApi(port string, db db.Database, b mtp.Broker, msgQueue map[string](chan
 
 func StartApi(a Api) {
 	r := mux.NewRouter()
-	authentication := r.PathPrefix("/auth").Subrouter()
+	authentication := r.PathPrefix("/api/auth").Subrouter()
 	authentication.HandleFunc("/login", a.generateToken).Methods("PUT")
 	//authentication.HandleFunc("/register", a.registerUser).Methods("POST")
-	iot := r.PathPrefix("/device").Subrouter()
+	iot := r.PathPrefix("/api/device").Subrouter()
 	iot.HandleFunc("", a.retrieveDevices).Methods("GET")
 	iot.HandleFunc("/{sn}/get", a.deviceGetMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/add", a.deviceCreateMsg).Methods("PUT")

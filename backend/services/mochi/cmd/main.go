@@ -85,6 +85,9 @@ func main() {
 
 	serverForTLS := mqtt.New(&mqtt.Options{})
 
+	lTls := serverForTLS.Log.Level(zerolog.DebugLevel)
+	serverForTLS.Log = &lTls
+
 	l := server.Log.Level(zerolog.DebugLevel)
 	server.Log = &l
 
@@ -193,6 +196,10 @@ func main() {
 
 	go func() {
 		err := server.Serve()
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = serverForTLS.Serve()
 		if err != nil {
 			log.Fatal(err)
 		}
