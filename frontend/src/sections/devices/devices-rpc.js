@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Button,
   Card,
@@ -12,33 +12,150 @@ import {
   MenuItem, 
   Select,
   FormControl,
-  SvgIcon
+  SvgIcon,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions, 
+  Box,
+  IconButton
 } from '@mui/material';
+import XMarkIcon from '@heroicons/react/24/outline/XMarkIcon';
 import PaperAirplane from '@heroicons/react/24/solid/PaperAirplaneIcon';
 import CircularProgress from '@mui/material/CircularProgress';
 import Backdrop from '@mui/material/Backdrop';
+import { useRouter } from 'next/router';
 
 
 export const DevicesRPC = () => {
 
+const router = useRouter()
+
 const [open, setOpen] = useState(false);
+const [scroll, setScroll] = useState('paper');
+const [answer, setAnswer] = useState(false)
+const [content, setContent] = useState('')
+const [age, setAge] = useState(2);
+
+const [value, setValue] = useState(`{
+  "param_paths": [
+      "Device.WiFi.SSID.[Name==wlan0].",
+      "Device.IP.Interface.*.Alias",
+      "Device.DeviceInfo.FirmwareImage.*.Alias",
+      "Device.IP.Interface.1.IPv4Address.1.IPAddress"
+  ],
+  "max_depth": 2
+}`)
 
 const handleClose = () => {
   setOpen(false);
 };
 const handleOpen = () => {
   setOpen(true);
-};
+  var myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append("Authorization", "<token>");
 
-  const [value, setValue] = useState(`
-  {opa, 
-    teste123:goiaba}`
-  )
+ var raw = value
 
-  const [age, setAge] = useState(1);
+  var requestOptions = {
+    method: 'PUT',
+    headers: myHeaders,
+    body: raw,
+    redirect: 'follow'
+  };
+
+  var method;
+
+  switch(age) {
+    case 1:
+      method="add"
+      break;
+    case 2:
+      method="get"
+      break;
+    case 3:
+      method="set"
+      break;
+    case 4:
+      method="del"
+    break;
+  }
+
+ 
+  fetch(`https://d9962fd9-2464-4a30-9a86-a15a04b57ad0.mock.pstmn.io/device/${router.query.id}/${method}`, requestOptions)
+    .then(response => response.text())
+    .then(result => {
+      setOpen(false)
+      setAnswer(true)
+      let teste =  JSON.stringify(JSON.parse(result), null, 2)
+      console.log(teste)
+      setContent(teste)
+    })
+    .catch(error => console.log('error', error));
+  };
 
   const handleChangeRPC = (event) => {
     setAge(event.target.value);
+    switch(event.target.value) {
+      case 1:
+        setValue(`{
+          "allow_partial": true,
+          "create_objs": [
+              {
+                  "obj_path": "Device.IP.Interface.",
+                  "param_settings": [
+                      {
+                          "param": "Alias",
+                          "value": "test",
+                          "required": true
+                      }
+                  ]
+              }
+          ]
+      }`)
+        break;
+      case 2:
+        setValue(`{
+          "param_paths": [
+              "Device.WiFi.SSID.[Name==wlan0].",
+              "Device.IP.Interface.*.Alias",
+              "Device.DeviceInfo.FirmwareImage.*.Alias",
+              "Device.IP.Interface.1.IPv4Address.1.IPAddress"
+          ],
+          "max_depth": 2
+      }`)
+        break;
+      case 3:
+        setValue(`
+        {
+          "allow_partial":true,
+          "update_objs":[
+              {
+                  "obj_path":"Device.IP.Interface.[Alias==pamonha].",
+                  "param_settings":[
+                      {
+                      "param":"Alias",
+                      "value":"goiaba",
+                      "required":true
+                      }
+                  ]
+              }
+          ]
+      }`)
+        break;
+      case 4:
+        setValue(`{
+          "allow_partial": true,
+          "obj_paths": [
+              "Device.IP.Interface.3."
+          ]
+      }`)
+        break;
+      default:
+        // code block
+    }
   };
 
   const handleChange = (event) => {
@@ -87,7 +204,7 @@ const handleOpen = () => {
               onChange={handleChange}
               value={value}
               fullWidth
-              rows="10"
+              rows="9"
             />
           </Stack>
         </CardContent>
@@ -108,6 +225,43 @@ const handleOpen = () => {
             >
             <CircularProgress color="inherit" />
         </Backdrop>
+        <Dialog
+        fullWidth={ true } 
+        maxWidth={"md"}
+        open={answer}
+        scroll={scroll}
+        aria-labelledby="scroll-dialog-title"
+        aria-describedby="scroll-dialog-description"
+      >
+        <DialogTitle id="scroll-dialog-title">
+        <Box display="flex" alignItems="center">
+              <Box flexGrow={1} >Response</Box>
+              <Box>
+                  <IconButton >
+                        <SvgIcon><XMarkIcon /></SvgIcon>
+                  </IconButton>
+              </Box>
+        </Box>
+        </DialogTitle>
+        <DialogContent dividers={scroll === 'paper'}>
+          <DialogContentText
+            id="scroll-dialog-description"
+            //ref={descriptionElementRef}
+            tabIndex={-1}
+          >
+          <pre>
+            {content}
+          </pre>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={()=>{
+            setAnswer(false);
+            handleClose;
+            //setContent("");
+          }}>Ok</Button>
+        </DialogActions>
+      </Dialog>
       </Card>
     </form>
   );
