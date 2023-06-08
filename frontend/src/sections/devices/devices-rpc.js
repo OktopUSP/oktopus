@@ -84,7 +84,7 @@ const handleOpen = () => {
   }
 
  
-  fetch(`https://d9962fd9-2464-4a30-9a86-a15a04b57ad0.mock.pstmn.io/device/${router.query.id}/${method}`, requestOptions)
+  fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/device/${router.query.id}/${method}`, requestOptions)
     .then(response => response.text())
     .then(result => {
       setOpen(false)
