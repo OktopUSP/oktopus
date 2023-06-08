@@ -84,7 +84,7 @@ export const AuthProvider = (props) => {
       const user = {
         id: '5e86809283e28b96d2d38537',
         avatar: '/assets/avatars/default-avatar.png',
-        name: 'Anika Visser',
+        name: 'Oktopus',
         email: 'anika.visser@devias.io',
       };
 
@@ -117,7 +117,7 @@ export const AuthProvider = (props) => {
     const user = {
       id: '5e86809283e28b96d2d38537',
       avatar: '/assets/avatars/default-avatar.png',
-      name: 'Anika Visser',
+      name: 'Oktopus',
       email: 'anika.visser@devias.io',
     };
 
@@ -162,7 +162,7 @@ export const AuthProvider = (props) => {
     const user = {
       id: '5e86809283e28b96d2d38537',
       avatar: '/assets/avatars/default-avatar.png',
-      name: 'Anika Visser',
+      name: 'Oktopus',
       email: 'anika.visser@devias.io',
       token: token
     };
