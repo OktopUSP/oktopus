@@ -100,7 +100,12 @@ export const OverviewLatestOrders = (props) => {
                     <SvgIcon 
                       fontSize="small" 
                       sx={{cursor:'pointer'}} 
-                      onClick={()=>router.push("devices/"+order.SN)}
+                      onClick={()=>{
+                          if (order.Status !== 2){
+                            router.push("devices/"+order.SN)
+                          }
+                        }
+                      }
                     >
                       <ArrowTopRightOnSquareIcon />
                     </SvgIcon>
