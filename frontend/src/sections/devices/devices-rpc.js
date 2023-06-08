@@ -55,7 +55,7 @@ const handleOpen = () => {
   setOpen(true);
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
-  myHeaders.append("Authorization", "<token>");
+  myHeaders.append("Authorization", localStorage.getItem("token"));
 
  var raw = value
 
