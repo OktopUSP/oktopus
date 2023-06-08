@@ -238,7 +238,15 @@ const handleOpen = () => {
               <Box flexGrow={1} >Response</Box>
               <Box>
                   <IconButton >
-                        <SvgIcon><XMarkIcon /></SvgIcon>
+                        <SvgIcon 
+                          onClick={()=>{
+                          setAnswer(false);
+                          handleClose;
+                          //setContent("");
+                          }}
+                        >
+                          <XMarkIcon />
+                      </SvgIcon>
                   </IconButton>
               </Box>
         </Box>
