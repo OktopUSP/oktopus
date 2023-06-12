@@ -257,7 +257,7 @@ const handleOpen = () => {
             //ref={descriptionElementRef}
             tabIndex={-1}
           >
-          <pre>
+          <pre style={{color: 'black'}}>
             {content}
           </pre>
           </DialogContentText>
