@@ -47,6 +47,7 @@ func StartApi(a Api) {
 	iot.HandleFunc("/{sn}/add", a.deviceCreateMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/del", a.deviceDeleteMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/set", a.deviceUpdateMsg).Methods("PUT")
+	iot.HandleFunc("/{sn}/parameters", a.deviceGetSupportedParametersMsg).Methods("PUT")
 	//TODO: Create operation action handler
 	iot.HandleFunc("/device/{sn}/act", a.deviceUpdateMsg).Methods("PUT")
 
@@ -91,6 +92,51 @@ func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func (a *Api) deviceGetSupportedParametersMsg(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	sn := vars["sn"]
+	a.deviceExists(sn, w)
+
+	var receiver usp_msg.GetSupportedDM
+
+	err := json.NewDecoder(r.Body).Decode(&receiver)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	msg := utils.NewGetSupportedParametersMsg(receiver)
+	encodedMsg, err := proto.Marshal(&msg)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	record := utils.NewUspRecord(encodedMsg, sn)
+	tr369Message, err := proto.Marshal(&record)
+	if err != nil {
+		log.Fatalln("Failed to encode tr369 record:", err)
+	}
+
+	//a.Broker.Request(tr369Message, usp_msg.Header_GET, "oktopus/v1/agent/"+sn, "oktopus/v1/get/"+sn)
+	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
+	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn)
+
+	select {
+	case msg := <-a.MsgQueue[msg.Header.MsgId]:
+		log.Printf("Received Msg: %s", msg.Header.MsgId)
+		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetSetResp())
+		return
+	case <-time.After(time.Second * 28):
+		log.Printf("Request %s Timed Out", msg.Header.MsgId)
+		w.WriteHeader(http.StatusGatewayTimeout)
+		json.NewEncoder(w).Encode("Request Timed Out")
+		return
+	}
+}
+
 func (a *Api) deviceCreateMsg(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sn := vars["sn"]
@@ -128,7 +174,7 @@ func (a *Api) deviceCreateMsg(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Received Msg: %s", msg.Header.MsgId)
 		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetAddResp())
 		return
-	case <-time.After(time.Second * 5):
+	case <-time.After(time.Second * 28):
 		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		json.NewEncoder(w).Encode("Request Timed Out")
@@ -173,7 +219,7 @@ func (a *Api) deviceGetMsg(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Received Msg: %s", msg.Header.MsgId)
 		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetGetResp())
 		return
-	case <-time.After(time.Second * 5):
+	case <-time.After(time.Second * 30):
 		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		json.NewEncoder(w).Encode("Request Timed Out")
@@ -218,7 +264,7 @@ func (a *Api) deviceDeleteMsg(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Received Msg: %s", msg.Header.MsgId)
 		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetDeleteResp())
 		return
-	case <-time.After(time.Second * 5):
+	case <-time.After(time.Second * 28):
 		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		json.NewEncoder(w).Encode("Request Timed Out")
@@ -263,7 +309,7 @@ func (a *Api) deviceUpdateMsg(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Received Msg: %s", msg.Header.MsgId)
 		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetSetResp())
 		return
-	case <-time.After(time.Second * 5):
+	case <-time.After(time.Second * 28):
 		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		json.NewEncoder(w).Encode("Request Timed Out")

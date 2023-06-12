@@ -7,7 +7,7 @@ import (
 	"net"
 )
 
-//Status are saved at database as numbers
+// Status are saved at database as numbers
 const (
 	Online = iota
 	Associating
@@ -109,6 +109,24 @@ func NewSetMsg(updateStuff usp_msg.Set) usp_msg.Msg {
 				Request: &usp_msg.Request{
 					ReqType: &usp_msg.Request_Set{
 						Set: &updateStuff,
+					},
+				},
+			},
+		},
+	}
+}
+
+func NewGetSupportedParametersMsg(getStuff usp_msg.GetSupportedDM) usp_msg.Msg {
+	return usp_msg.Msg{
+		Header: &usp_msg.Header{
+			MsgId:   uuid.NewString(),
+			MsgType: usp_msg.Header_GET_SUPPORTED_DM,
+		},
+		Body: &usp_msg.Body{
+			MsgBody: &usp_msg.Body_Request{
+				Request: &usp_msg.Request{
+					ReqType: &usp_msg.Request_GetSupportedDm{
+						GetSupportedDm: &getStuff,
 					},
 				},
 			},
