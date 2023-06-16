@@ -140,6 +140,12 @@ func (m *Mqtt) startClient(devices, controller, disconnect, apiMsg chan *paho.Pu
 	clientConfig := paho.ClientConfig{
 		Conn:   conn,
 		Router: singleHandler,
+		OnServerDisconnect: func(disconnect *paho.Disconnect) {
+			log.Println("disconnected from mqtt server, reason code: ", disconnect.ReasonCode)
+		},
+		OnClientError: func(err error) {
+			log.Println(err)
+		},
 	}
 
 	return paho.NewClient(clientConfig)
