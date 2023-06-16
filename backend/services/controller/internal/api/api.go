@@ -26,6 +26,11 @@ type Api struct {
 	QMutex   *sync.Mutex
 }
 
+const (
+	NormalUser = iota
+	AdminUser
+)
+
 func NewApi(port string, db db.Database, b mtp.Broker, msgQueue map[string](chan usp_msg.Msg), m *sync.Mutex) Api {
 	return Api{
 		Port:     port,
@@ -40,7 +45,10 @@ func StartApi(a Api) {
 	r := mux.NewRouter()
 	authentication := r.PathPrefix("/api/auth").Subrouter()
 	authentication.HandleFunc("/login", a.generateToken).Methods("PUT")
-	//authentication.HandleFunc("/register", a.registerUser).Methods("POST")
+	authentication.HandleFunc("/register", a.registerUser).Methods("POST")
+	// Keep the line above commented to avoid people get unintended admin privileges.
+	// Uncomment it only once for you to get admin privileges and create new users.
+	// authentication.HandleFunc("/admin/register", a.registerAdminUser).Methods("POST")
 	iot := r.PathPrefix("/api/device").Subrouter()
 	iot.HandleFunc("", a.retrieveDevices).Methods("GET")
 	iot.HandleFunc("/{sn}/get", a.deviceGetMsg).Methods("PUT")
@@ -331,12 +339,55 @@ func (a *Api) deviceExists(sn string, w http.ResponseWriter) {
 }
 
 func (a *Api) registerUser(w http.ResponseWriter, r *http.Request) {
+
+	tokenString := r.Header.Get("Authorization")
+	if tokenString == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	email, err := auth.ValidateToken(tokenString)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	//Check if user which is requesting creation has the necessary privileges
+	rUser, err := a.Db.FindUser(email)
+	if rUser.Level != AdminUser {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	var user db.User
+	err = json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	user.Level = NormalUser
+
+	if err := user.HashPassword(user.Password); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if err := a.Db.RegisterUser(user); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func (a *Api) registerAdminUser(w http.ResponseWriter, r *http.Request) {
+
 	var user db.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	user.Level = AdminUser
 
 	if err := user.HashPassword(user.Password); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
