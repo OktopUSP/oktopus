@@ -56,11 +56,16 @@ func StartApi(a Api) {
 	iot.HandleFunc("/{sn}/del", a.deviceDeleteMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/set", a.deviceUpdateMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/parameters", a.deviceGetSupportedParametersMsg).Methods("PUT")
-	//TODO: Create operation action handler
-	iot.HandleFunc("/device/{sn}/act", a.deviceUpdateMsg).Methods("PUT")
 
 	// Middleware for requests which requires user to be authenticated
 	iot.Use(func(handler http.Handler) http.Handler {
+		return middleware.Middleware(handler)
+	})
+
+	users := r.PathPrefix("/api/users").Subrouter()
+	users.HandleFunc("", a.retrieveUsers).Methods("GET")
+
+	users.Use(func(handler http.Handler) http.Handler {
 		return middleware.Middleware(handler)
 	})
 
@@ -97,6 +102,20 @@ func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
+	return
+}
+
+func (a *Api) retrieveUsers(w http.ResponseWriter, r *http.Request) {
+	devices, err := a.Db.FindAllUsers()
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	err = json.NewEncoder(w).Encode(devices)
+	if err != nil {
+		log.Println(err)
+	}
 	return
 }
 

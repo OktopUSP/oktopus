@@ -26,6 +26,18 @@ func (d *Database) RegisterUser(user User) error {
 	return err
 }
 
+func (d *Database) FindAllUsers() ([]User, error) {
+	var result []User
+	cursor, err := d.users.Find(d.ctx, bson.D{{}})
+	if err != nil {
+		return []User{}, err
+	}
+	if err = cursor.All(d.ctx, &result); err != nil {
+		log.Fatal(err)
+	}
+	return result, err
+}
+
 func (d *Database) FindUser(email string) (User, error) {
 	var result User
 	err := d.users.FindOne(d.ctx, bson.D{{"email", email}}).Decode(&result)
