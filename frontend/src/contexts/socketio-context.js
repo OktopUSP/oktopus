@@ -8,7 +8,7 @@ export const WsContext = createContext({ undefined });
 
 export const WsProvider = (props) => {
   const { children } = props;
-  const [users, setUsers] = useState([])
+  const [users, setUsers] = useState(null)
   const auth = useAuth()
   const initialize = async () => {
     // Prevent from calling twice in development mode with React.StrictMode enable
@@ -19,7 +19,7 @@ export const WsProvider = (props) => {
 
         socket.on("users", (data) => {
             setUsers(data)
-            console.log("data received from users event: ", users)
+            console.log("data received from users event: ", data)
         })
 
         socket.emit("newuser",{

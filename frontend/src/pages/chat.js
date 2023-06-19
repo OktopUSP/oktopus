@@ -119,7 +119,7 @@ const Page = () => {
         }
     }
 
-    return(ws.users.length > 1 ?
+    return(ws.users ?
         <Box
         component="main"
         sx={{
