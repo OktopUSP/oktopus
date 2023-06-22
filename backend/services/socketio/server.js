@@ -19,13 +19,16 @@ io.on('connection', (socket) => {
     console.log(`🚀: ${socket.id} user just connected!`);
 
     socket.on("callUser", ({ userToCall, signalData, from }) => {
-      console.log("user to call: ",userToCall)
-      let index = users.findIndex(x =>{ x.name === userToCall})
+      console.log("user to call:",userToCall)
+      let index = users.findIndex(x =>{ 
+        return x.name === userToCall
+      })
+      console.log(index)
       if (index >= 0){
         console.log("calling user named "+ users[index].name+" and id "+users[index].id)
-        io.to(users[index].id).emit("callUser", { signal: signalData, from, name });
+        io.to(users[index].id).emit("callUser", { signal: signalData, from });
       }else{
-        console.log("There is no user named "+userToCall+" or it's he/she is offline")
+        console.log("There is no user named "+userToCall+" or he/she is offline")
       }
     });
 
