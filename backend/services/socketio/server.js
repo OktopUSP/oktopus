@@ -17,10 +17,29 @@ let users = []
 
 io.on('connection', (socket) => {
     console.log(`🚀: ${socket.id} user just connected!`);
-    const sessionId = socket.id
+
+    socket.on("callUser", ({ userToCall, signalData, from }) => {
+      console.log("user to call: ",userToCall)
+      let index = users.findIndex(x =>{ x.name === userToCall})
+      if (index >= 0){
+        console.log("calling user named "+ users[index].name+" and id "+users[index].id)
+        io.to(users[index].id).emit("callUser", { signal: signalData, from, name });
+      }else{
+        console.log("There is no user named "+userToCall+" or it's he/she is offline")
+      }
+    });
+
+    socket.on("answerCall", (data) => {
+      io.to(data.to).emit("callAccepted", data.signal);
+    });
 
     socket.on("newuser", (data) => {
-      users.push(data)
+      let index = users.findIndex(x =>{ x.name === data.name})
+      if (index >=0){
+        console.log("user already exists, but got connected with other id")
+      }else{
+        users.push(data)
+      }
       console.log(data)
       console.log("total users: ", users)
       io.emit('users', users)
@@ -28,9 +47,15 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
       console.log('🔥: A user disconnected');
-      users.splice(users.findIndex(x => x.id === sessionId), 1);
-      console.log("users after disconection: ", users)
-      io.emit('users', users)
+      let index = users.findIndex(x => x.id === socket.id)
+      if (index >= 0){
+        let deletedEl = users.splice(index, 1)
+        console.log("users deleted", deletedEl)
+        console.log("users after disconection: ", users)
+        io.emit('users', users)
+      }else{
+        console.log("couldn't find user with socket id:", socket.id)
+      }
     });
 });
 
