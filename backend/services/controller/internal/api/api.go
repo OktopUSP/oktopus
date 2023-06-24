@@ -41,6 +41,9 @@ func NewApi(port string, db db.Database, b mtp.Broker, msgQueue map[string](chan
 	}
 }
 
+//TODO: restructure http api calls for mqtt, to use golang generics and avoid code repetition
+//TODO: standardize timeouts through code
+
 func StartApi(a Api) {
 	r := mux.NewRouter()
 	authentication := r.PathPrefix("/api/auth").Subrouter()
@@ -56,6 +59,8 @@ func StartApi(a Api) {
 	iot.HandleFunc("/{sn}/del", a.deviceDeleteMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/set", a.deviceUpdateMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/parameters", a.deviceGetSupportedParametersMsg).Methods("PUT")
+	iot.HandleFunc("/{sn}/instances", a.deviceGetParameterInstances).Methods("PUT")
+	iot.HandleFunc("/{sn}/update", a.deviceFwUpdate).Methods("PUT")
 
 	// Middleware for requests which requires user to be authenticated
 	iot.Use(func(handler http.Handler) http.Handler {
@@ -117,6 +122,161 @@ func (a *Api) retrieveUsers(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	return
+}
+
+// Check which fw image is activated
+func checkAvaiableFwPartition(reqPathResult []*usp_msg.GetResp_RequestedPathResult) int {
+	for _, x := range reqPathResult {
+		partitionsNumber := len(x.ResolvedPathResults)
+		if partitionsNumber > 1 {
+			log.Printf("Device has %d firmware partitions", partitionsNumber)
+		}
+		for i, y := range x.ResolvedPathResults {
+			if y.ResultParams["Status"] == "Available" {
+				log.Printf("Partition %d is avaiable", i)
+				return i
+			}
+		}
+	}
+	return -1
+}
+
+func (a *Api) deviceFwUpdate(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	sn := vars["sn"]
+	a.deviceExists(sn, w)
+
+	msg := utils.NewGetMsg(usp_msg.Get{
+		ParamPaths: []string{"Device.DeviceInfo.FirmwareImage.*.Status"},
+		MaxDepth:   1,
+	})
+	encodedMsg, err := proto.Marshal(&msg)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	record := utils.NewUspRecord(encodedMsg, sn)
+	tr369Message, err := proto.Marshal(&record)
+	if err != nil {
+		log.Fatalln("Failed to encode tr369 record:", err)
+	}
+
+	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
+	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn)
+
+	var getMsgAnswer *usp_msg.GetResp
+
+	select {
+	case msg := <-a.MsgQueue[msg.Header.MsgId]:
+		log.Printf("Received Msg: %s", msg.Header.MsgId)
+		getMsgAnswer = msg.Body.GetResponse().GetGetResp()
+	case <-time.After(time.Second * 30):
+		log.Printf("Request %s Timed Out", msg.Header.MsgId)
+		w.WriteHeader(http.StatusGatewayTimeout)
+		json.NewEncoder(w).Encode("Request Timed Out")
+		return
+	}
+
+	// Check which fw image is activated
+	partition := checkAvaiableFwPartition(getMsgAnswer.ReqPathResults)
+	if partition < 0 {
+		log.Println("Error to get device available firmware partition, probably it has only one partition")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode("Server don't have the hability to update device with only one partition")
+		return
+		//TODO: update device with only one partition
+	}
+
+	var receiver = usp_msg.Operate{
+		Command:    "Device.DeviceInfo.FirmwareImage.1.Download()",
+		CommandKey: "Download()",
+		SendResp:   true,
+		InputArgs: map[string]string{
+			"URL":          "http://cronos.intelbras.com.br/download/PON/121AC/beta/121AC-2.3-230620-77753201df4f1e2c607a7236746c8491.tar", //TODO: use dynamic url
+			"AutoActivate": "true",
+			//"Username": "",
+			//"Password": "",
+			"FileSize": "0", //TODO: send firmware length
+			//"CheckSumAlgorithm": "",
+			//"CheckSum":          "",
+		},
+	}
+
+	msg = utils.NewOperateMsg(receiver)
+	encodedMsg, err = proto.Marshal(&msg)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	record = utils.NewUspRecord(encodedMsg, sn)
+	tr369Message, err = proto.Marshal(&record)
+	if err != nil {
+		log.Fatalln("Failed to encode tr369 record:", err)
+	}
+
+	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
+	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn)
+
+	select {
+	case msg := <-a.MsgQueue[msg.Header.MsgId]:
+		log.Printf("Received Msg: %s", msg.Header.MsgId)
+		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetSetResp())
+		return
+	case <-time.After(time.Second * 28):
+		log.Printf("Request %s Timed Out", msg.Header.MsgId)
+		w.WriteHeader(http.StatusGatewayTimeout)
+		json.NewEncoder(w).Encode("Request Timed Out")
+		return
+	}
+}
+
+func (a *Api) deviceGetParameterInstances(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	sn := vars["sn"]
+	a.deviceExists(sn, w)
+
+	var receiver usp_msg.GetInstances
+
+	err := json.NewDecoder(r.Body).Decode(&receiver)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	msg := utils.NewGetParametersInstancesMsg(receiver)
+	encodedMsg, err := proto.Marshal(&msg)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	record := utils.NewUspRecord(encodedMsg, sn)
+	tr369Message, err := proto.Marshal(&record)
+	if err != nil {
+		log.Fatalln("Failed to encode tr369 record:", err)
+	}
+
+	//a.Broker.Request(tr369Message, usp_msg.Header_GET, "oktopus/v1/agent/"+sn, "oktopus/v1/get/"+sn)
+	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
+	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn)
+
+	select {
+	case msg := <-a.MsgQueue[msg.Header.MsgId]:
+		log.Printf("Received Msg: %s", msg.Header.MsgId)
+		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetSetResp())
+		return
+	case <-time.After(time.Second * 28):
+		log.Printf("Request %s Timed Out", msg.Header.MsgId)
+		w.WriteHeader(http.StatusGatewayTimeout)
+		json.NewEncoder(w).Encode("Request Timed Out")
+		return
+	}
 }
 
 func (a *Api) deviceGetSupportedParametersMsg(w http.ResponseWriter, r *http.Request) {

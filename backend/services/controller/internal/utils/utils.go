@@ -133,3 +133,39 @@ func NewGetSupportedParametersMsg(getStuff usp_msg.GetSupportedDM) usp_msg.Msg {
 		},
 	}
 }
+
+func NewGetParametersInstancesMsg(getStuff usp_msg.GetInstances) usp_msg.Msg {
+	return usp_msg.Msg{
+		Header: &usp_msg.Header{
+			MsgId:   uuid.NewString(),
+			MsgType: usp_msg.Header_GET_INSTANCES,
+		},
+		Body: &usp_msg.Body{
+			MsgBody: &usp_msg.Body_Request{
+				Request: &usp_msg.Request{
+					ReqType: &usp_msg.Request_GetInstances{
+						GetInstances: &getStuff,
+					},
+				},
+			},
+		},
+	}
+}
+
+func NewOperateMsg(getStuff usp_msg.Operate) usp_msg.Msg {
+	return usp_msg.Msg{
+		Header: &usp_msg.Header{
+			MsgId:   uuid.NewString(),
+			MsgType: usp_msg.Header_OPERATE,
+		},
+		Body: &usp_msg.Body{
+			MsgBody: &usp_msg.Body_Request{
+				Request: &usp_msg.Request{
+					ReqType: &usp_msg.Request_Operate{
+						Operate: &getStuff,
+					},
+				},
+			},
+		},
+	}
+}
