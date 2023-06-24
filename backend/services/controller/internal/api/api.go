@@ -52,7 +52,7 @@ func StartApi(a Api) {
 	authentication.HandleFunc("/register", a.registerUser).Methods("POST")
 	// Keep the line above commented to avoid people get unintended admin privileges.
 	// Uncomment it only once for you to get admin privileges and create new users.
-	// authentication.HandleFunc("/admin/register", a.registerAdminUser).Methods("POST")
+	//authentication.HandleFunc("/admin/register", a.registerAdminUser).Methods("POST")
 	iot := r.PathPrefix("/api/device").Subrouter()
 	iot.HandleFunc("", a.retrieveDevices).Methods("GET")
 	iot.HandleFunc("/{sn}/get", a.deviceGetMsg).Methods("PUT")
@@ -112,13 +112,18 @@ func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Api) retrieveUsers(w http.ResponseWriter, r *http.Request) {
-	devices, err := a.Db.FindAllUsers()
+	users, err := a.Db.FindAllUsers()
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	err = json.NewEncoder(w).Encode(devices)
+
+	for _, x := range users {
+		delete(x, "password")
+	}
+
+	err = json.NewEncoder(w).Encode(users)
 	if err != nil {
 		log.Println(err)
 	}
@@ -315,7 +320,7 @@ func (a *Api) deviceGetSupportedParametersMsg(w http.ResponseWriter, r *http.Req
 	select {
 	case msg := <-a.MsgQueue[msg.Header.MsgId]:
 		log.Printf("Received Msg: %s", msg.Header.MsgId)
-		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetSetResp())
+		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetGetSupportedDmResp())
 		return
 	case <-time.After(time.Second * 28):
 		log.Printf("Request %s Timed Out", msg.Header.MsgId)
