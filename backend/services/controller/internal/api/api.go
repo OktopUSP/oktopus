@@ -43,6 +43,7 @@ func NewApi(port string, db db.Database, b mtp.Broker, msgQueue map[string](chan
 
 //TODO: restructure http api calls for mqtt, to use golang generics and avoid code repetition
 //TODO: standardize timeouts through code
+//TODO: fix api methods
 
 func StartApi(a Api) {
 	r := mux.NewRouter()
