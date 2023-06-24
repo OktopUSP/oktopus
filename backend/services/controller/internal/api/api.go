@@ -275,7 +275,7 @@ func (a *Api) deviceGetParameterInstances(w http.ResponseWriter, r *http.Request
 	select {
 	case msg := <-a.MsgQueue[msg.Header.MsgId]:
 		log.Printf("Received Msg: %s", msg.Header.MsgId)
-		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetSetResp())
+		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetGetInstancesResp())
 		return
 	case <-time.After(time.Second * 28):
 		log.Printf("Request %s Timed Out", msg.Header.MsgId)
