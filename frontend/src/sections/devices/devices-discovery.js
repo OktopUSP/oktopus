@@ -113,7 +113,7 @@ const getDeviceParameters = async (raw) =>{
     console.log(deviceParameters)
     return deviceParameters.req_obj_results[0].supported_objs.map((x,i)=> {
         return (
-        <List dense={true}>
+        <List dense={true} key={x.supported_obj_path}>
             <ListItem
                 key={x.supported_obj_path}
                 divider={true}
@@ -135,7 +135,12 @@ const getDeviceParameters = async (raw) =>{
             </ListItem>
             { x.supported_params &&
                 x.supported_params.map((y)=>{
-                    return <List component="div" disablePadding dense={true}>
+                    return <List 
+                    component="div" 
+                    disablePadding 
+                    dense={true}
+                    key={y.param_name}
+                    >
                     <ListItem
                         key={i}
                         divider={true}
