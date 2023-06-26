@@ -9,6 +9,7 @@ import { useNProgress } from 'src/hooks/use-nprogress';
 import { createTheme } from 'src/theme';
 import { createEmotionCache } from 'src/utils/create-emotion-cache';
 import 'simplebar-react/dist/simplebar.min.css';
+import { WsProvider } from 'src/contexts/socketio-context';
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -27,7 +28,7 @@ const App = (props) => {
     <CacheProvider value={emotionCache}>
       <Head>
         <title>
-          Devias Kit
+          Oktopus
         </title>
         <meta
           name="viewport"
@@ -36,16 +37,18 @@ const App = (props) => {
       </Head>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <AuthProvider>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <AuthConsumer>
-              {
-                (auth) => auth.isLoading
-                  ? <SplashScreen />
-                  : getLayout(<Component {...pageProps} />)
-              }
-            </AuthConsumer>
-          </ThemeProvider>
+          <WsProvider>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <AuthConsumer>
+                {
+                  (auth) => auth.isLoading
+                    ? <SplashScreen />
+                    : getLayout(<Component {...pageProps} />)
+                }
+              </AuthConsumer>
+            </ThemeProvider>
+          </WsProvider>
         </AuthProvider>
       </LocalizationProvider>
     </CacheProvider>

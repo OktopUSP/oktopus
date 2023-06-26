@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import React, { useState } from 'react';
 import { subDays, subHours } from 'date-fns';
 import { Box, Container, Unstable_Grid2 as Grid } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
@@ -13,7 +14,9 @@ import { OverviewTraffic } from 'src/sections/overview/overview-traffic';
 
 const now = new Date();
 
-const Page = () => (
+const Page = () => {
+  
+  return(
   <>
     <Head>
       <title>
@@ -109,8 +112,8 @@ const Page = () => (
         </Grid>
       </Container>
     </Box>
-  </>
-);
+  </>)
+};
 
 Page.getLayout = (page) => (
   <DashboardLayout>

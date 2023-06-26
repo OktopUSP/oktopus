@@ -10,7 +10,8 @@ import (
 type User struct {
 	Email    string `json:"email"`
 	Name     string `json:"name"`
-	Password string `json:"password"`
+	Password string `json:"password,omitempty"`
+	Level    int    `json:"level"`
 }
 
 func (d *Database) RegisterUser(user User) error {
@@ -23,6 +24,18 @@ func (d *Database) RegisterUser(user User) error {
 		log.Println(err)
 	}
 	return err
+}
+
+func (d *Database) FindAllUsers() ([]map[string]interface{}, error) {
+	var result []map[string]interface{}
+	cursor, err := d.users.Find(d.ctx, bson.D{{}})
+	if err != nil {
+		return []map[string]interface{}{}, err
+	}
+	if err = cursor.All(d.ctx, &result); err != nil {
+		log.Fatal(err)
+	}
+	return result, err
 }
 
 func (d *Database) FindUser(email string) (User, error) {

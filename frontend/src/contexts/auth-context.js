@@ -155,6 +155,7 @@ export const AuthProvider = (props) => {
 
     try {
       window.sessionStorage.setItem('authenticated', 'true');
+      window.sessionStorage.setItem('email',email)
     } catch (err) {
       console.error(err);
     }
@@ -163,7 +164,7 @@ export const AuthProvider = (props) => {
       id: '5e86809283e28b96d2d38537',
       avatar: '/assets/avatars/default-avatar.png',
       name: 'Oktopus',
-      email: 'anika.visser@devias.io',
+      email: email,
       token: token
     };
 
