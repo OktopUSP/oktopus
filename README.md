@@ -14,7 +14,7 @@ Esta solução tem como inspirações o projeto <a href="https://github.com/geni
 </p>
 <ul><li><h4>Infraestrutura:</h4></li></ul>
 
-![Oktopus-infra](https://user-images.githubusercontent.com/83298718/222589707-58a8786d-d4b7-49c3-a014-e8f4ef95497e.png)
+![Oktopus-infra](https://github.com/leandrofars/oktopus/assets/83298718/7a8112fb-7fa6-49e7-8c48-2c1bbf26ae32)
 
 <ul>
     <li>
