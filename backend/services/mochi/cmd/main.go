@@ -67,6 +67,7 @@ var (
 func main() {
 	tcpAddr := flag.String("tcp", ":1883", "network address for TCP listener")
 	redisAddr := flag.String("redis", "172.17.0.2:6379", "host address of redis db")
+	redisPassword := flag.String("redis_passwd", "", "redis db password")
 	wsAddr := flag.String("ws", "", "network address for Websocket listener")
 	infoAddr := flag.String("info", ":8080", "network address for web info dashboard listener")
 	path := flag.String("path", "", "path to data auth file")
@@ -184,9 +185,9 @@ func main() {
 	if *redisAddr != "" {
 		err = server.AddHook(new(redis.Hook), &redis.Options{
 			Options: &rv8.Options{
-				Addr:     *redisAddr, // default redis address
-				Password: "",         // your password
-				DB:       0,          // your redis db
+				Addr:     *redisAddr,     // default redis address
+				Password: *redisPassword, // your password
+				DB:       0,              // your redis db
 			},
 		})
 		if err != nil {
