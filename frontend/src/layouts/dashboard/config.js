@@ -25,7 +25,7 @@ export const items = [
     )
   },
   {
-    title: 'Chat',
+    title: 'Chat (beta)',
     path: '/chat',
     icon: (
       <SvgIcon fontSize="small">
@@ -33,15 +33,15 @@ export const items = [
       </SvgIcon>
     )
   },
-  {
-    title: 'Map',
-    path: '/',
-    icon: (
-      <SvgIcon fontSize="small">
-       <MapIcon/>
-      </SvgIcon>
-    )
-  },
+  // {
+  //   title: 'Map',
+  //   path: '/',
+  //   icon: (
+  //     <SvgIcon fontSize="small">
+  //      <MapIcon/>
+  //     </SvgIcon>
+  //   )
+  // },
   {
     title: 'Settings',
     path: '/settings',
