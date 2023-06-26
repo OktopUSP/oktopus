@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import BellIcon from '@heroicons/react/24/solid/BellIcon';
 import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
+import PhoneIcon from '@heroicons/react/24/solid/PhoneIcon';
 import Bars3Icon from '@heroicons/react/24/solid/Bars3Icon';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import {
@@ -11,12 +12,21 @@ import {
   Stack,
   SvgIcon,
   Tooltip,
-  useMediaQuery
+  useMediaQuery,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  Button
 } from '@mui/material';
+import XMarkIcon from '@heroicons/react/24/outline/XMarkIcon';
 import { alpha } from '@mui/material/styles';
 import { usePopover } from 'src/hooks/use-popover';
 import { AccountPopover } from './account-popover';
 import { useAuth } from 'src/hooks/use-auth';
+import { WsContext } from 'src/contexts/socketio-context';
+import { useContext, useEffect } from 'react';
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
@@ -26,6 +36,7 @@ export const TopNav = (props) => {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
   const accountPopover = usePopover();
   const auth = useAuth();
+  const { answerCall, call, callAccepted } = useContext(WsContext);
 
   return ( auth.user &&
     <>
@@ -113,6 +124,57 @@ export const TopNav = (props) => {
           </Stack>
         </Stack>
       </Box>
+      {call.isReceivingCall && !callAccepted &&
+      <Dialog
+        fullWidth={ true } 
+        maxWidth={"sm"}
+        open={true}
+        //scroll={scroll}
+        aria-labelledby="scroll-dialog-title"
+        aria-describedby="scroll-dialog-description"
+      >
+        <DialogContent dividers={scroll === 'paper'}>
+        <Box display="flex" alignItems="center" justifyContent={'center'}>
+              <Box sx={{margin:"30px",textAlign:'center'}}>
+                <Avatar
+                  sx={{
+                      height: 150,
+                      width: 150,
+                  }}
+                  src={"/assets/avatars/default-avatar.png"}
+                  />
+                  <Box flexGrow={1} >{call.from}</Box>
+              </Box>
+        </Box>
+        <Box display="flex" alignItems="center" justifyContent={'center'}>
+        <IconButton>
+          <Tooltip title="Refuse" placement="left" onClick={()=>{}}>
+              <SvgIcon
+              sx={{cursor:'pointer'}}
+              style={{transform: "scale(1.5,1.5)"}}
+              >
+                <PhoneIcon 
+                color={"#CB1E02"}
+                />
+              </SvgIcon>
+          </Tooltip>
+        </IconButton>
+          <div style={{width:'15%'}}></div>
+          <IconButton>
+            <Tooltip title="Accept" placement="right" onClick={()=>{}}>
+                <SvgIcon
+                sx={{cursor:'pointer'}}
+                style={{transform: "scale(1.5,1.5) scale(-1,1)"}}
+                >
+                  <PhoneIcon 
+                  color={"#17A000"}
+                  />
+                </SvgIcon>
+            </Tooltip>
+          </IconButton>
+        </Box>
+        </DialogContent>
+      </Dialog>}
       <AccountPopover
         anchorEl={accountPopover.anchorRef.current}
         open={accountPopover.open}

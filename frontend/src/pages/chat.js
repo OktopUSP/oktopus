@@ -10,9 +10,10 @@ import {
     SvgIcon,
     CircularProgress,
     Avatar,
-    Backdrop,
+    Tooltip
 } from "@mui/material";
 import { WsContext } from "src/contexts/socketio-context";
+import { useRouter } from "next/router";
 
 const Page = () => {
 
@@ -21,6 +22,7 @@ const Page = () => {
     //const [onlineUsers, setOnlineUsers] = useState([])
 
     const ws = useContext(WsContext)
+    const router = useRouter()
 
     useEffect(()=>{
         var myHeaders = new Headers();
@@ -75,7 +77,7 @@ const Page = () => {
 
                             if (x.email !== window.sessionStorage.getItem("email")){
                                 return (
-                                    <Box sx={{margin:"30px",textAlign:'center'}}>
+                                    <Box sx={{margin:"30px",textAlign:'center'}} key={x.email}>
                                         <Avatar
                                         sx={{
                                             height: 150,
@@ -86,27 +88,32 @@ const Page = () => {
                                         />
                                         <div style={{marginTop:'10px'}}>
                                         </div>
-                                        <SvgIcon
-                                        sx={{cursor:'pointer'}}
-                                        >
                                             {status === "online" ?
-                                                <PhoneIcon 
-                                                color={color}
-                                                onClick={()=>{
-                                                    console.log("call", x.email)
-                                                }}
-                                                title={"call"}
-                                                />
+                                            <Tooltip title="Call" placement="right" onClick={()=>{
+                                                router.push({
+                                                    pathname:"chat/room",
+                                                    query: {user: x.email}
+                                                    })
+                                                }}>
+                                                <SvgIcon
+                                                sx={{cursor:'pointer'}}
+                                                >
+                                                    <PhoneIcon 
+                                                    color={color}
+                                                    />
+                                                </SvgIcon>
+                                            </Tooltip>
                                             :
-                                            <PhoneXMarkIcon 
-                                            color={color}
-                                            onClick={()=>{
-                                                console.log("call", x.email)
-                                            }}
-                                            title={"offline"}
-                                            />
+                                            <Tooltip title="Offline" placement="right">
+                                                <SvgIcon
+                                                sx={{cursor:'default'}}
+                                                >
+                                                    <PhoneXMarkIcon 
+                                                    color={color}
+                                                    />
+                                                </SvgIcon>
+                                            </Tooltip>
                                             }
-                                        </SvgIcon>
                                         <p style={{marginTop:'-2.5px'}}>{x.email}</p>
                                     </Box> 
                                 )   
