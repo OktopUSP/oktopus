@@ -1,0 +1,11 @@
+[Unit]
+Description=Socketio Server
+
+[Service]
+ExecStart=/home/ec2-user/.nvm/versions/node/v20.1.0/bin/node /home/ec2-user/oktopus/backend/services/socketio/server.js
+
+Restart=always
+RestartSec=4
+
+[Install]
+WantedBy=multi-user.target
