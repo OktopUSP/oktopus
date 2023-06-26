@@ -31,7 +31,7 @@ const Page = () => {
       .then(response => response.json())
       .then(json => setDevices(json))
       .catch(error => console.error('Error:', error));
-  }, []);
+  }, [auth.user]);
 
   return (devices &&
     <>

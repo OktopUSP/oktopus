@@ -50,8 +50,12 @@ const Page = () => {
         if(users.length == 0){
             console.log("users is empty")
             return (
-                <div style={{display:'flex', justifyContent:'center'}} height={'100%'} >
-                    <CircularProgress color="inherit" width='100%'/>
+                <div 
+                style={{display:'flex', justifyContent:'center'}}
+                height={'100%'} >
+                    <CircularProgress 
+                    color="inherit" 
+                    width='100%'/>
                 </div>
             )
         }else {
@@ -77,7 +81,9 @@ const Page = () => {
 
                             if (x.email !== window.sessionStorage.getItem("email")){
                                 return (
-                                    <Box sx={{margin:"30px",textAlign:'center'}} key={x.email}>
+                                    <Box 
+                                    sx={{margin:"30px",textAlign:'center'}} 
+                                    key={x.email}>
                                         <Avatar
                                         sx={{
                                             height: 150,
@@ -89,7 +95,9 @@ const Page = () => {
                                         <div style={{marginTop:'10px'}}>
                                         </div>
                                             {status === "online" ?
-                                            <Tooltip title="Call" placement="right" onClick={()=>{
+                                            <Tooltip title="Call" 
+                                            placement="right" 
+                                            onClick={()=>{
                                                 router.push({
                                                     pathname:"chat/room",
                                                     query: {user: x.email}
@@ -104,7 +112,9 @@ const Page = () => {
                                                 </SvgIcon>
                                             </Tooltip>
                                             :
-                                            <Tooltip title="Offline" placement="right">
+                                            <Tooltip 
+                                            title="Offline" 
+                                            placement="right">
                                                 <SvgIcon
                                                 sx={{cursor:'default'}}
                                                 >

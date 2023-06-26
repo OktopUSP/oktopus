@@ -134,7 +134,11 @@ export const TopNav = (props) => {
         aria-describedby="scroll-dialog-description"
       >
         <DialogContent dividers={scroll === 'paper'}>
-        <Box display="flex" alignItems="center" justifyContent={'center'}>
+        <Box
+        display="flex" 
+        alignItems="center" 
+        justifyContent={'center'}
+        >
               <Box sx={{margin:"30px",textAlign:'center'}}>
                 <Avatar
                   sx={{
@@ -146,9 +150,13 @@ export const TopNav = (props) => {
                   <Box flexGrow={1} >{call.from}</Box>
               </Box>
         </Box>
-        <Box display="flex" alignItems="center" justifyContent={'center'}>
+        <Box display="flex" 
+        alignItems="center" 
+        justifyContent={'center'}>
         <IconButton>
-          <Tooltip title="Refuse" placement="left" onClick={()=>{}}>
+          <Tooltip title="Refuse" 
+          placement="left" 
+          onClick={()=>{}}>
               <SvgIcon
               sx={{cursor:'pointer'}}
               style={{transform: "scale(1.5,1.5)"}}
@@ -161,7 +169,9 @@ export const TopNav = (props) => {
         </IconButton>
           <div style={{width:'15%'}}></div>
           <IconButton>
-            <Tooltip title="Accept" placement="right" onClick={()=>{}}>
+            <Tooltip title="Accept" 
+            placement="right" 
+            onClick={()=>{}}>
                 <SvgIcon
                 sx={{cursor:'pointer'}}
                 style={{transform: "scale(1.5,1.5) scale(-1,1)"}}
