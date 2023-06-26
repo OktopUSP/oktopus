@@ -84,7 +84,7 @@ const handleOpen = () => {
   }
 
  
-  fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/device/${router.query.id}/${method}`, requestOptions)
+  fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/device/${router.query.id[0]}/${method}`, requestOptions)
     .then(response => response.text())
     .then(result => {
       setOpen(false)

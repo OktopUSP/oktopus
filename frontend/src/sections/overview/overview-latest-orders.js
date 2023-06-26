@@ -102,7 +102,7 @@ export const OverviewLatestOrders = (props) => {
                       sx={{cursor:'pointer'}} 
                       onClick={()=>{
                           if (order.Status !== 2){
-                            router.push("devices/"+order.SN)
+                            router.push("devices/"+order.SN+"/discovery")
                           }
                         }
                       }
