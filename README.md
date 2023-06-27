@@ -194,6 +194,16 @@ Atualmente, gigantes das telecomunicações e startups, publicam software novo d
         </ul>
     </li>
 </ul>
+<ul>
+    <li>
+        <h4>Desenvolvimento:</h4>
+Subir aplicação utilizando Docker:
+<pre>
+leandro@leandro-laptop:~$ cd oktopus/devops
+leandro@leandro-laptop:~/oktopus/devops$ docker compose up
+</pre>
+    </li>
+</ul>
 
 
 <br/>
