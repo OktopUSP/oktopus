@@ -81,8 +81,8 @@ func StartApi(a Api) {
 	srv := &http.Server{
 		Addr: "0.0.0.0:" + a.Port,
 		// Good practice to set timeouts to avoid Slowloris attacks.
-		WriteTimeout: time.Second * 30,
-		ReadTimeout:  time.Second * 30,
+		WriteTimeout: time.Second * 60,
+		ReadTimeout:  time.Second * 60,
 		IdleTimeout:  time.Second * 60,
 		Handler:      corsOpts.Handler(r), // Pass our instance of gorilla/mux in.
 	}
@@ -181,7 +181,7 @@ func (a *Api) deviceFwUpdate(w http.ResponseWriter, r *http.Request) {
 		delete(a.MsgQueue, msg.Header.MsgId)
 		log.Println("requests queue:", a.MsgQueue)
 		getMsgAnswer = msg.Body.GetResponse().GetGetResp()
-	case <-time.After(time.Second * 30):
+	case <-time.After(time.Second * 40):
 		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		delete(a.MsgQueue, msg.Header.MsgId)
@@ -441,7 +441,7 @@ func (a *Api) deviceGetMsg(w http.ResponseWriter, r *http.Request) {
 		log.Println("requests queue:", a.MsgQueue)
 		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetGetResp())
 		return
-	case <-time.After(time.Second * 30):
+	case <-time.After(time.Second * 40):
 		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		delete(a.MsgQueue, msg.Header.MsgId)
