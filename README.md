@@ -163,13 +163,23 @@ Possui mais de 130 métricas de configuração e diagnóstico de Wi-Fi, muitas d
     </li>
 </ul>
 
+<ul>
+    <li>
+        <h4>Módulos de Software:</h4>
+Atualmente, gigantes das telecomunicações e startups, publicam software novo diariamente, ciclos de entrega lentos e processos de garantia de qualidade manuais e demorados, torna difícil a competição para integradores e prestadores de serviços. USP "Software Module Management" permite uma abordagem containerizada ao desenvolvimento de software de dispositivos embarcados, tornando possível diminuir drasticamente a chance de erro em atualições de software, também facilita a integração de terceiros em um dispositvo, manténdo ainda assim, isolada a parte de firmware do Vendor. 
+<br/>
+<img src="https://github.com/leandrofars/oktopus/assets/83298718/64664b0e-81cd-4a29-bbc5-b4186a04dfa2" width="50%"/>
+    </li>
+</ul>
+
 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <ul><li><h4>Infraestrutura:</h4></li></ul>
 
-![Oktopus Infra](https://github.com/leandrofars/oktopus/assets/83298718/69ca2b2c-ec9e-47ce-9df9-c4af33409737)
+![Oktopus drawio](https://github.com/leandrofars/oktopus/assets/83298718/3c542f76-3d73-4ed7-92db-1144a40da456)
+
 
 <ul>
     <li>
