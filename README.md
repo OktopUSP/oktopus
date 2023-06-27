@@ -129,18 +129,15 @@ Buscando resolver os desafios citados anteriormente, provedores e fabricantes ju
 
 <ul>
     <li>
+        <h4>Análise de Dados</h4> 
+O protocolo possui um mecanismo chamado "Bulk Data", onde é possível recolher grandes volumes de dados do dispositivo, os dados podem ser recolhidos por HTTP, ou outro MTP de telemetria definido na norma do TR, esses dados podem estar em formato JSON, CSV ou XML. Isso gera a oportunidade de utilizar IA em cima desses dados, obtendo informações relevantes que podem ser usadas tendo diversas intenções, desde a predição de eventos, KPIs, informações para a área comercial, mas também para a melhor configuração de um dispositivo.
+    </li>
+</ul>
+
+<ul>
+    <li>
         <h4>Wi-Fi:</h4> 
-        <ul>
-            <li>
-                Mais de 130 métricas de performance e diagnóstico
-            </li>
-            <li>
-                Possível captar interferência de rádios vizinhos através do comando neighboringwifidiagnostic()
-            </li>
-             <li>
-                Captura períodica de volume de dados para análise
-            </li>
-        </ul>
+Possui mais de 130 métricas de configuração e diagnóstico de Wi-Fi, muitas dessa configurações e parâmetros são uma troca entre área de cobertura do sinal, latência e throughput. Ao implantar sistemas Wi-Fi, tende-se a manter a mesma configuração em todos os clientes, fazendo com que a tecnologia tenha uma performance abaixo do esperado. A Machine Learning aliada à análise de dados citada no tópico anterior, torna possível automatizar o gerenciamento e a optimização de redes Wireless, onde uma abordagem de big data é capax de encontrar a configuração ideal para cada dispositivo.
         
 ![image](https://github.com/leandrofars/oktopus/assets/83298718/3d6fe3e8-3ca2-460b-9583-da89b42753f8)
     </li>
@@ -181,5 +178,5 @@ Caso você tenha interesse em informações internas sobre o time e nossas prete
 <p>Fontes usadas neste arquivo: </p>
 <p><a href="https://www.broadband-forum.org/download/MU-461.pdf">MU-461.pdf</a></p>
 <p><a href="https://usp.technology/specification/index.htm">TR-369.html</a></p>
-<p><a href="https://drive.google.com/drive/folders/1N7FqK0PkDhjCN5s3OhQ_wmz9UcTSwRCX"></a>USP Training Session Slides</p>
+<p><a href="https://drive.google.com/drive/folders/1N7FqK0PkDhjCN5s3OhQ_wmz9UcTSwRCX">USP Training Session Slides</a></p>
 
