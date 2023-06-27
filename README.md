@@ -150,6 +150,21 @@ Possui mais de 130 métricas de configuração e diagnóstico de Wi-Fi, muitas d
     </li>
 </ul>
 
+<ul>
+    <li>
+        <h4>IoT:</h4>
+<div align="center">
+<img src="https://github.com/leandrofars/oktopus/assets/83298718/a2a12d9d-05a0-428b-ba3f-1ad83c876301" width="90%"/>
+<br/>
+<img src="https://github.com/leandrofars/oktopus/assets/83298718/91a87f43-3de7-42bd-a689-a4e14eecf5c0" width="60%"/>
+<br/>
+<img src="https://github.com/leandrofars/oktopus/assets/83298718/73e2e360-d53e-494e-9a50-60c83dae75df" width="60%"/>
+<div>
+    </li>
+</ul>
+
+
+
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <ul><li><h4>Infraestrutura:</h4></li></ul>
