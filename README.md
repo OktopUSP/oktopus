@@ -205,8 +205,8 @@ leandro@leandro-laptop:~/oktopus/devops$ docker compose up
     </li>
 </ul>
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------
 
-<br/>
 Caso você tenha interesse em informações internas sobre o time e nossas pretensões acesse nossa <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>.
 <br/>
 <p>Fontes bibliográficas: </p>
