@@ -181,7 +181,7 @@ func (a *Api) deviceFwUpdate(w http.ResponseWriter, r *http.Request) {
 		delete(a.MsgQueue, msg.Header.MsgId)
 		log.Println("requests queue:", a.MsgQueue)
 		getMsgAnswer = msg.Body.GetResponse().GetGetResp()
-	case <-time.After(time.Second * 40):
+	case <-time.After(time.Second * 55):
 		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		delete(a.MsgQueue, msg.Header.MsgId)
@@ -240,7 +240,7 @@ func (a *Api) deviceFwUpdate(w http.ResponseWriter, r *http.Request) {
 		log.Println("requests queue:", a.MsgQueue)
 		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetSetResp())
 		return
-	case <-time.After(time.Second * 28):
+	case <-time.After(time.Second * 55):
 		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		delete(a.MsgQueue, msg.Header.MsgId)
@@ -290,7 +290,7 @@ func (a *Api) deviceGetParameterInstances(w http.ResponseWriter, r *http.Request
 		log.Println("requests queue:", a.MsgQueue)
 		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetGetInstancesResp())
 		return
-	case <-time.After(time.Second * 28):
+	case <-time.After(time.Second * 55):
 		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		delete(a.MsgQueue, msg.Header.MsgId)
@@ -340,7 +340,7 @@ func (a *Api) deviceGetSupportedParametersMsg(w http.ResponseWriter, r *http.Req
 		log.Println("requests queue:", a.MsgQueue)
 		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetGetSupportedDmResp())
 		return
-	case <-time.After(time.Second * 28):
+	case <-time.After(time.Second * 55):
 		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		delete(a.MsgQueue, msg.Header.MsgId)
@@ -390,7 +390,7 @@ func (a *Api) deviceCreateMsg(w http.ResponseWriter, r *http.Request) {
 		log.Println("requests queue:", a.MsgQueue)
 		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetAddResp())
 		return
-	case <-time.After(time.Second * 28):
+	case <-time.After(time.Second * 55):
 		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		delete(a.MsgQueue, msg.Header.MsgId)
@@ -441,7 +441,7 @@ func (a *Api) deviceGetMsg(w http.ResponseWriter, r *http.Request) {
 		log.Println("requests queue:", a.MsgQueue)
 		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetGetResp())
 		return
-	case <-time.After(time.Second * 40):
+	case <-time.After(time.Second * 55):
 		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		delete(a.MsgQueue, msg.Header.MsgId)
@@ -491,7 +491,7 @@ func (a *Api) deviceDeleteMsg(w http.ResponseWriter, r *http.Request) {
 		log.Println("requests queue:", a.MsgQueue)
 		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetDeleteResp())
 		return
-	case <-time.After(time.Second * 28):
+	case <-time.After(time.Second * 55):
 		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		delete(a.MsgQueue, msg.Header.MsgId)
@@ -541,7 +541,7 @@ func (a *Api) deviceUpdateMsg(w http.ResponseWriter, r *http.Request) {
 		log.Println("requests queue:", a.MsgQueue)
 		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetSetResp())
 		return
-	case <-time.After(time.Second * 28):
+	case <-time.After(time.Second * 55):
 		log.Printf("Request %s Timed Out", msg.Header.MsgId)
 		w.WriteHeader(http.StatusGatewayTimeout)
 		delete(a.MsgQueue, msg.Header.MsgId)
