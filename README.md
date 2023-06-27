@@ -1,17 +1,97 @@
-<p>Leia em outros idiomas: <a href="README.en.md">English</a>, <a href="README.es.md">Español</a></p><br/><br/>
 <p align="center">
 <img src="https://user-images.githubusercontent.com/83298718/220207485-8c2aac78-95eb-4b43-b23e-c4bfa6cd30e6.png"/>
 </p>
 <br/>
+
+<ul>
+    <li>
+        <h4>Introdução:</h4>
+    </li>
+</ul>        
 <p>
-Este repositório tem como intuito fomentar o desenvolvimento de uma plataforma de gerência multi-vendor para IoTs. Todo dispositivo que seguir o protocolo TR-369 poderá ser gerenciado. O objetivo principal é facilitar e unificar a gerência de dispositivos, o que gera inúmeros benefícios para o usuário final e prestadores de serviços, extingue problemas antigos da área de telecomunicações e suprimi as demandas que as tecnologias de hoje exigem: interconexão de dispositivos, coleta de dados, rápidez, disponibilidade e muito mais.
+Este repositório tem como intuito fomentar o desenvolvimento de uma plataforma de gerência multi-vendor para IoTs. Todo dispositivo que seguir o protocolo TR-369 poderá ser gerenciado. O objetivo principal é facilitar e unificar a gerência de dispositivos, o que gera inúmeros benefícios para o usuário final e prestadores de serviços, suprimindo as demandas que as tecnologias de hoje exigem: interconexão de dispositivos, coleta de dados, rápidez, disponibilidade e muito mais.
+</p>
+<ul>
+    <li>
+        <h4>TR-069 ---> TR-369 :</h4>
+    </li>
+</ul>  
+<p>
+O advento da Internet das Coisas traz inúmeras oportunidades e desafios pra os prestadores de serviços, com mais de um bilhão de dispositivos espalhados pelo globo hoje, fazendo uso do <a href="https://www.broadband-forum.org/download/TR-069_Amendment-2.pdf">TR-069</a>, qual é o futuro do protocolo e o que podemos esperar pela frente?
 </p>
 <p>
-Com a criação de novas tecnologias mostrou-se necessário criar uma solução mais robusta que abrangesse uma gama maior de nichos, assim surgiu o TR-369, buscando preencher lacunas do seu antecessor (TR-069).
-</p> 
-<p>
-Esta aplicação tem como inspirações o projeto <a href="https://github.com/genieacs/genieacs">GenieACS</a> e outras soluções comerciais encontradas no mercado. Buscamos seguir rigorosamente as especificações do USP TR-369, optando por usar MQTT e Websockets na camada de MTP (Message Transfer Protocol).
+O CWMP(CPE Wan Management Protocol), mais conhecido como TR-069, abriu muitas portas para o ecossistema de provedores, por meio dele é possível entregar serviços com agilidade, que servem ou ultrapassam as expectativas do cliente, fazendo uma gestão pró-ativa e segura da rede, tendo em vista também o menor custo e a maior eficiência para os prestadores de serviços.
 </p>
+<p>
+Com a ascensão do que hoje chamamos de casa inteligente, a Internet das Coisas e a demanda por ambientes cada vez mais interconectadas e baseados em nuvem, novas demandas e obstáculos surgiram, abrindo a porta para a criação de uma nova forma de comunicação que supra as necessidades do mercado atual.
+</p>
+<p>
+Existe uma corrida acirrada para monetizar os dispostivos IoT que hoje fazem parte da casa conectada e de outros ambientes. Como resultado disso, muitas empresas estão criando suas próprias soluções proprietárias; isso é compreensível dada tamanha pressão gerada pela promessa da monetização da Casa Inteligente. Infelizmente, essas aplicações contribuem para um ecossistema pobre, onde um provedor acaba dependente e limitado a uma solução vertical, de um único Vendor. Isso gera um <b>ambiente de pouca competição (o que leva a maiores riscos), menos inovação, e o potencial de soluções com custos muito elevados</b>. 
+</p>
+<p>
+As tecnologias por trás do Wi-Fi, a conectividade entre dispositivos, a Casa Inteligente e os IoTs estão em constante evolução e aprimoramento. É importante que quando os prestadores de serviços forem buscar uma solução, busquem por algo que seja a "prova de futuro", pensando sempre adiante.
+</p>
+<p>
+Buscando resolver os desafios citados anteriormente, provedores e fabricantes juntos, desenvolveram o USP (User Services Platform), definido pela norma TR-369 da Broadband Forum, sendo este, a evolução natural do TR-069. <b>Este novo padrão foi desenhado para ser flexível, seguro, escalonável e padronizado, para atender as demandas de um mundo conectado hoje, e no futuro.</b>
+</p>
+
+<ul>
+    <li>
+        <h4>Empresas/instituições envolvidas na criação do TR-369:</h4>
+        <ul>
+            <li> 
+            Google
+            </li>
+            <li> 
+            Nokia
+            </li>
+            <li> 
+            Huawei
+            </li>
+            <li> 
+            Axiros
+            </li>
+            <li> 
+            Orange
+            </li>
+            <li> 
+            Commscope
+            </li>
+            <li> 
+            Assia
+            </li>
+            <li> 
+            AT&AT
+            </li>
+            <li> 
+            NEC
+            </li>
+            <li> 
+            Arris
+            </li>
+            <li> 
+            QA Cafe
+            </li>
+        </ul>
+    </li>
+</ul> 
+<br/>
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+<br/>
+<ul>
+    <li>
+        <h4>Topologia:</h4>
+    </li>
+</ul>  
+
+<img src="https://usp.technology/specification/architecture/usp_architecture.png"/>
+
+<ul>
+    <li>
+        <h4>Notificações:</h4>
+    </li>
+</ul>  
+
 <ul><li><h4>Infraestrutura:</h4></li></ul>
 
 ![Oktopus Infra](https://github.com/leandrofars/oktopus/assets/83298718/69ca2b2c-ec9e-47ce-9df9-c4af33409737)
@@ -29,6 +109,13 @@ Esta aplicação tem como inspirações o projeto <a href="https://github.com/ge
         </ul>
     </li>
 </ul>
+
+
 <br/>
 Caso você tenha interesse em informações internas sobre o time e nossas pretensões acesse nossa <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>.
+<br/>
+<br/>
+<p>Fontes: </p>
+<p><a href="https://www.broadband-forum.org/download/MU-461.pdf">MU-461.pdf</a></p>
+<p><a href="https://usp.technology/specification/index.htm">TR-369.html</a></p>
 
