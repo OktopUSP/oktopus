@@ -37,7 +37,7 @@ Buscando resolver os desafios citados anteriormente, provedores e fabricantes ju
 
 <ul>
     <li>
-        <h4>Empresas/instituições envolvidas na criação do TR-369:</h4>
+        <h4>Empresas/Instituições envolvidas na criação do TR-369:</h4>
         <ul>
             <li> 
             Google
@@ -75,9 +75,9 @@ Buscando resolver os desafios citados anteriormente, provedores e fabricantes ju
         </ul>
     </li>
 </ul> 
-<br/>
+
 --------------------------------------------------------------------------------------------------------------------------------------------------------
-<br/>
+
 <ul>
     <li>
         <h4>Topologia:</h4>
@@ -92,7 +92,7 @@ Buscando resolver os desafios citados anteriormente, provedores e fabricantes ju
 
 <ul>
     <li>
-        <h4>Protocolos utilizados:</h4> 
+        <h4>Protocolos:</h4> 
         
 ![image](https://github.com/leandrofars/oktopus/assets/83298718/9b789f0b-cb0c-4cec-8b8e-767ba21bffae)
     </li>
@@ -100,13 +100,60 @@ Buscando resolver os desafios citados anteriormente, provedores e fabricantes ju
 
 <ul>
     <li>
-        <h4>Notificações:</h4> 
+        <h4>Notificações/Coleta de dados:</h4> 
         É possível criar notificações que são disparadas em uma mudaça de valor, criação e remoção de objeto, operação completa, ou um evento.
         
 ![image](https://github.com/leandrofars/oktopus/assets/83298718/184899a3-52e7-491a-8ee7-7b442fe50719)
     </li>
-</ul>  
+</ul>
 
+<ul>
+    <li>
+        <h4><a href="https://github.com/BroadbandForum/obuspa">OB-USP-A</a> (Open Broadband User Services Platfrom Agent):</h4> 
+        <ul>
+            <li> 
+            Desenhado para software embarcado (~400kb em ARM)
+            </li>
+            <li> 
+            Codificado em C
+            </li>
+            <li> 
+            Licença <a href="https://opensource.org/license/bsd-3-clause/">3-Clause BSD</a>
+            </li>
+            <li> 
+            Feito para ambientes linux
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<ul>
+    <li>
+        <h4>Wi-Fi:</h4> 
+        <ul>
+            <li>
+                Mais de 130 métricas de performance e diagnóstico
+            </li>
+            <li>
+                Possível captar interferência de rádios vizinhos através do comando neighboringwifidiagnostic()
+            </li>
+             <li>
+                Captura períodica de volume de dados para análise
+            </li>
+        </ul>
+        
+![image](https://github.com/leandrofars/oktopus/assets/83298718/3d6fe3e8-3ca2-460b-9583-da89b42753f8)
+    </li>
+</ul>
+
+<ul>
+    <li>
+        <h4>Comandos:</h4>
+        É possível realizar comandos remotamente no produto, como por exemplo: atualização de firmware, reboot, reset, busca de redes vizinhas, backup, ping, diagnósticos de rede e muitos outros.
+    </li>
+</ul>
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <ul><li><h4>Infraestrutura:</h4></li></ul>
 
@@ -131,7 +178,8 @@ Buscando resolver os desafios citados anteriormente, provedores e fabricantes ju
 Caso você tenha interesse em informações internas sobre o time e nossas pretensões acesse nossa <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>.
 <br/>
 <br/>
-<p>Fontes: </p>
+<p>Fontes usadas neste arquivo: </p>
 <p><a href="https://www.broadband-forum.org/download/MU-461.pdf">MU-461.pdf</a></p>
 <p><a href="https://usp.technology/specification/index.htm">TR-369.html</a></p>
+<p><a href="https://drive.google.com/drive/folders/1N7FqK0PkDhjCN5s3OhQ_wmz9UcTSwRCX"></a>USP Training Session Slides</p>
 
