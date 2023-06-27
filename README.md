@@ -205,12 +205,9 @@ leandro@leandro-laptop:~/oktopus/devops$ docker compose up
     </li>
 </ul>
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------
 
-<br/>
 Caso você tenha interesse em informações internas sobre o time e nossas pretensões acesse nossa <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>.
 <br/>
-<p>Fontes bibliográficas: </p>
-<p><a href="https://www.broadband-forum.org/download/MU-461.pdf">MU-461.pdf</a></p>
-<p><a href="https://usp.technology/specification/index.htm">TR-369.html</a></p>
-<p><a href="https://drive.google.com/drive/folders/1N7FqK0PkDhjCN5s3OhQ_wmz9UcTSwRCX">USP Training Session Slides</a></p>
+<p>Fontes bibliográficas: <a href="https://www.broadband-forum.org/download/MU-461.pdf">MU-461.pdf</a>, <a href="https://usp.technology/specification/index.htm">TR-369.html</a>, <a href="https://drive.google.com/drive/folders/1N7FqK0PkDhjCN5s3OhQ_wmz9UcTSwRCX">USP Training Session Slides</a></p>
 
