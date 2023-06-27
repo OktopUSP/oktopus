@@ -189,8 +189,7 @@ Possui mais de 130 métricas de configuração e diagnóstico de Wi-Fi, muitas d
 <br/>
 Caso você tenha interesse em informações internas sobre o time e nossas pretensões acesse nossa <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>.
 <br/>
-<br/>
-<p>Fontes usadas neste arquivo: </p>
+<p>Fontes bibliográficas: </p>
 <p><a href="https://www.broadband-forum.org/download/MU-461.pdf">MU-461.pdf</a></p>
 <p><a href="https://usp.technology/specification/index.htm">TR-369.html</a></p>
 <p><a href="https://drive.google.com/drive/folders/1N7FqK0PkDhjCN5s3OhQ_wmz9UcTSwRCX">USP Training Session Slides</a></p>
