@@ -1,0 +1,74 @@
+services:
+
+  oktopustr369:
+      image: 'golang:1.18'
+      container_name: oktopustr369
+      tty: true
+      stdin_open: true
+      volumes:
+      - ../:/app/oktopus
+      command: bash -c "cd /app/oktopus/backend/services/controller && go run cmd/oktopus/main.go -mongo mongodb://mongodb:27017 -a mochi -p 1883"
+      ports:
+      - 8000:8000
+      depends_on:
+      - mongodb
+      - mochi
+      networks:
+      - usp_network
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    networks:
+    - usp_network
+
+  redis:
+    image: redis
+    container_name: redis
+    networks:
+    - usp_network
+
+  mochi:
+    image: 'golang:1.18'
+    container_name: mochi
+    tty: true
+    stdin_open: true
+    volumes:
+    - ../:/app/oktopus
+    command: bash -c "cd /app/oktopus/backend/services/mochi/cmd/ && go run main.go -redis 'redis:6379'"
+    ports:
+    - 1883:1883
+    depends_on:
+      - redis
+    networks:
+    - usp_network
+
+  socketio:
+    image: 'node:14.20'
+    container_name: socketio
+    tty: true
+    stdin_open: true
+    volumes:
+    - ../:/app/oktopus
+    command: bash -c "cd /app/oktopus/backend/services/socketio/ && npm i && node server.js"
+    ports:
+    - 5000:5000
+    networks:
+    - usp_network
+
+  frontend:
+    image: 'node:14.20'
+    container_name: frontend
+    tty: true
+    stdin_open: true
+    volumes:
+      - ../:/app/oktopus
+    command: bash -c "cd /app/oktopus/frontend && npm i && npm run dev"
+    ports:
+      - 3000:3000
+    networks:
+      - usp_network
+
+networks:
+  usp_network:
+    driver: bridge
