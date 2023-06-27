@@ -76,7 +76,7 @@ Buscando resolver os desafios citados anteriormente, provedores e fabricantes ju
     </li>
 </ul> 
 <br/>
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 <br/>
 <ul>
     <li>
@@ -86,11 +86,27 @@ Buscando resolver os desafios citados anteriormente, provedores e fabricantes ju
 
 <img src="https://usp.technology/specification/architecture/usp_architecture.png"/>
 
+![image](https://github.com/leandrofars/oktopus/assets/83298718/b1d5a0c7-4567-464c-bc9b-1956ef5c5f3b)
+
+![image](https://github.com/leandrofars/oktopus/assets/83298718/7b46dc1f-5eb2-4a1b-8e77-376b0836948a)
+
 <ul>
     <li>
-        <h4>Notificações:</h4>
+        <h4>Protocolos utilizados:</h4> 
+        
+![image](https://github.com/leandrofars/oktopus/assets/83298718/9b789f0b-cb0c-4cec-8b8e-767ba21bffae)
+    </li>
+</ul>
+
+<ul>
+    <li>
+        <h4>Notificações:</h4> 
+        É possível criar notificações que são disparadas em uma mudaça de valor, criação e remoção de objeto, operação completa, ou um evento.
+        
+![image](https://github.com/leandrofars/oktopus/assets/83298718/184899a3-52e7-491a-8ee7-7b442fe50719)
     </li>
 </ul>  
+
 
 <ul><li><h4>Infraestrutura:</h4></li></ul>
 
