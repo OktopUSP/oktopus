@@ -225,12 +225,17 @@ func (h *MyHook) Provides(b byte) bool {
 	return bytes.Contains([]byte{
 		mqtt.OnSubscribed,
 		mqtt.OnDisconnect,
+		mqtt.OnClientExpired,
 	}, []byte{b})
 }
 
 func (h *MyHook) Init(config any) error {
 	h.Log.Info().Msg("initialised")
 	return nil
+}
+
+func (h *MyHook) OnClientExpired(cl *mqtt.Client) {
+	log.Printf("Client id %s expired", cl.ID)
 }
 
 func (h *MyHook) OnDisconnect(cl *mqtt.Client, err error, expire bool) {
@@ -257,6 +262,10 @@ func (h *MyHook) OnSubscribed(cl *mqtt.Client, pk packets.Packet, reasonCodes []
 		}
 
 		if clUser != "" {
+			cl.Properties.Will = mqtt.Will{
+				Qos:     1,
+				Payload: []byte(clUser),
+			}
 			log.Println("new device:", clUser)
 			err := server.Publish("oktopus/devices", []byte(clUser), false, 1)
 			if err != nil {
