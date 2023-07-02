@@ -73,8 +73,15 @@ func main() {
 	path := flag.String("path", "", "path to data auth file")
 	fullchain := flag.String("full_chain_path", "", "path to fullchain.pem certificate")
 	privkey := flag.String("private_key_path", "", "path to privkey.pem certificate")
+	logLevel := flag.Int("logLevel", 1, "log level, default is INFO, 0 value is DEBUG")
 
 	flag.Parse()
+
+	if *logLevel > 2 || *logLevel < 0 {
+		log.Println("Log level not valid, choose a number between 0 and 7")
+		log.Println("For more info access zeroLog documentation: https://github.com/rs/zerolog")
+		os.Exit(1)
+	}
 
 	sigs := make(chan os.Signal, 1)
 	done := make(chan bool, 1)
@@ -86,10 +93,10 @@ func main() {
 
 	serverForTLS := mqtt.New(&mqtt.Options{})
 
-	lTls := serverForTLS.Log.Level(zerolog.DebugLevel)
+	lTls := serverForTLS.Log.Level(zerolog.Level(*logLevel))
 	serverForTLS.Log = &lTls
 
-	l := server.Log.Level(zerolog.DebugLevel)
+	l := server.Log.Level(zerolog.Level(*logLevel))
 	server.Log = &l
 
 	if *path != "" {
