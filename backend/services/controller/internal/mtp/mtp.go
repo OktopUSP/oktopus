@@ -38,5 +38,5 @@ func MtpService(b Broker, done chan os.Signal) {
 			done <- os.Interrupt
 		}
 	}()
-	b.Subscribe()
+	//b.Subscribe()
 }
