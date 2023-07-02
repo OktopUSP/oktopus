@@ -78,27 +78,6 @@ func (m *Mqtt) Connect() {
 	}
 
 	c = cm
-
-	//devices := make(chan *paho.Publish)
-	//controller := make(chan *paho.Publish)
-	//disconnect := make(chan *paho.Publish)
-	//apiMsg := make(chan *paho.Publish)
-	//go m.messageHandler(devices, controller, disconnect, apiMsg)
-	//clientConfig := m.startClient(devices, controller, disconnect, apiMsg)
-	//connParameters := startConnection(m.Id, m.User, m.Passwd)
-	//
-	//conn, err := clientConfig.Connect(m.Ctx, &connParameters)
-	//if err != nil {
-	//	log.Println(err)
-	//}
-	//if conn.ReasonCode != 0 {
-	//	log.Fatalf("Failed to connect to %s : %d - %s", m.Addr+m.Port, conn.ReasonCode, conn.Properties.ReasonString)
-	//}
-	//
-	//// Sets global client to be used by other mqtt functions
-	//c = clientConfig
-	//
-	//log.Printf("Connected to broker--> %s:%s", m.Addr, m.Port)
 }
 
 func (m *Mqtt) Disconnect() {
@@ -160,23 +139,6 @@ func (m *Mqtt) buildClientConfig(devices, controller, disconnect, apiMsg chan *p
 		}
 	})
 
-	//if m.TLS {
-	//	conn := connWithTls(m.Addr+":"+m.Port, m.Ctx)
-	//	clientConfig := paho.ClientConfig{
-	//		Conn:   conn,
-	//		Router: singleHandler,
-	//		OnServerDisconnect: func(discon *paho.Disconnect) {
-	//			log.Println("disconnected from mqtt server, reason code: ", discon.ReasonCode)
-	//		},
-	//		OnClientError: func(err error) {
-	//			log.Println(err)
-	//		},
-	//	}
-	//	return &clientConfig
-	//}
-
-	//conn, _ := connWithoutTLS(m.Addr, m.Port)
-
 	clientConfig := paho.ClientConfig{}
 
 	clientConfig = paho.ClientConfig{
@@ -206,93 +168,6 @@ func (m *Mqtt) buildClientConfig(devices, controller, disconnect, apiMsg chan *p
 
 	return &clientConfig
 }
-
-//Not used by autopaho package
-//func connWithoutTLS(addr, port string) (net.Conn, error) {
-//	x := 1
-//	for {
-//		log.Println("Trying connection to broker...")
-//		conn, err := net.Dial("tcp", addr+":"+port)
-//		if err == nil {
-//			log.Println("Successfully connected to broker!")
-//			return conn, err
-//		} else {
-//			if x == 5 {
-//				log.Println("Couldn't connect to broker")
-//				os.Exit(1)
-//			}
-//			x = x + 1
-//			time.Sleep(5 * time.Second)
-//		}
-//	}
-//}
-
-//Not used by autopaho package
-//func connWithTls(address string, ctx context.Context) net.Conn {
-//	config := &tls.Config{
-//		// After going to cloud, certificates must match names, and we must take this option below
-//		InsecureSkipVerify: true,
-//	}
-//
-//	d := tls.Dialer{
-//		Config: config,
-//	}
-//
-//	conn, err := d.DialContext(ctx, "tcp", address)
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//
-//	conn = newThreadSafeConnection(conn)
-//
-//	return conn
-//}
-
-// Custom net.Conn with thread safety
-//func newThreadSafeConnection(c net.Conn) net.Conn {
-//	type threadSafeConn struct {
-//		net.Conn
-//		sync.Locker
-//	}
-//
-//	return &threadSafeConn{
-//		Conn:   c,
-//		Locker: &sync.Mutex{},
-//	}
-//}
-
-//func startConnection(id, user, pass string) paho.Connect {
-//
-//	connParameters := paho.Connect{
-//		KeepAlive:  30,
-//		ClientID:   id,
-//		CleanStart: true,
-//	}
-//
-//	if id != "" {
-//		connParameters.ClientID = id
-//	} else {
-//		mac, err := utils.GetMacAddr()
-//		if err != nil {
-//			log.Fatal(err)
-//		}
-//		connParameters.ClientID = mac[0]
-//		log.Println("MQTT client id:", connParameters.ClientID)
-//	}
-//
-//	if user != "" {
-//		connParameters.Username = user
-//		connParameters.UsernameFlag = true
-//		log.Println("MQTT username:", connParameters.Username)
-//	}
-//	if pass != "" {
-//		connParameters.Password = []byte(pass)
-//		connParameters.PasswordFlag = true
-//		log.Println("MQTT password:", pass)
-//	}
-//
-//	return connParameters
-//}
 
 func (m *Mqtt) messageHandler(devices, controller, disconnect, apiMsg chan *paho.Publish) {
 	for {
