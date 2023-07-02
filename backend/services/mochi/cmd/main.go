@@ -252,7 +252,7 @@ func (h *MyHook) OnDisconnect(cl *mqtt.Client, err error, expire bool) {
 	}
 
 	if clUser != "" {
-		err := server.Publish("oktopus/disconnect", []byte(clUser), false, 1)
+		err := server.Publish("oktopus/v1/disconnect/"+clUser, []byte(""), false, 1)
 		if err != nil {
 			log.Println("server publish error: ", err)
 		}
@@ -270,11 +270,11 @@ func (h *MyHook) OnSubscribed(cl *mqtt.Client, pk packets.Packet, reasonCodes []
 
 		if clUser != "" {
 			cl.Properties.Will = mqtt.Will{
-				Qos:     1,
-				Payload: []byte(clUser),
+				Qos:       1,
+				TopicName: "oktopus/v1/disconnect/" + clUser,
 			}
 			log.Println("new device:", clUser)
-			err := server.Publish("oktopus/devices", []byte(clUser), false, 1)
+			err := server.Publish("oktopus/v1/devices/"+clUser, []byte(""), false, 1)
 			if err != nil {
 				log.Println("server publish error: ", err)
 			}

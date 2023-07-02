@@ -126,11 +126,11 @@ func (m *Mqtt) Publish(msg []byte, topic, respTopic string) {
 func (m *Mqtt) buildClientConfig(devices, controller, disconnect, apiMsg chan *paho.Publish) *paho.ClientConfig {
 	log.Println("Starting new mqtt client")
 	singleHandler := paho.NewSingleHandlerRouter(func(p *paho.Publish) {
-		if p.Topic == m.DevicesTopic {
+		if strings.Contains(p.Topic, "devices") {
 			devices <- p
 		} else if strings.Contains(p.Topic, "controller") {
 			controller <- p
-		} else if p.Topic == m.DisconnectTopic {
+		} else if strings.Contains(p.Topic, "disconnect") {
 			disconnect <- p
 		} else if strings.Contains(p.Topic, "api") {
 			apiMsg <- p
@@ -173,17 +173,19 @@ func (m *Mqtt) messageHandler(devices, controller, disconnect, apiMsg chan *paho
 	for {
 		select {
 		case d := <-devices:
-			payload := string(d.Payload)
-			log.Println("New device: ", payload)
-			m.handleNewDevice(payload)
+			paths := strings.Split(d.Topic, "/")
+			device := paths[len(paths)-1]
+			log.Println("New device: ", device)
+			m.handleNewDevice(device)
 		case c := <-controller:
 			topic := c.Topic
 			sn := strings.Split(topic, "/")
 			m.handleNewDevicesResponse(c.Payload, sn[3])
 		case dis := <-disconnect:
-			payload := string(dis.Payload)
-			log.Println("Device disconnected: ", payload)
-			m.handleDevicesDisconnect(payload)
+			paths := strings.Split(dis.Topic, "/")
+			device := paths[len(paths)-1]
+			log.Println("Device disconnected: ", device)
+			m.handleDevicesDisconnect(device)
 		case api := <-apiMsg:
 			log.Println("Handle api request")
 			m.handleApiRequest(api.Payload)

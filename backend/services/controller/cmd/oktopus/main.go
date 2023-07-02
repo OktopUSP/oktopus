@@ -45,8 +45,8 @@ func main() {
 
 	log.Println("Starting Oktopus Project TR-369 Controller Version:", VERSION)
 	// fl_endpointId := flag.String("endpoint_id", "proto::oktopus-controller", "Defines the enpoint id the Agent must trust on.")
-	flDevicesTopic := flag.String("d", "oktopus/devices", "That's the topic mqtt broker end new devices info.")
-	flDisconTopic := flag.String("dis", "oktopus/disconnect", "It's where disconnected IoTs are known.")
+	flDevicesTopic := flag.String("d", "oktopus/+/devices/+", "That's the topic mqtt broker end new devices info.")
+	flDisconTopic := flag.String("dis", "oktopus/+/disconnect/+", "It's where disconnected IoTs are known.")
 	flSubTopic := flag.String("sub", "oktopus/+/controller/+", "That's the topic agent must publish to, and the controller keeps on listening.")
 	flBrokerAddr := flag.String("a", "localhost", "Mqtt broker adrress")
 	flBrokerPort := flag.String("p", "1883", "Mqtt broker port")
