@@ -13,7 +13,7 @@ import (
 type Broker interface {
 	Connect()
 	Disconnect()
-	Publish(msg []byte, topic, respTopic string)
+	Publish(msg []byte, topic, respTopic string, retain bool)
 	Subscribe()
 	/*
 		At request method we're able to send a message to a topic

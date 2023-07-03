@@ -11,27 +11,32 @@ import (
 	"google.golang.org/protobuf/proto"
 	"log"
 	"net/url"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 )
 
 type Mqtt struct {
-	Addr            string
-	Port            string
-	Id              string
-	User            string
-	Passwd          string
-	Ctx             context.Context
-	QoS             int
-	SubTopic        string
-	DevicesTopic    string
-	DisconnectTopic string
-	TLS             bool
-	DB              db.Database
-	MsgQueue        map[string](chan usp_msg.Msg)
-	QMutex          *sync.Mutex
+	Addr         string
+	Port         string
+	Id           string
+	User         string
+	Passwd       string
+	Ctx          context.Context
+	QoS          int
+	SubTopic     string
+	DevicesTopic string
+	TLS          bool
+	DB           db.Database
+	MsgQueue     map[string](chan usp_msg.Msg)
+	QMutex       *sync.Mutex
 }
+
+const (
+	ONLINE = iota
+	OFFLINE
+)
 
 var c *autopaho.ConnectionManager
 
@@ -41,13 +46,12 @@ func (m *Mqtt) Connect() {
 
 	broker, _ := url.Parse("tcp://" + m.Addr + ":" + m.Port)
 
-	devices := make(chan *paho.Publish)
+	status := make(chan *paho.Publish)
 	controller := make(chan *paho.Publish)
-	disconnect := make(chan *paho.Publish)
 	apiMsg := make(chan *paho.Publish)
 
-	go m.messageHandler(devices, controller, disconnect, apiMsg)
-	pahoClientConfig := m.buildClientConfig(devices, controller, disconnect, apiMsg)
+	go m.messageHandler(status, controller, apiMsg)
+	pahoClientConfig := m.buildClientConfig(status, controller, apiMsg)
 
 	autopahoClientConfig := autopaho.ClientConfig{
 		BrokerUrls:        []*url.URL{broker},
@@ -90,10 +94,9 @@ func (m *Mqtt) Disconnect() {
 func (m *Mqtt) Subscribe() {
 	if _, err := c.Subscribe(m.Ctx, &paho.Subscribe{
 		Subscriptions: map[string]paho.SubscribeOptions{
-			m.SubTopic:        {QoS: byte(m.QoS), NoLocal: true},
-			m.DevicesTopic:    {QoS: byte(m.QoS), NoLocal: true},
-			m.DisconnectTopic: {QoS: byte(m.QoS), NoLocal: true},
-			"oktopus/+/api/+": {QoS: byte(m.QoS), NoLocal: true},
+			m.SubTopic:        {QoS: byte(m.QoS)},
+			m.DevicesTopic:    {QoS: byte(m.QoS)},
+			"oktopus/+/api/+": {QoS: byte(m.QoS)},
 		},
 	}); err != nil {
 		log.Fatalln(err)
@@ -101,15 +104,14 @@ func (m *Mqtt) Subscribe() {
 
 	log.Printf("Subscribed to %s", m.SubTopic)
 	log.Printf("Subscribed to %s", m.DevicesTopic)
-	log.Printf("Subscribed to %s", m.DisconnectTopic)
-	log.Println("Subscribed to %s", "oktopus/+/api/+")
+	log.Printf("Subscribed to %s", "oktopus/+/api/+")
 }
 
-func (m *Mqtt) Publish(msg []byte, topic, respTopic string) {
+func (m *Mqtt) Publish(msg []byte, topic, respTopic string, retain bool) {
 	if _, err := c.Publish(context.Background(), &paho.Publish{
 		Topic:   topic,
 		QoS:     byte(m.QoS),
-		Retain:  false,
+		Retain:  retain,
 		Payload: msg,
 		Properties: &paho.PublishProperties{
 			ResponseTopic: respTopic,
@@ -123,15 +125,13 @@ func (m *Mqtt) Publish(msg []byte, topic, respTopic string) {
 
 /* -------------------------------------------------------------------------- */
 
-func (m *Mqtt) buildClientConfig(devices, controller, disconnect, apiMsg chan *paho.Publish) *paho.ClientConfig {
+func (m *Mqtt) buildClientConfig(status, controller, apiMsg chan *paho.Publish) *paho.ClientConfig {
 	log.Println("Starting new mqtt client")
 	singleHandler := paho.NewSingleHandlerRouter(func(p *paho.Publish) {
-		if strings.Contains(p.Topic, "devices") {
-			devices <- p
+		if strings.Contains(p.Topic, "status") {
+			status <- p
 		} else if strings.Contains(p.Topic, "controller") {
 			controller <- p
-		} else if strings.Contains(p.Topic, "disconnect") {
-			disconnect <- p
 		} else if strings.Contains(p.Topic, "api") {
 			apiMsg <- p
 		} else {
@@ -169,29 +169,44 @@ func (m *Mqtt) buildClientConfig(devices, controller, disconnect, apiMsg chan *p
 	return &clientConfig
 }
 
-func (m *Mqtt) messageHandler(devices, controller, disconnect, apiMsg chan *paho.Publish) {
+func (m *Mqtt) messageHandler(status, controller, apiMsg chan *paho.Publish) {
 	for {
 		select {
-		case d := <-devices:
+		case d := <-status:
 			paths := strings.Split(d.Topic, "/")
 			device := paths[len(paths)-1]
-			log.Println("New device: ", device)
-			m.handleNewDevice(device)
+			payload, err := strconv.Atoi(string(d.Payload))
+			if err != nil {
+				log.Println("Status topic payload message type error")
+				log.Fatalln(err)
+			}
+			if payload == ONLINE {
+				log.Println("Device connected:", device)
+				m.handleNewDevice(device)
+				//m.deleteRetainedMessage(d, device)
+			} else if payload == OFFLINE {
+				log.Println("Device disconnected:1", device)
+				m.handleDevicesDisconnect(device)
+				//m.deleteRetainedMessage(d, device)
+			} else {
+				log.Println("Status topic payload message type error")
+			}
 		case c := <-controller:
 			topic := c.Topic
 			sn := strings.Split(topic, "/")
 			m.handleNewDevicesResponse(c.Payload, sn[3])
-		case dis := <-disconnect:
-			paths := strings.Split(dis.Topic, "/")
-			device := paths[len(paths)-1]
-			log.Println("Device disconnected: ", device)
-			m.handleDevicesDisconnect(device)
 		case api := <-apiMsg:
 			log.Println("Handle api request")
 			m.handleApiRequest(api.Payload)
 		}
 	}
 }
+
+//TODO: handle device status at mochi redis
+//func (m *Mqtt) deleteRetainedMessage(message *paho.Publish, deviceMac string) {
+//	m.Publish([]byte(""), "oktopus/v1/status/"+deviceMac, "", true)
+//	log.Println("Message contains the retain flag, deleting it, as it's already received")
+//}
 
 func (m *Mqtt) handleApiRequest(api []byte) {
 	var record usp_record.Record
@@ -246,7 +261,7 @@ func (m *Mqtt) handleNewDevice(deviceMac string) {
 	if err != nil {
 		log.Fatalln("Failed to encode tr369 record:", err)
 	}
-	m.Publish(tr369Message, "oktopus/v1/agent/"+deviceMac, "oktopus/v1/controller/"+deviceMac)
+	m.Publish(tr369Message, "oktopus/v1/agent/"+deviceMac, "oktopus/v1/controller/"+deviceMac, false)
 }
 
 func (m *Mqtt) handleNewDevicesResponse(p []byte, sn string) {

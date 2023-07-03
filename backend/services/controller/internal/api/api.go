@@ -171,7 +171,7 @@ func (a *Api) deviceFwUpdate(w http.ResponseWriter, r *http.Request) {
 
 	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
 	log.Println("Sending Msg:", msg.Header.MsgId)
-	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn)
+	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
 
 	var getMsgAnswer *usp_msg.GetResp
 
@@ -231,7 +231,7 @@ func (a *Api) deviceFwUpdate(w http.ResponseWriter, r *http.Request) {
 
 	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
 	log.Println("Sending Msg:", msg.Header.MsgId)
-	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn)
+	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
 
 	select {
 	case msg := <-a.MsgQueue[msg.Header.MsgId]:
@@ -281,7 +281,7 @@ func (a *Api) deviceGetParameterInstances(w http.ResponseWriter, r *http.Request
 	//a.Broker.Request(tr369Message, usp_msg.Header_GET, "oktopus/v1/agent/"+sn, "oktopus/v1/get/"+sn)
 	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
 	log.Println("Sending Msg:", msg.Header.MsgId)
-	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn)
+	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
 
 	select {
 	case msg := <-a.MsgQueue[msg.Header.MsgId]:
@@ -331,7 +331,7 @@ func (a *Api) deviceGetSupportedParametersMsg(w http.ResponseWriter, r *http.Req
 	//a.Broker.Request(tr369Message, usp_msg.Header_GET, "oktopus/v1/agent/"+sn, "oktopus/v1/get/"+sn)
 	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
 	log.Println("Sending Msg:", msg.Header.MsgId)
-	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn)
+	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
 
 	select {
 	case msg := <-a.MsgQueue[msg.Header.MsgId]:
@@ -381,7 +381,7 @@ func (a *Api) deviceCreateMsg(w http.ResponseWriter, r *http.Request) {
 	//a.Broker.Request(tr369Message, usp_msg.Header_GET, "oktopus/v1/agent/"+sn, "oktopus/v1/get/"+sn)
 	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
 	log.Println("Sending Msg:", msg.Header.MsgId)
-	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn)
+	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
 
 	select {
 	case msg := <-a.MsgQueue[msg.Header.MsgId]:
@@ -432,7 +432,7 @@ func (a *Api) deviceGetMsg(w http.ResponseWriter, r *http.Request) {
 	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
 
 	log.Println("Sending Msg:", msg.Header.MsgId)
-	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn)
+	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
 
 	select {
 	case msg := <-a.MsgQueue[msg.Header.MsgId]:
@@ -482,7 +482,7 @@ func (a *Api) deviceDeleteMsg(w http.ResponseWriter, r *http.Request) {
 	//a.Broker.Request(tr369Message, usp_msg.Header_GET, "oktopus/v1/agent/"+sn, "oktopus/v1/get/"+sn)
 	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
 	log.Println("Sending Msg:", msg.Header.MsgId)
-	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn)
+	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
 
 	select {
 	case msg := <-a.MsgQueue[msg.Header.MsgId]:
@@ -532,7 +532,7 @@ func (a *Api) deviceUpdateMsg(w http.ResponseWriter, r *http.Request) {
 	//a.Broker.Request(tr369Message, usp_msg.Header_GET, "oktopus/v1/agent/"+sn, "oktopus/v1/get/"+sn)
 	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
 	log.Println("Sending Msg:", msg.Header.MsgId)
-	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn)
+	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
 
 	select {
 	case msg := <-a.MsgQueue[msg.Header.MsgId]:
