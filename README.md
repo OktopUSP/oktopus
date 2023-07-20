@@ -3,6 +3,7 @@
 </p>
 <br/>
 
+<a href="https://github.com/leandrofars/oktopus/blob/main/README.en.md">README in English</a>
 <ul>
     <li>
         <h4>Introdução:</h4>
