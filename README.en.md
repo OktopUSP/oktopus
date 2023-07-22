@@ -92,7 +92,7 @@ Seeking to solve the challenges mentioned above, providers and manufacturers tog
 
 <ul>
     <li>
-        <h4>Protocolos:</h4> 
+        <h4>Protocols:</h4> 
         
 ![image](https://github.com/leandrofars/oktopus/assets/83298718/9b789f0b-cb0c-4cec-8b8e-767ba21bffae)
     </li>
