@@ -2,7 +2,7 @@
 <img src="https://user-images.githubusercontent.com/83298718/220207485-8c2aac78-95eb-4b43-b23e-c4bfa6cd30e6.png"/>
 </p>
 <br/>
-
+<ul></ul>
 <a href="https://github.com/leandrofars/oktopus/blob/main/README.en.md">README in English</a>
 <ul>
     <li>
@@ -207,8 +207,8 @@ leandro@leandro-laptop:~/oktopus/devops$ docker compose up
 </ul>
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
-
-Caso você tenha interesse em informações internas sobre o time e nossas pretensões acesse nossa <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>.
+<p>Vai usar nosso projeto na sua empresa? gostaria de conversar sobre o TR-369 e gerenciamento de IoTs, estamos online no <a href="https://app.slack.com/huddle/T05J9QUBKTM/C05J38Z1AP8">Slack</a>.</p>
+<p>Caso você tenha interesse em informações internas sobre o time e nossas pretensões acesse nossa <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>.</p>
 <br/>
 <p>Fontes bibliográficas: <a href="https://www.broadband-forum.org/download/MU-461.pdf">MU-461.pdf</a>, <a href="https://usp.technology/specification/index.htm">TR-369.html</a>, <a href="https://drive.google.com/drive/folders/1N7FqK0PkDhjCN5s3OhQ_wmz9UcTSwRCX">USP Training Session Slides</a></p>
 
