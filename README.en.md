@@ -207,6 +207,7 @@ leandro@leandro-laptop:~/oktopus/devops$ docker compose up
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
-If you are interested in internal information about the team and our intentions, visit our <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>.
+<p>Are you going to use our project in your company? would like to talk about TR-369 and IoT management, we're online on <a href="https://join.slack.com/t/oktopustr-369/shared_invite/zt-1znmrbr52-3AXgOlSeQTPQW8_Qhn3C4g">Slack</a>.</p>
+<p>If you are interested in internal information about the team and our intentions, visit our <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>.</p>
 <br/>
 <p>Bibliographic sources: <a href="https://www.broadband-forum.org/download/MU-461.pdf">MU-461.pdf</a>, <a href="https:/ /usp.technology/specification/index.htm">TR-369.html</a>, <a href="https://drive.google.com/drive/folders/1N7FqK0PkDhjCN5s3OhQ_wmz9UcTSwRCX">USP Training Session Slides</usp.technology/specification/index.htm">TR-369.html</a> a></p>
