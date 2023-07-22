@@ -2,8 +2,11 @@
 <img src="https://user-images.githubusercontent.com/83298718/220207485-8c2aac78-95eb-4b43-b23e-c4bfa6cd30e6.png"/>
 </p>
 <br/>
-<ul></ul>
-<a href="https://github.com/leandrofars/oktopus/blob/main/README.en.md">README in English</a>
+<ul>
+    <li>
+        <a href="https://github.com/leandrofars/oktopus/blob/main/README.en.md">Readme in English</a>
+    </li>
+</ul>
 <ul>
     <li>
         <h4>Introdução:</h4>
