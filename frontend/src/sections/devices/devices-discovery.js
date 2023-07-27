@@ -10,9 +10,13 @@ import {
   Collapse,
   Box,
   Tabs,
-  Tab
+  Tab,
+  ListItemIcon,
+  ListItemAvatar,
+  Avatar
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
+import PlusCircleIcon from '@heroicons/react/24/outline/PlusCircleIcon';
 import { useRouter } from 'next/router';
 
 
@@ -52,7 +56,7 @@ const getDeviceParameters = async (raw) =>{
     initialize(
     JSON.stringify({
         "obj_paths": ["Device."],
-        "first_level_only" : false,
+        "first_level_only" : true,
         "return_commands" : false,
         "return_events" : false,
         "return_params" : true 
@@ -83,31 +87,22 @@ const getDeviceParameters = async (raw) =>{
 //     })
 //   }
 
-//   const updateDeviceParameters = async (param,) => {
+  const updateDeviceParameters = async (param) => {
     
-//     let raw = JSON.stringify({
-//             "obj_paths": [param],
-//             "first_level_only" : true,
-//             "return_commands" : false,
-//             "return_events" : false,
-//             "return_params" : true 
-//     })
+    let raw = JSON.stringify({
+            "obj_paths": [param],
+            "first_level_only" : true,
+            "return_commands" : true,
+            "return_events" : true,
+            "return_params" : true 
+    })
 
-//     let content = await getDeviceParameters(raw)
+    let content = await getDeviceParameters(raw)
 
-//     console.log(content)
+    console.log(content)
 
-//     setDeviceParameters(prevState => {
-//         return {...prevState, req_obj_results: [
-//                 {
-//                 supported_objs:[ ...prevState.req_obj_results[0].
-//                 supported_objs][index]
-//                 .supported_params:[]
-//                 }
-//             ]
-//         }
-//     })
-//   }
+    setDeviceParameters(content)
+  }
 
   const showParameters = () => {
     console.log(deviceParameters)
@@ -117,13 +112,13 @@ const getDeviceParameters = async (raw) =>{
             <ListItem
                 key={x.supported_obj_path}
                 divider={true}
-                // secondaryAction={
-                //     <IconButton /*onClick={()=>updateDeviceParameters(x.supported_obj_path, index)}*/>
-                //         <SvgIcon>
-                //             <PlusCircleIcon></PlusCircleIcon>
-                //         </SvgIcon>
-                //     </IconButton>
-                // }
+                secondaryAction={
+                    <IconButton onClick={()=>updateDeviceParameters(x.supported_obj_path)}>
+                        <SvgIcon>
+                            <PlusCircleIcon></PlusCircleIcon>
+                        </SvgIcon>
+                    </IconButton>
+                }
                 sx={{
                     boxShadow: 'rgba(149, 157, 165, 0.2) 0px 0px 5px;'
                 }}
@@ -151,6 +146,52 @@ const getDeviceParameters = async (raw) =>{
                     >
                         <ListItemText
                             primary={y.param_name}
+                        />
+                    </ListItem>
+                </List>
+                })
+            }
+            { x.supported_commands &&
+                x.supported_commands.map((y)=>{
+                    return <List 
+                    component="div" 
+                    disablePadding 
+                    dense={true}
+                    key={y.command_name}
+                    >
+                    <ListItem
+                        key={i}
+                        divider={true}
+                        sx={{
+                            boxShadow: 'rgba(149, 157, 165, 0.2) 0px 0px 5px;',
+                            pl: 4 
+                        }}
+                    >
+                        <ListItemText
+                            primary={y.command_name}
+                        />
+                    </ListItem>
+                </List>
+                })
+            }
+            { x.supported_events &&
+                x.supported_events.map((y)=>{
+                    return <List 
+                    component="div" 
+                    disablePadding 
+                    dense={true}
+                    key={y.event_name}
+                    >
+                    <ListItem
+                        key={i}
+                        divider={true}
+                        sx={{
+                            boxShadow: 'rgba(149, 157, 165, 0.2) 0px 0px 5px;',
+                            pl: 4 
+                        }}
+                    >
+                        <ListItemText
+                            primary={y.event_name}
                         />
                     </ListItem>
                 </List>
