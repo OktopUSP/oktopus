@@ -182,7 +182,7 @@ Currently, telecommunications giants and startups, publishing new software daily
 
 <ul><li><h4>Infrastructure:</h4></li></ul>
 
-![Oktopus drawio](https://github.com/leandrofars/oktopus/assets/83298718/3c542f76-3d73-4ed7-92db-1144a40da456)
+![Oktopus Drawio](https://github.com/leandrofars/oktopus/assets/83298718/0edbf9ad-354a-4dbc-b65d-fdcca2b299fe)
 
 
 <ul>
