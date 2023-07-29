@@ -182,8 +182,7 @@ Atualmente, gigantes das telecomunicações e startups, publicam software novo d
 
 <ul><li><h4>Infraestrutura:</h4></li></ul>
 
-![Oktopus drawio](https://github.com/leandrofars/oktopus/assets/83298718/3c542f76-3d73-4ed7-92db-1144a40da456)
-
+![image](https://github.com/leandrofars/oktopus/assets/83298718/aa22edbb-bc82-4330-9678-650011bce5a8)
 
 <ul>
     <li>
