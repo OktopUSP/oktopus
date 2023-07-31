@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Head from 'next/head';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -66,6 +66,38 @@ const Page = () => {
     },
     [auth, router]
   );
+
+  const [adminExists, setAdminExists] = useState(true)
+
+  const initialize = async () => {
+    await adminUserExists()
+  }
+
+  const adminUserExists = async () => {
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow',
+    };
+
+    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/auth/admin/exists`, requestOptions))
+    let content = await result.json()
+    console.log("content: ", content)
+    if (result.status != 200) {
+        throw new Error(content);
+    }else{
+        if (!content){
+          router.push("/auth/register")
+        }
+    }
+}
+
+  useEffect(()=>{
+    initialize()
+  },[])
 
   return (
     <>

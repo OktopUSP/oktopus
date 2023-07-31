@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { useRouter } from 'next/router';
 
 const HANDLERS = {
   INITIALIZE: 'INITIALIZE',
@@ -63,6 +64,7 @@ export const AuthProvider = (props) => {
   const { children } = props;
   const [state, dispatch] = useReducer(reducer, initialState);
   const initialized = useRef(false);
+  const router = useRouter();
 
   const initialize = async () => {
     // Prevent from calling twice in development mode with React.StrictMode enabled
@@ -177,7 +179,31 @@ export const AuthProvider = (props) => {
   };
 
   const signUp = async (email, name, password) => {
-    throw new Error('Sign up is not implemented');
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    var raw = JSON.stringify({
+      "email": email,
+      "password": password,
+      "name": name
+    });
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: raw,
+      redirect: 'follow'
+    };
+
+    let result = await fetch(process.env.NEXT_PUBLIC_REST_ENPOINT+"/auth/admin/register", requestOptions)
+
+    if (result.status == 200) {
+      router.push("/auth/login")
+    }else{
+      const content = await result.json()
+      throw new Error(content);
+    }
+
   };
 
   const signOut = () => {

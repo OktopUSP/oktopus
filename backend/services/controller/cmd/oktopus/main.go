@@ -45,8 +45,7 @@ func main() {
 
 	log.Println("Starting Oktopus Project TR-369 Controller Version:", VERSION)
 	// fl_endpointId := flag.String("endpoint_id", "proto::oktopus-controller", "Defines the enpoint id the Agent must trust on.")
-	flDevicesTopic := flag.String("d", "oktopus/devices", "That's the topic mqtt broker end new devices info.")
-	flDisconTopic := flag.String("dis", "oktopus/disconnect", "It's where disconnected IoTs are known.")
+	flDevicesTopic := flag.String("d", "oktopus/+/status/+", "That's the topic mqtt broker end new devices info.")
 	flSubTopic := flag.String("sub", "oktopus/+/controller/+", "That's the topic agent must publish to, and the controller keeps on listening.")
 	flBrokerAddr := flag.String("a", "localhost", "Mqtt broker adrress")
 	flBrokerPort := flag.String("p", "1883", "Mqtt broker port")
@@ -54,7 +53,7 @@ func main() {
 	flBrokerUsername := flag.String("u", "", "Mqtt broker username")
 	flBrokerPassword := flag.String("P", "", "Mqtt broker password")
 	flBrokerClientId := flag.String("i", "", "A clientid for the Mqtt connection")
-	flBrokerQos := flag.Int("q", 2, "Quality of service of mqtt messages delivery")
+	flBrokerQos := flag.Int("q", 0, "Quality of service of mqtt messages delivery")
 	flAddrDB := flag.String("mongo", "mongodb://localhost:27017/", "MongoDB URI")
 	flApiPort := flag.String("ap", "8000", "Rest api port")
 	flHelp := flag.Bool("help", false, "Help")
@@ -77,20 +76,19 @@ func main() {
 	 If you want to use another message protocol just make it implement Broker interface.
 	*/
 	mqttClient := mqtt.Mqtt{
-		Addr:            *flBrokerAddr,
-		Port:            *flBrokerPort,
-		Id:              *flBrokerClientId,
-		User:            *flBrokerUsername,
-		Passwd:          *flBrokerPassword,
-		Ctx:             ctx,
-		QoS:             *flBrokerQos,
-		SubTopic:        *flSubTopic,
-		DevicesTopic:    *flDevicesTopic,
-		DisconnectTopic: *flDisconTopic,
-		TLS:             *flTlsCert,
-		DB:              database,
-		MsgQueue:        apiMsgQueue,
-		QMutex:          &m,
+		Addr:         *flBrokerAddr,
+		Port:         *flBrokerPort,
+		Id:           *flBrokerClientId,
+		User:         *flBrokerUsername,
+		Passwd:       *flBrokerPassword,
+		Ctx:          ctx,
+		QoS:          *flBrokerQos,
+		SubTopic:     *flSubTopic,
+		DevicesTopic: *flDevicesTopic,
+		TLS:          *flTlsCert,
+		DB:           database,
+		MsgQueue:     apiMsgQueue,
+		QMutex:       &m,
 	}
 
 	mtp.MtpService(&mqttClient, done)
