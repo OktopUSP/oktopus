@@ -276,7 +276,7 @@ Configurações dispositivo de teste:
 "ControllerTrust.Role.1.Permission.1.Targets": "Device.",
 "ControllerTrust.Role.1.PermissionNumberOfEntries": "1",
 "ControllerTrust.RoleNumberOfEntries": "2",
-"EndpointID": "os::test-000000000001",
+"EndpointID": "os::4851CF-000000000002",
 "MTP.1.Alias": "",
 "MTP.1.Enable": "false",
 "MTP.1.MQTT.PublishQoS": "0",
