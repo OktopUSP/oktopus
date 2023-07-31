@@ -2,6 +2,13 @@ package api
 
 import (
 	"encoding/json"
+	"log"
+	"net/http"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/gorilla/mux"
 	"github.com/leandrofars/oktopus/internal/api/auth"
 	"github.com/leandrofars/oktopus/internal/api/cors"
@@ -12,12 +19,6 @@ import (
 	"github.com/leandrofars/oktopus/internal/utils"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/protobuf/proto"
-	"log"
-	"net/http"
-	"strconv"
-	"strings"
-	"sync"
-	"time"
 )
 
 type Api struct {
@@ -65,9 +66,8 @@ func StartApi(a Api) {
 	authentication := r.PathPrefix("/api/auth").Subrouter()
 	authentication.HandleFunc("/login", a.generateToken).Methods("PUT")
 	authentication.HandleFunc("/register", a.registerUser).Methods("POST")
-	// Keep the line above commented to avoid people get unintended admin privileges.
-	// Uncomment it only once for you to get admin privileges and create new users.
-	//authentication.HandleFunc("/admin/register", a.registerAdminUser).Methods("POST")
+	authentication.HandleFunc("/admin/register", a.registerAdminUser).Methods("POST")
+	authentication.HandleFunc("/admin/exists", a.adminUserExists).Methods("GET")
 	iot := r.PathPrefix("/api/device").Subrouter()
 	iot.HandleFunc("", a.retrieveDevices).Methods("GET")
 	iot.HandleFunc("/{sn}/get", a.deviceGetMsg).Methods("PUT")
@@ -757,6 +757,20 @@ func (a *Api) registerAdminUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	users, err := a.Db.FindAllUsers()
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	adminExists := adminUserExists(users)
+	if adminExists {
+		log.Println("There might exist only one admin")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("There might exist only one admin")
+		return
+	}
+
 	user.Level = AdminUser
 
 	if err := user.HashPassword(user.Password); err != nil {
@@ -768,6 +782,29 @@ func (a *Api) registerAdminUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+}
+
+func adminUserExists(users []map[string]interface{}) bool {
+	for _, x := range users {
+		if x["level"].(int32) == AdminUser {
+			log.Println("Admin exists")
+			return true
+		}
+	}
+	return false
+}
+
+func (a *Api) adminUserExists(w http.ResponseWriter, r *http.Request) {
+
+	users, err := a.Db.FindAllUsers()
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	adminExits := adminUserExists(users)
+	json.NewEncoder(w).Encode(adminExits)
+	return
 }
 
 type TokenRequest struct {
