@@ -207,6 +207,124 @@ leandro@leandro-laptop:~$ cd oktopus/devops
 leandro@leandro-laptop:~/oktopus/devops$ docker compose up
 </pre>
     </li>
+    <li>
+Basic manual compilation and run:
+    <ul>
+        <li>
+        <b>Dependencies:</b> Node version: v14.20.0 | Go version: v1.18.1
+        </li>
+        <li>
+        Mqtt broker:
+            <pre>leandro@leandro-laptop:~$ go run oktopus/backend/services/mochi/cmd/main.go -redis "127.0.0.1:6379"</pre>
+        </li>
+        <li>
+        TR-369 controller:
+            <pre>
+leandro@leandro-laptop:~$ go run oktopus/backend/services/controller/cmd/oktopus/main.go -u root -P root -mongo "mongodb://127.0.0.1:27017"</pre>
+        </li>
+        <li>
+        Socketio server:
+            <pre>
+leandro@leandro-laptop:~$ cd oktopus/backend/services/socketio && npm i && npm start</pre>
+        </li>
+        <li>
+        Frontend:
+            <pre>
+leandro@leandro-laptop:~$ cd oktopus/frontend && npm i && npm run dev</pre>
+        </li>       
+    </ul>
+OBS: Do not use those instructions in production. To implement the project in production you might use more resources that are already avaiable in Oktopus, but would take longer to explain in this README. Soon, there will be more help and explanations about those extra needed configs. 
+</li>
+    <li>
+Device test agent config:
+    </li>
+<ul>
+        <li>
+<b>Device.LocalAgent.</b>
+<pre>
+"CertificateNumberOfEntries": "0",
+"Controller.1.Alias": "",
+"Controller.1.AssignedRole": "",
+"Controller.1.BootParameterNumberOfEntries": "0",
+"Controller.1.ControllerCode": "",
+"Controller.1.Enable": "true",
+"Controller.1.EndpointID": "oktopusController",
+"Controller.1.InheritedRole": "Device.LocalAgent.ControllerTrust.Role.1",
+"Controller.1.MTP.1.Alias": "",
+"Controller.1.MTP.1.Enable": "true",
+"Controller.1.MTP.1.MQTT.Reference": "Device.MQTT.Client.1",
+"Controller.1.MTP.1.MQTT.Topic": "oktopus/v1/controller",
+"Controller.1.MTP.1.Protocol": "MQTT",
+"Controller.1.MTPNumberOfEntries": "1",
+"Controller.1.PeriodicNotifInterval": "15",
+"Controller.1.PeriodicNotifTime": "0001-01-01T00:00:00Z",
+"Controller.1.ProvisioningCode": "",
+"Controller.1.USPNotifRetryIntervalMultiplier": "2000",
+"Controller.1.USPNotifRetryMinimumWaitInterval": "5",
+"ControllerNumberOfEntries": "1",
+"ControllerTrust.ChallengeNumberOfEntries": "0",
+"ControllerTrust.CredentialNumberOfEntries": "0",
+"ControllerTrust.Role.1.Alias": "cpe-1",
+"ControllerTrust.Role.1.Enable": "true",
+"ControllerTrust.Role.1.Name": "Full Access",
+"ControllerTrust.Role.1.Permission.1.Alias": "cpe-1",
+"ControllerTrust.Role.1.Permission.1.CommandEvent": "r-xn",
+"ControllerTrust.Role.1.Permission.1.Enable": "true",
+"ControllerTrust.Role.1.Permission.1.InstantiatedObj": "rw-n",
+"ControllerTrust.Role.1.Permission.1.Obj": "rw-n",
+"ControllerTrust.Role.1.Permission.1.Order": "0",
+"ControllerTrust.Role.1.Permission.1.Param": "rw-n",
+"ControllerTrust.Role.1.Permission.1.Targets": "Device.",
+"ControllerTrust.Role.1.PermissionNumberOfEntries": "1",
+"ControllerTrust.RoleNumberOfEntries": "2",
+"EndpointID": "os::test-000000000001",
+"MTP.1.Alias": "",
+"MTP.1.Enable": "false",
+"MTP.1.MQTT.PublishQoS": "0",
+"MTP.1.MQTT.Reference": "Device.MQTT.Client.1",
+"MTP.1.MQTT.ResponseTopicConfigured": "oktopus/v1/controller",
+"MTP.1.MQTT.ResponseTopicDiscovered": "oktopus/v1/agent/os::4851CF-000000000002",
+"MTP.1.Protocol": "MQTT",
+"MTP.1.Status": "Down",
+"MTPNumberOfEntries": "1",
+"RequestNumberOfEntries": "0",
+"SoftwareVersion": "5.0.0",
+"SubscriptionNumberOfEntries": "0",
+"SupportedFingerprintAlgorithms": "SHA-1, SHA-224, SHA-256, SHA-384, SHA-512",
+"SupportedProtocols": "STOMP, CoAP, MQTT, WebSocket",
+"UpTime": "42"
+</pre>
+    </li>
+    <li>
+<b>Device.MQTT.Client.1</b>
+    </li>
+    <pre>
+"Alias": "cpe-1",
+"BrokerAddress": "10.100.250.4",
+"BrokerPort": "1883",
+"CleanSession": "false",
+"CleanStart": "false",
+"ClientID": "",
+"ConnectRetryIntervalMultiplier": "2000",
+"ConnectRetryMaxInterval": "30720",
+"ConnectRetryTime": "5",
+"Enable": "true",
+"KeepAliveTime": "30",
+"Name": "",
+"Password": "",
+"ProtocolVersion": "5.0",
+"RequestProblemInfo": "false",
+"RequestResponseInfo": "false",
+"ResponseInformation": "oktopus/v1/agent/os::4851CF-000000000002",
+"Status": "Connected",
+"Subscription.1.Alias": "cpe-1",
+"Subscription.1.Enable": "false",
+"Subscription.1.QoS": "1",
+"Subscription.1.Topic": "oktopus/v1/agent",
+"SubscriptionNumberOfEntries": "1",
+"TransportProtocol": "TCP/IP",
+"Username": "test"</pre>
+</ul>
 </ul>
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
