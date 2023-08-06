@@ -214,12 +214,12 @@ Basic manual compilation and run:
         </li>
         <li>
         Mqtt broker:
-            <pre>leandro@leandro-laptop:~$ go run oktopus/backend/services/mochi/cmd/main.go -redis "127.0.0.1:6379"</pre>
+            <pre>leandro@leandro-laptop:~$ cd oktopus/backend/services/mochi/ && go run cmd/main.go -redis "127.0.0.1:6379"</pre>
         </li>
         <li>
         TR-369 controller:
             <pre>
-leandro@leandro-laptop:~$ go run oktopus/backend/services/controller/cmd/oktopus/main.go -u root -P root -mongo "mongodb://127.0.0.1:27017"</pre>
+leandro@leandro-laptop:~$ cd oktopus/backend/services/controller/ && go run cmd/oktopus/main.go -u root -P root -mongo "mongodb://127.0.0.1:27017"</pre>
         </li>
         <li>
         Socketio server:
