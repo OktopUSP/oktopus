@@ -28,7 +28,7 @@ const App = (props) => {
     <CacheProvider value={emotionCache}>
       <Head>
         <title>
-          Oktopus
+          Oktopus | TR-369 Controller
         </title>
         <meta
           name="viewport"
