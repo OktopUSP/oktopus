@@ -4,11 +4,6 @@
 <br/>
 <ul>
     <li>
-        <a href="https://github.com/leandrofars/oktopus/blob/main/README.pt-br.md">Readme em Português</a>
-    </li>
-</ul>
-<ul>
-    <li>
         <h4>Introduction:</h4>
     </li>
 </ul>        
