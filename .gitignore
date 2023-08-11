@@ -17,3 +17,7 @@ go.work
 *.pwd
 *.acl
 .idea
+.vscode
+controller
+main
+mochi
