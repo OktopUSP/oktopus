@@ -16,7 +16,7 @@ jobs:
       - run:
           name: Build Controller
           command: |
-            cd backend/services/controller && go build -o controller cmd/oktopus/dev.go
+            cd backend/services/controller && go build -o controller cmd/oktopus/main.go
 
   build_mochi:
     executor: golang
@@ -25,7 +25,7 @@ jobs:
       - run:
           name: Build Mochi
           command: |
-            cd backend/services/mochi/ && go build -o mochi cmd/dev.go
+            cd backend/services/mochi/ && go build -o mochi cmd/main.go
 
   build_frontend:
     executor: nodejs
