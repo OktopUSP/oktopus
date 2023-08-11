@@ -1,0 +1,75 @@
+version: 2.1
+executors:
+  nodejs:
+    docker:
+      - image: cimg/node:18.17.1
+  golang:
+    docker:
+      - image: cimg/go:1.20.7
+
+jobs:
+
+  build_controller:
+    executor: golang
+    steps:
+      - checkout
+      - run:
+          name: Build Controller
+          command: |
+            cd backend/services/controller && go build -o controller cmd/oktopus/main.go
+
+  build_mochi:
+    executor: golang
+    steps:
+      - checkout
+      - run:
+          name: Build Mochi
+          command: |
+            cd backend/services/mochi/ && go build -o mochi cmd/main.go
+
+  build_frontend:
+    executor: nodejs
+    steps:
+      - checkout
+      - run:
+          name: Build Frontend
+          command: |
+            cd frontend/ && npm i && npm run build
+
+  # deploy_to_server:
+  #   executor: nodejs
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints:
+  #           - "YOUR_SSH_KEY_FINGERPRINT"
+  #     - run:
+  #         name: Deploy Apps to Server
+  #         command: |
+  #           scp -r app1/ user@your-server-ip:/path/to/destination/
+  #           scp -r app2/ user@your-server-ip:/path/to/destination/
+  #           scp -r app3/ user@your-server-ip:/path/to/destination/
+
+workflows:
+  build_and_deploy:
+    jobs:
+      - build_controller:
+          filters:
+            branches:
+              only: main
+      - build_mochi:
+          filters:
+            branches:
+              only: main
+      - build_frontend:
+          filters:
+            branches:
+              only: main
+      # - deploy_to_server:
+      #     requires:
+      #       - build_controller
+      #       - build_mochi
+      #       - build_frontend
+      #     filters:
+      #       branches:
+      #         only: main
