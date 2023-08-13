@@ -36,20 +36,21 @@ jobs:
           command: |
             cd frontend/ && npm i && npm run build
 
-  # deploy_to_server:
-  #   executor: nodejs
-  #   steps:
-  #     - checkout
-  #     - add_ssh_keys:
-  #         fingerprints:
-  #           - "YOUR_SSH_KEY_FINGERPRINT"
-  #     - run:
-  #         name: Deploy Apps to Server
-  #         command: |
-  #           scp -r app1/ user@your-server-ip:/path/to/destination/
-  #           scp -r app2/ user@your-server-ip:/path/to/destination/
-  #           scp -r app3/ user@your-server-ip:/path/to/destination/
-
+  deploy_controller:
+    machine:
+      image: ubuntu-2004:202010-01
+    steps:
+        - run:
+            name: Send Binary to Server
+            command: |
+              scp backend/services/controller/controller  $SSH_USER@$SSH_HOST:/home/$SSH_USER
+              ssh $SSH_USER@$SSH_HOST
+        - run:
+            name: Restart Services
+            command: |
+              sudo su
+              mv controller /usr/bin/
+              systemctl restart controller
 workflows:
   build_and_deploy:
     jobs:
@@ -65,11 +66,9 @@ workflows:
           filters:
             branches:
               only: dev
-      # - deploy_to_server:
-      #     requires:
-      #       - build_controller
-      #       - build_mochi
-      #       - build_frontend
-      #     filters:
-      #       branches:
-      #         only: dev
+      - deploy_controller:
+          requires:
+            - build_controller
+          filters:
+            branches:
+              only: dev
