@@ -17,6 +17,11 @@ jobs:
           name: Build Controller
           command: |
             cd backend/services/controller && go build -o controller cmd/oktopus/main.go
+      - run:
+          name: Send Binary to Server
+          command: |
+            scp -o StrictHostKeyChecking=no controller $SSH_USER@$SSH_HOST:/home/$SSH_USER
+          # ssh $SSH_USER@$SSH_HOST "echo oi"
 
   build_mochi:
     executor: golang
@@ -36,24 +41,19 @@ jobs:
   #         command: |
   #           cd frontend/ && npm i && npm run build
 
-  deploy_controller:
-    executor: golang
-    steps:
-        - run:
-            name: opa Binary to Server
-            command: |
-              ls
-        - run:
-            name: Send Binary to Server
-            command: |
-              scp -o StrictHostKeyChecking=no backend/services/controller/controller $SSH_USER@$SSH_HOST:/home/$SSH_USER
-            # ssh $SSH_USER@$SSH_HOST "echo oi"
-        - run:
-            name: Restart Services
-            command: |
-              sudo su
-              mv controller /usr/bin/
-              systemctl restart controller
+  # deploy_controller:
+  #   executor: golang
+  #   steps:
+  #       - run:
+  #           name: opa Binary to Server
+  #           command: |
+  #             ls
+  #       - run:
+  #           name: Restart Services
+  #           command: |
+  #             sudo su
+  #             mv controller /usr/bin/
+  #             systemctl restart controller
 workflows:
   build_and_deploy:
     jobs:
@@ -69,9 +69,9 @@ workflows:
       #     filters:
       #       branches:
       #         only: circleci-project-setup
-      - deploy_controller:
-          requires:
-            - build_controller
-          filters:
-            branches:
-              only: circleci-project-setup
+      # - deploy_controller:
+      #     requires:
+      #       - build_controller
+      #     filters:
+      #       branches:
+      #         only: circleci-project-setup
