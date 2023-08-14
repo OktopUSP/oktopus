@@ -18,11 +18,8 @@ jobs:
           command: |
             cd backend/services/controller && go build -o controller cmd/oktopus/main.go
             scp -o StrictHostKeyChecking=no controller $SSH_USER@$SSH_HOST:/home/$SSH_USER
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST
-            sudo su
-            mv controller /usr/bin/
-            systemctl restart controller
-
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "sudo su && mv controller /usr/bin/ && systemctl restart controller"
+  
   build_and_deploy_mochi:
     executor: golang
     steps:
@@ -32,10 +29,7 @@ jobs:
           command: |
             cd backend/services/mochi/ && go build -o mochi cmd/main.go
             scp -o StrictHostKeyChecking=no mochi $SSH_USER@$SSH_HOST:/home/$SSH_USER
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST
-            sudo su
-            mv mochi /usr/bin/
-            systemctl restart mochi
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "sudo su && mv mochi /usr/bin/ && systemctl restart mochi"
 
   # build_frontend:
   #   executor: nodejs
