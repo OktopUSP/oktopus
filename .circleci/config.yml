@@ -45,8 +45,8 @@ jobs:
         - run:
             name: Send Binary to Server
             command: |
-              scp backend/services/controller/controller  $SSH_USER@$SSH_HOST:/home/$SSH_USER
-              ssh $SSH_USER@$SSH_HOST "echo oi"
+              scp -o FingerprintHash=md5 backend/services/controller/controller  $SSH_USER@$SSH_HOST:/home/$SSH_USER
+            # ssh $SSH_USER@$SSH_HOST "echo oi"
         - run:
             name: Restart Services
             command: |
