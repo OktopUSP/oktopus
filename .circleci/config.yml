@@ -39,13 +39,10 @@ jobs:
   deploy_controller:
     executor: nodejs
     steps:
-        - add_ssh_keys:
-            fingerprints:
-              - "sV4cl+JLa8HR/ybe8HqpStJmyNFZSjNtMqn3iVKxP9w"
         - run:
             name: Send Binary to Server
             command: |
-              scp backend/services/controller/controller  $SSH_USER@$SSH_HOST:/home/$SSH_USER
+              scp -o StrictHostKeyChecking=no backend/services/controller/controller $SSH_USER@$SSH_HOST:/home/$SSH_USER
             # ssh $SSH_USER@$SSH_HOST "echo oi"
         - run:
             name: Restart Services
