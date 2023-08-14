@@ -37,8 +37,12 @@ jobs:
   #           cd frontend/ && npm i && npm run build
 
   deploy_controller:
-    executor: nodejs
+    executor: golang
     steps:
+        - run:
+            name: opa Binary to Server
+            command: |
+              ls
         - run:
             name: Send Binary to Server
             command: |
