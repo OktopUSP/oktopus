@@ -17,12 +17,8 @@ jobs:
           name: Build Controller
           command: |
             cd backend/services/controller && go build -o controller cmd/oktopus/main.go
-      - run:
-          name: Send Binary to Server
-          command: |
             scp -o StrictHostKeyChecking=no controller $SSH_USER@$SSH_HOST:/home/$SSH_USER
-          # ssh $SSH_USER@$SSH_HOST "echo oi"
-
+            
   build_mochi:
     executor: golang
     steps:
