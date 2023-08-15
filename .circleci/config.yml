@@ -48,12 +48,12 @@ workflows:
       - build_and_deploy_controller:
           filters:
             branches:
-              only: circleci-project-setup
+              only: main
       - build_and_deploy_mochi:
           filters:
             branches:
-              only: circleci-project-setup
+              only: main
       - build_and_deploy_frontend:
           filters:
             branches:
-              only: circleci-project-setup
+              only: main
