@@ -38,7 +38,7 @@ jobs:
       - run:
           name: Build and Deploy Frontend
           command: |
-            cd oktopus/frontend && npm i && npm run build
+            cd frontend && npm i && npm run build
             scp -o StrictHostKeyChecking=no -r .next/ $SSH_USER@$SSH_HOST:/home/$SSH_USER/oktopus/frontend
             ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "pm2 restart oktopus"
 
