@@ -25,31 +25,22 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Build Mochi
+          name: Build and Deploy Mochi
           command: |
             cd backend/services/mochi/ && go build -o mochi cmd/main.go
             scp -o StrictHostKeyChecking=no mochi $SSH_USER@$SSH_HOST:/home/$SSH_USER
             ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "sudo mv mochi /usr/bin/ && sudo systemctl restart mochi"
 
-  # build_frontend:
-  #   executor: nodejs
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Build Frontend
-  #         command: |
-  #           cd frontend/ && npm i && npm run build
-
-  # deploy_controller:
-  #   executor: golang
-  #   steps:
-  #       - run:
-  #           name: opa Binary to Server
-  #           command: |
-  #             ls
-  #       - run:
-  #           name: Restart Services
-  #           command: |
+  build_and_deploy_frontend:
+    executor: nodejs
+    steps:
+      - checkout
+      - run:
+          name: Build and Deploy Frontend
+          command: |
+            scp -o StrictHostKeyChecking=no -r frontend/.next $SSH_USER@$SSH_HOST:/home/$SSH_USER/oktopus/frontend
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "pm2 restart oktopus"
+            
 workflows:
   build_and_deploy:
     jobs:
@@ -61,13 +52,7 @@ workflows:
           filters:
             branches:
               only: circleci-project-setup
-      # - build_frontend:
-      #     filters:
-      #       branches:
-      #         only: circleci-project-setup
-      # - deploy_controller:
-      #     requires:
-      #       - build_controller
-      #     filters:
-      #       branches:
-      #         only: circleci-project-setup
+      - build_and_deploy_frontend:
+          filters:
+            branches:
+              only: circleci-project-setup
