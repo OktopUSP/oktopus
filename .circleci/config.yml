@@ -9,66 +9,51 @@ executors:
 
 jobs:
 
-  build_controller:
+  build_and_deploy_controller:
     executor: golang
     steps:
       - checkout
       - run:
-          name: Build Controller
+          name: Build and Deploy Controller
           command: |
             cd backend/services/controller && go build -o controller cmd/oktopus/main.go
-
-  build_mochi:
+            scp -o StrictHostKeyChecking=no controller $SSH_USER@$SSH_HOST:/home/$SSH_USER
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "sudo mv controller /usr/bin/ && sudo systemctl restart controller"
+  
+  build_and_deploy_mochi:
     executor: golang
     steps:
       - checkout
       - run:
-          name: Build Mochi
+          name: Build and Deploy Mochi
           command: |
             cd backend/services/mochi/ && go build -o mochi cmd/main.go
+            scp -o StrictHostKeyChecking=no mochi $SSH_USER@$SSH_HOST:/home/$SSH_USER
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "sudo mv mochi /usr/bin/ && sudo systemctl restart mochi"
 
-  build_frontend:
+  build_and_deploy_frontend:
     executor: nodejs
     steps:
       - checkout
       - run:
-          name: Build Frontend
+          name: Build and Deploy Frontend
           command: |
-            cd frontend/ && npm i && npm run build
+            cd frontend && npm i && npm run build
+            scp -o StrictHostKeyChecking=no -r .next/ $SSH_USER@$SSH_HOST:/home/$SSH_USER/oktopus/frontend
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "pm2 restart oktopus"
 
-  deploy_controller:
-    machine:
-      image: ubuntu-2004:202010-01
-    steps:
-        - run:
-            name: Send Binary to Server
-            command: |
-              scp backend/services/controller/controller  $SSH_USER@$SSH_HOST:/home/$SSH_USER
-              ssh $SSH_USER@$SSH_HOST
-        - run:
-            name: Restart Services
-            command: |
-              sudo su
-              mv controller /usr/bin/
-              systemctl restart controller
 workflows:
   build_and_deploy:
     jobs:
-      - build_controller:
+      - build_and_deploy_controller:
           filters:
             branches:
-              only: dev
-      - build_mochi:
+              only: main
+      - build_and_deploy_mochi:
           filters:
             branches:
-              only: dev
-      - build_frontend:
+              only: main
+      - build_and_deploy_frontend:
           filters:
             branches:
-              only: dev
-      - deploy_controller:
-          requires:
-            - build_controller
-          filters:
-            branches:
-              only: dev
+              only: main
