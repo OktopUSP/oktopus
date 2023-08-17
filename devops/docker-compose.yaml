@@ -7,26 +7,29 @@ services:
       stdin_open: true
       volumes:
       - ../:/app/oktopus
-      command: bash -c "cd /app/oktopus/backend/services/controller && go run cmd/oktopus/main.go -mongo mongodb://mongodb:27017 -a mochi -p 1883"
+      command: bash -c "cd /app/oktopus/backend/services/controller && go run cmd/oktopus/main.go -mongo mongodb://172.16.235.2:27017 -a 172.16.235.4 -p 1883"
       ports:
       - 8000:8000
       depends_on:
       - mongodb
       - mochi
       networks:
-      - usp_network
+        usp_network:
+          ipv4_address: 172.16.235.1
 
   mongodb:
     image: mongo
     container_name: mongodb
     networks:
-    - usp_network
+      usp_network:
+        ipv4_address: 172.16.235.2
 
   redis:
     image: redis
     container_name: redis
     networks:
-    - usp_network
+      usp_network:
+        ipv4_address: 172.16.235.3
 
   mochi:
     image: 'golang:1.18'
@@ -41,7 +44,8 @@ services:
     depends_on:
       - redis
     networks:
-    - usp_network
+      usp_network:
+        ipv4_address: 172.16.235.4
 
   socketio:
     image: 'node:14.20'
@@ -54,7 +58,8 @@ services:
     ports:
     - 5000:5000
     networks:
-    - usp_network
+      usp_network:
+        ipv4_address: 172.16.235.5
 
   frontend:
     image: 'node:14.20'
@@ -67,8 +72,14 @@ services:
     ports:
       - 3000:3000
     networks:
-      - usp_network
+      usp_network:
+        ipv4_address: 172.16.235.6
 
 networks:
-  usp_network:
+   usp_network:
     driver: bridge
+    ipam: 
+      driver: default
+      config:
+        - subnet: 172.16.235.0/24
+          gateway: 172.16.235.1
