@@ -18,6 +18,5 @@ go.work
 *.acl
 .idea
 .vscode
-controller
 main
 mochi

@@ -24,15 +24,15 @@ export const items = [
       </SvgIcon>
     )
   },
-  {
-    title: 'Chat (beta)',
-    path: '/chat',
-    icon: (
-      <SvgIcon fontSize="small">
-       <ChatBubbleLeftRightIcon/>
-      </SvgIcon>
-    )
-  },
+  // {
+  //   title: 'Chat (beta)',
+  //   path: '/chat',
+  //   icon: (
+  //     <SvgIcon fontSize="small">
+  //      <ChatBubbleLeftRightIcon/>
+  //     </SvgIcon>
+  //   )
+  // },
    {
      title: 'Map',
      path: '/map',

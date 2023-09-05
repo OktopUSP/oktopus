@@ -5,15 +5,17 @@ package main
 import (
 	"context"
 	"flag"
+	"log"
+	"os"
+	"os/signal"
+	"strconv"
+	"sync"
+	"syscall"
+
 	"github.com/joho/godotenv"
 	"github.com/leandrofars/oktopus/internal/api"
 	"github.com/leandrofars/oktopus/internal/db"
 	usp_msg "github.com/leandrofars/oktopus/internal/usp_message"
-	"log"
-	"os"
-	"os/signal"
-	"sync"
-	"syscall"
 
 	"github.com/leandrofars/oktopus/internal/mqtt"
 	"github.com/leandrofars/oktopus/internal/mtp"
@@ -43,19 +45,26 @@ func main() {
 
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
+	/*
+		App variables priority:
+		1º - Flag through command line.
+		2º - Env variables.
+		3º - Default flag value
+	*/
+
 	log.Println("Starting Oktopus Project TR-369 Controller Version:", VERSION)
 	// fl_endpointId := flag.String("endpoint_id", "proto::oktopus-controller", "Defines the enpoint id the Agent must trust on.")
-	flDevicesTopic := flag.String("d", "oktopus/+/status/+", "That's the topic mqtt broker end new devices info.")
-	flSubTopic := flag.String("sub", "oktopus/+/controller/+", "That's the topic agent must publish to, and the controller keeps on listening.")
-	flBrokerAddr := flag.String("a", "localhost", "Mqtt broker adrress")
-	flBrokerPort := flag.String("p", "1883", "Mqtt broker port")
-	flTlsCert := flag.Bool("tls", false, "Connect to broker over TLS")
-	flBrokerUsername := flag.String("u", "", "Mqtt broker username")
-	flBrokerPassword := flag.String("P", "", "Mqtt broker password")
-	flBrokerClientId := flag.String("i", "", "A clientid for the Mqtt connection")
-	flBrokerQos := flag.Int("q", 0, "Quality of service of mqtt messages delivery")
-	flAddrDB := flag.String("mongo", "mongodb://localhost:27017/", "MongoDB URI")
-	flApiPort := flag.String("ap", "8000", "Rest api port")
+	flDevicesTopic := flag.String("d", lookupEnvOrString("DEVICES_STATUS_TOPIC", "oktopus/+/status/+"), "That's the topic mqtt broker end new devices info.")
+	flSubTopic := flag.String("sub", lookupEnvOrString("DEVICE_PUB_TOPIC", "oktopus/+/controller/+"), "That's the topic agent must publish to, and the controller keeps on listening.")
+	flBrokerAddr := flag.String("a", lookupEnvOrString("BROKER_ADDR", "localhost"), "Mqtt broker adrress")
+	flBrokerPort := flag.String("p", lookupEnvOrString("BROKER_PORT", "1883"), "Mqtt broker port")
+	flTlsCert := flag.Bool("tls", lookupEnvOrBool("BROKER_TLS", false), "Connect to broker over TLS")
+	flBrokerUsername := flag.String("u", lookupEnvOrString("BROKER_USERNAME", ""), "Mqtt broker username")
+	flBrokerPassword := flag.String("P", lookupEnvOrString("BROKER_PASSWORD", ""), "Mqtt broker password")
+	flBrokerClientId := flag.String("i", lookupEnvOrString("BROKER_CLIENTID", ""), "A clientid for the Mqtt connection")
+	flBrokerQos := flag.Int("q", lookupEnvOrInt("BROKER_QOS", 0), "Quality of service of mqtt messages delivery")
+	flAddrDB := flag.String("mongo", lookupEnvOrString("MONGO_URI", "mongodb://localhost:27017"), "MongoDB URI")
+	flApiPort := flag.String("ap", lookupEnvOrString("REST_API_PORT", "8000"), "Rest api port")
 	flHelp := flag.Bool("help", false, "Help")
 
 	flag.Parse()
@@ -100,4 +109,33 @@ func main() {
 
 	log.Println("(⌐■_■) Oktopus is out!")
 
+}
+
+func lookupEnvOrString(key string, defaultVal string) string {
+	if val, _ := os.LookupEnv(key); val != "" {
+		return val
+	}
+	return defaultVal
+}
+
+func lookupEnvOrInt(key string, defaultVal int) int {
+	if val, _ := os.LookupEnv(key); val != "" {
+		v, err := strconv.Atoi(val)
+		if err != nil {
+			log.Fatalf("LookupEnvOrInt[%s]: %v", key, err)
+		}
+		return v
+	}
+	return defaultVal
+}
+
+func lookupEnvOrBool(key string, defaultVal bool) bool {
+	if val, _ := os.LookupEnv(key); val != "" {
+		v, err := strconv.ParseBool(val)
+		if err != nil {
+			log.Fatalf("LookupEnvOrInt[%s]: %v", key, err)
+		}
+		return v
+	}
+	return defaultVal
 }
