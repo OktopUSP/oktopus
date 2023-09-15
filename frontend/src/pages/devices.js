@@ -33,7 +33,7 @@ const Page = () => {
       .catch(error => console.error('Error:', error));
   }, [auth.user]);
 
-  return (devices &&
+  return (
     <>
       <Head>
         <title>
