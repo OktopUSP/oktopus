@@ -230,17 +230,12 @@ leandro@leandro-laptop:~$ cd oktopus/frontend && npm i && npm run dev</pre>
 OBS: Do not use those instructions in production. To implement the project in production you might use more resources that are already avaiable in Oktopus, but would take longer to explain in this README. Soon, there will be more help and explanations about those extra needed configs. 
 </li>
     <li>
-Device test agent (obuspa):
-    </li>
-<ul>
+      <h4>Device test agent (obuspa):</h4>
         <p>You might follow the instructions to build <a href="https://github.com/BroadbandForum/obuspa">obuspa</a> at their repo QUICK_START_GUIDE.md and remember to define 'INCLUDE_PROGRAMMATIC_FACTORY_RESET' at <a href="https://github.com/BroadbandForum/obuspa/blob/master/src/vendor/vendor_defs.h">'vendor_defs.h'</a> inside src/vendor folder, also advice you to build it with make tool.</p>
-
         <p>You can customize <a href="https://github.com/OktopUSP/oktopus/tree/main/agent/oktopus-mqqt-obuspa.txt">'oktopus-mqqt-obuspa.txt'</a> accordingly to your needs, there you can change broker address, client password, and etc. '-i' option defines the interface your usp packets will go through, in this case it's localhost, also keep in mind that after you run obuspa if you made a change to 'oktopus-mqqt-obuspa.txt' and want it to take effect you must delete '/usr/local/var/obuspa/usp.db' file before running the agent again (docs provide you other methods to do it too).'-r' option defines the config file you want the agent to use:</p>
-
         <pre>leandro@leandro-laptop:~/oktopus$ obuspa -p -v 4 -r agent/oktopus-mqqt-obuspa.txt -i lo</pre>
-
         <p>Obuspa has a lot of info and docs at their repo, which shows you many options to set your environment and customize agent to your embedded project. This basic agent has the purpose to test oktopus connection and shows an idea of how it's like with true devices, although with those, you're able to explore much more parameters and execute lots of configurations.</p>
-</ul>
+    </li>
 </ul>
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
