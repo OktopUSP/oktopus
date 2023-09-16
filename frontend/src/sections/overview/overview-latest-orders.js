@@ -72,7 +72,7 @@ export const OverviewLatestOrders = (props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {orders.map((order) => {
+              {orders && orders.map((order) => {
 
                 return (
                   <TableRow
