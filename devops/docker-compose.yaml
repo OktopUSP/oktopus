@@ -19,13 +19,13 @@ services:
 
   mongodb:
     image: mongo
-    container_name: mongodb
+    container_name: mongodb_usp
     networks:
       usp_network:
         ipv4_address: 172.16.235.2
 
   redis:
-    image: redis
+    image: redis_usp
     container_name: redis
     networks:
       usp_network:
