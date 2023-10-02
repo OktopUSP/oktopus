@@ -25,8 +25,8 @@ services:
         ipv4_address: 172.16.235.2
 
   redis:
-    image: redis_usp
-    container_name: redis
+    image: redis
+    container_name: redis_usp
     networks:
       usp_network:
         ipv4_address: 172.16.235.3
