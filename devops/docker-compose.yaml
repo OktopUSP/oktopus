@@ -15,7 +15,7 @@ services:
       - mochi
       networks:
         usp_network:
-          ipv4_address: 172.16.235.1
+          ipv4_address: 172.16.235.7
 
   mongodb:
     image: mongo
