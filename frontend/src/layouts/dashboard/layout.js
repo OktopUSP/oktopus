@@ -52,10 +52,25 @@ export const Layout = withAuthGuard((props) => {
         onClose={() => setOpenNav(false)}
         open={openNav}
       />
+      
       <LayoutRoot>
         <LayoutContainer>
           {children}
         </LayoutContainer>
+        <div style={{
+      position:"fixed", 
+      bottom:"5px", 
+      right:"5px",
+      cursor:"pointer"
+      }}>
+        <a href='https://github.com/OktopUSP/oktopus' target='blank'>
+        <img 
+        src="assets/general/github-mark.png" 
+        width={"30px"}
+        >
+        </img>
+        </a>
+      </div>
       </LayoutRoot>
     </>
   );
