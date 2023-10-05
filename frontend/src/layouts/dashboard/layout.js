@@ -4,6 +4,7 @@ import { styled } from '@mui/material/styles';
 import { withAuthGuard } from 'src/hocs/with-auth-guard';
 import { SideNav } from './side-nav';
 import { TopNav } from './top-nav';
+import Image from 'next/image'
 
 const SIDE_NAV_WIDTH = 280;
 
@@ -64,11 +65,13 @@ export const Layout = withAuthGuard((props) => {
       cursor:"pointer"
       }}>
         <a href='https://github.com/OktopUSP/oktopus' target='blank'>
-        <img 
-        src="assets/general/github-mark.png" 
-        width={"30px"}
+        <Image 
+        alt="github logo"
+        src="/assets/general/github-mark.png" 
+        width="30"
+        height="30"
         >
-        </img>
+        </Image>
         </a>
       </div>
       </LayoutRoot>
