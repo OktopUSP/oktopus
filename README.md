@@ -8,7 +8,7 @@
     </li>
 </ul>        
 <p>
-This repository aims to promote the development of a multi-vendor management platform for IoTs. Any device that follows the TR-369 protocol can be managed. The main objective is to facilitate and unify device management, which generates countless benefits for the end user and service providers, suppressing the demands that today's technologies require: device interconnection, data collection, speed, availability and much more. .
+This repository aims to promote the development of a multi-vendor management platform for IoTs. Any device that follows the TR-369 protocol can be managed. The main objective is to facilitate and unify device management, which generates countless benefits for the end user and service providers, suppressing the demands that today's technologies require: device interconnection, data collection, speed, availability and more.
 </p>
 <ul>
     <li>
