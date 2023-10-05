@@ -131,21 +131,12 @@ const Page = () => {
               <Typography variant="h4">
                 Login
               </Typography>
-              {/* <Typography
+              <Typography
                 color="text.secondary"
                 variant="body2"
               >
-                Don't have an account?
-                &nbsp;
-                <Link
-                  component={NextLink}
-                  href="/auth/register"
-                  underline="hover"
-                  variant="subtitle2"
-                >
-                  Register
-                </Link>
-              </Typography> */}
+              This project is open source, reach out at <Link href='https://github.com/OktopUSP/oktopus'>Github</Link> or <Link href='https://join.slack.com/t/oktopustr-369/shared_invite/zt-1znmrbr52-3AXgOlSeQTPQW8_Qhn3C4g'>Slack</Link> 
+              </Typography>
             </Stack>
             {/*<Tabs
               onChange={handleMethodChange}
@@ -225,11 +216,7 @@ const Page = () => {
                   sx={{ mt: 3 }}
                 >
                   <div>
-                    Don't have an account? ask one for us at <Link 
-                    href="https://github.com/leandrofars/oktopus" 
-                    underline="hover">
-                      Github
-                    </Link>
+                    You can use <b>demo@gmail.com</b> and password <b>demo</b>
                   </div>
                 </Alert>
               </form>
