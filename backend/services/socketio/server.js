@@ -1,13 +1,24 @@
+const dotenv = require('dotenv')
+dotenv.config();
+dotenv.config({ path: `.env.local`, override: true });
 const express = require('express');
 const app = express();
 const PORT = 5000;
 
 const http = require('http').Server(app);
 const cors = require('cors');
+var allowedOrigins;
+let allowedOriginsFromEnv = process.env.CORS_ALLOWED_ORIGINS.split(',')
+if (allowedOriginsFromEnv.length > 1) {
+  allowedOrigins = allowedOriginsFromEnv
+}else{
+  allowedOrigins = "*"
+}
+console.log("allowedOrigins:",allowedOrigins)
 
 const io = require('socket.io')(http, {
     cors: {
-        origin: "http://localhost:3000"
+        origin: allowedOrigins
     }
 });
 
