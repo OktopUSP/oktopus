@@ -3,13 +3,16 @@ package cors
 import (
 	"github.com/rs/cors"
 	"net/http"
+	"os"
+	"strings"
+	"fmt"
 )
 
 func GetCorsConfig() cors.Cors {
+	allowedOrigins := getCorsEnvConfig()
+	fmt.Println(allowedOrigins)
 	return *cors.New(cors.Options{
-		AllowedOrigins: []string{
-			"http://localhost:3000",
-		},
+		AllowedOrigins: allowedOrigins,
 		AllowedMethods: []string{
 			http.MethodGet,
 			http.MethodPost,
@@ -24,4 +27,12 @@ func GetCorsConfig() cors.Cors {
 			"*", //or you can your header key values which you are using in your application
 		},
 	})
+}
+
+func getCorsEnvConfig() []string {
+	val, _ := os.LookupEnv("REST_API_CORS")
+	if val == "" {
+		return []string{"*"}
+	}
+	return strings.Split(val, ",")
 }
