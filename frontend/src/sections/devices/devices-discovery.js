@@ -7,17 +7,21 @@ import {
   List,
   ListItem,
   ListItemText,
-  Box,
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import PlusCircleIcon from '@heroicons/react/24/outline/PlusCircleIcon';
+import Pencil from "@heroicons/react/24/outline/PencilIcon"
 import ArrowUturnLeftIcon from '@heroicons/react/24/outline/ArrowUturnLeftIcon'
 import { useRouter } from 'next/router';
 
+const AccessType = {
+    ReadOnly: 0,
+    ReadWrite: 1,
+    WriteOnly: 2,
+}
+
 function ShowParamsWithValues({x, deviceParametersValue}) {
-    console.log("estoy aqui")
     let paths = x.supported_obj_path.split(".")
-    console.log(paths)
     if(paths[paths.length -2] == "{i}"){
         return Object.keys(deviceParametersValue).map((paramKey, h)=>{
             return (
@@ -35,7 +39,6 @@ function ShowParamsWithValues({x, deviceParametersValue}) {
                 />
                 </ListItem>
             {deviceParametersValue[paramKey].map((param, i) => {
-                console.log("opa")
                 return (
                 <List 
                 component="div" 
@@ -52,7 +55,14 @@ function ShowParamsWithValues({x, deviceParametersValue}) {
                         }}
                         secondaryAction={
                             <div>
-                                {Object.values(param)[0]}
+                                {Object.values(param)[0].value}
+                                {Object.values(param)[0].access > 0 && <IconButton>
+                                <SvgIcon sx={{width:'20px'}}>
+                                
+                                    <Pencil></Pencil>
+                                
+                                </SvgIcon>
+                                </IconButton>}
                             </div>
                         }
                     >
@@ -84,7 +94,14 @@ function ShowParamsWithValues({x, deviceParametersValue}) {
                         }}
                         secondaryAction={
                             <div>
-                                {deviceParametersValue[y.param_name]}
+                                {deviceParametersValue[y.param_name].value}
+                                {deviceParametersValue[y.param_name].access > 0 && <IconButton>
+                                <SvgIcon sx={{width:'20px'}}>
+                                 
+                                    <Pencil></Pencil>
+                                
+                                </SvgIcon>
+                                </IconButton>}
                             </div>
                         }
                     >
@@ -286,12 +303,35 @@ const getDeviceParameterInstances = async (raw) =>{
 
     console.log("content:",content)
 
+    let values = {}
+    let multiInstanceParamsInfo = {}
+
     let supportedParams = content.req_obj_results[0].supported_objs[0].supported_params
     let parametersToFetch = () => {
         let paramsToFetch = []
         for (let i =0; i < supportedParams.length ;i++){
+            
             let supported_obj_path = content.req_obj_results[0].supported_objs[0].supported_obj_path.replaceAll("{i}","*")
-            paramsToFetch.push(supported_obj_path+supportedParams[i].param_name)
+            let param = supportedParams[i]
+            
+            paramsToFetch.push(supported_obj_path+param.param_name)
+
+            let paths = supported_obj_path.split(".")
+            if (paths[paths.length -2] !== "*"){
+                values[param.param_name] = {
+                    "value_change":param["value_change"],
+                    "value_type":param["value_type"],
+                    "access": param["access"],
+                    "value": "-",
+                }
+            }else{
+                multiInstanceParamsInfo[param.param_name] = {
+                    "value_change":param["value_change"],
+                    "value_type":param["value_type"],
+                    "access": param["access"],
+                    "value":"-",
+                }
+            }
         }
         return paramsToFetch
     }
@@ -308,21 +348,6 @@ const getDeviceParameterInstances = async (raw) =>{
         let result = await getDeviceParametersValue(raw)
         console.log("result:", result)
 
-        let values = {}
-        // let setvalues = () => {resultValues.req_path_results.map((x)=>{
-        //     // let path = x.requested_path.split(".")
-        //     // let param = path[path.length -1]
-        //     if (!x.resolved_path_results){
-        //         return
-        //     }
-
-        //     Object.keys(x.resolved_path_results[0].result_params).forEach((key, index) =>{
-        //         values[key] = x.resolved_path_results[0].result_params[key]
-        //     })
-        //     return values
-        // })}
-        // setvalues()
-
         let setvalues = () => {result.req_path_results.map((x)=>{
             if (!x.resolved_path_results){
                 return
@@ -331,29 +356,32 @@ const getDeviceParameterInstances = async (raw) =>{
             let paths = x.requested_path.split(".")
             if(paths[paths.length -2] == "*"){
                 x.resolved_path_results.map(y=>{
-                    if (values[y.resolved_path]){
-                        values[y.resolved_path].push(y.result_params)
-                    }else{
-                        values[y.resolved_path] = []
-                        values[y.resolved_path].push(y.result_params)
-                    }
-                    // Object.keys(y.result_params).forEach((key, index) =>{
-                    //     if (values[y.resolved_path]){
-                    //         values[y.resolved_path].push(y.result_params)
-                    //     }else{
-                    //         values[y.resolved_path] = []
-                    //         values[y.resolved_path].push(y.result_params)
-                    //     }
-                    // })
+                    Object.keys(y.result_params).forEach((key, index) =>{
+                        if (!values[y.resolved_path]){
+                            values[y.resolved_path] = []
+                        }
+                        if (y.result_params[key] == ""){
+                            y.result_params[key] = "\"\""
+                        }
+                        multiInstanceParamsInfo[key].value = y.result_params[key]
+                        let obj = {};
+                        obj[key] = multiInstanceParamsInfo[key]
+                        values[y.resolved_path].push(obj)
+                    })
                 })
             }else{
                 Object.keys(x.resolved_path_results[0].result_params).forEach((key, index) =>{
-                    values[key] = x.resolved_path_results[0].result_params[key]
+                    if (x.resolved_path_results[0].result_params[key] != ""){
+                        values[key].value = x.resolved_path_results[0].result_params[key]
+                    }else{
+                        values[key].value = "\"\""
+                    }
                 })
             }
 
             return values
         })}
+        console.log("VALUES:",values)
         setvalues()
         console.log(values)
         setDeviceParametersValue(values)
