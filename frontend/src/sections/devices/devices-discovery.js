@@ -7,6 +7,14 @@ import {
   List,
   ListItem,
   ListItemText,
+  Box,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+  Button
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import PlusCircleIcon from '@heroicons/react/24/outline/PlusCircleIcon';
@@ -20,8 +28,19 @@ const AccessType = {
     WriteOnly: 2,
 }
 
-function ShowParamsWithValues({x, deviceParametersValue}) {
+function ShowParamsWithValues({x, deviceParametersValue, setOpen, setParameter, setParameterValue}) {
     let paths = x.supported_obj_path.split(".")
+
+    const showDialog = (param, paramvalue) => {
+        setParameter(param);
+        if (paramvalue == "\"\"") {
+            setParameterValue("")
+        }else{
+            setParameterValue(paramvalue);
+        }
+        setOpen(true);
+    }
+
     if(paths[paths.length -2] == "{i}"){
         return Object.keys(deviceParametersValue).map((paramKey, h)=>{
             return (
@@ -57,7 +76,13 @@ function ShowParamsWithValues({x, deviceParametersValue}) {
                             <div>
                                 {Object.values(param)[0].value}
                                 {Object.values(param)[0].access > 0 && <IconButton>
-                                <SvgIcon sx={{width:'20px'}}>
+                                <SvgIcon sx={{width:'20px'}}
+                                onClick={()=>{
+                                    showDialog(
+                                        paramKey+Object.keys(param)[0],
+                                        Object.values(param)[0].value)
+                                }
+                                }>
                                 
                                     <Pencil></Pencil>
                                 
@@ -96,7 +121,13 @@ function ShowParamsWithValues({x, deviceParametersValue}) {
                             <div>
                                 {deviceParametersValue[y.param_name].value}
                                 {deviceParametersValue[y.param_name].access > 0 && <IconButton>
-                                <SvgIcon sx={{width:'20px'}}>
+                                <SvgIcon sx={{width:'20px'}}
+                                onClick={()=>{
+                                    showDialog(
+                                        x.supported_obj_path + y.param_name,
+                                        deviceParametersValue[y.param_name].value)
+                                }
+                                }>
                                  
                                     <Pencil></Pencil>
                                 
@@ -119,7 +150,10 @@ export const DevicesDiscovery = () => {
 const router = useRouter()
 
 const [deviceParameters, setDeviceParameters] = useState(null)
+const [parameter, setParameter] = useState(null)
+const [parameterValue, setParameterValue] = useState(null)
 const [deviceParametersValue, setDeviceParametersValue] = useState({})
+const [open, setOpen] = useState(false)
 
 const initialize = async (raw) => {
     let content = await getDeviceParameters(raw)
@@ -497,7 +531,13 @@ const getDeviceParameterInstances = async (raw) =>{
                     />
                 </ListItem>
                 { x.supported_params && 
-                    <ShowParamsWithValues x={x} deviceParametersValue={deviceParametersValue}/>
+                    <ShowParamsWithValues 
+                    x={x} 
+                    deviceParametersValue={deviceParametersValue} 
+                    setOpen={setOpen} 
+                    setParameter={setParameter}
+                    setParameterValue={setParameterValue}
+                    />
                 }
                 { x.supported_commands &&
                     x.supported_commands.map((y)=>{
@@ -555,6 +595,27 @@ const getDeviceParameterInstances = async (raw) =>{
         <CardContent>
             {showParameters()}
         </CardContent>
+                    <Dialog open={open} 
+                    slotProps={{ backdrop: { style: { backgroundColor: 'rgba(255,255,255,0.5)' } } }}
+                    >
+                    <DialogContent>
+                    <DialogContentText>
+                        {parameter}
+                    </DialogContentText>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="parameterValue"
+                        fullWidth
+                        variant="standard"
+                        defaultValue={parameterValue}
+                    />
+                    </DialogContent>
+                    <DialogActions>
+                    <Button onClick={()=>{setOpen(false)}}>Cancel</Button>
+                    <Button onClick={()=>{setOpen(false)}}>Apply</Button>
+                    </DialogActions>
+                </Dialog>
     </Card> 
     :
     <Box sx={{display:'flex',justifyContent:'center'}}>
