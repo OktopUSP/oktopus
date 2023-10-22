@@ -28,9 +28,22 @@ const AccessType = {
     WriteOnly: 2,
 }
 
+const ParamValueType = {
+    Unknown: 0,
+    Base64: 1,
+    Boolean: 2,
+    DateTime: 3,
+    Decimal: 4, 
+    HexBinary: 5,
+    Int: 6,
+    Long: 7,
+    String: 8,
+    UnisgnedInt: 9,
+    UnsignedLong: 10,
+}
+
 function ShowParamsWithValues({x, deviceParametersValue, setOpen, setParameter, setParameterValue}) {
     let paths = x.supported_obj_path.split(".")
-
     const showDialog = (param, paramvalue) => {
         setParameter(param);
         if (paramvalue == "\"\"") {
@@ -75,7 +88,7 @@ function ShowParamsWithValues({x, deviceParametersValue, setOpen, setParameter, 
                         secondaryAction={
                             <div>
                                 {Object.values(param)[0].value}
-                                {Object.values(param)[0].access > 0 && <IconButton>
+                                {Object.values(param)[0].access > AccessType.ReadOnly && <IconButton>
                                 <SvgIcon sx={{width:'20px'}}
                                 onClick={()=>{
                                     showDialog(
@@ -120,7 +133,7 @@ function ShowParamsWithValues({x, deviceParametersValue, setOpen, setParameter, 
                         secondaryAction={
                             <div>
                                 {deviceParametersValue[y.param_name].value}
-                                {deviceParametersValue[y.param_name].access > 0 && <IconButton>
+                                {deviceParametersValue[y.param_name].access > AccessType.ReadOnly && <IconButton>
                                 <SvgIcon sx={{width:'20px'}}
                                 onClick={()=>{
                                     showDialog(
@@ -152,6 +165,7 @@ const router = useRouter()
 const [deviceParameters, setDeviceParameters] = useState(null)
 const [parameter, setParameter] = useState(null)
 const [parameterValue, setParameterValue] = useState(null)
+const [parameterValueChange, setParameterValueChange] = useState(null)
 const [deviceParametersValue, setDeviceParametersValue] = useState({})
 const [open, setOpen] = useState(false)
 
@@ -337,8 +351,7 @@ const getDeviceParameterInstances = async (raw) =>{
 
     console.log("content:",content)
 
-    let values = {}
-    let multiInstanceParamsInfo = {}
+    let paramsInfo = {}
 
     let supportedParams = content.req_obj_results[0].supported_objs[0].supported_params
     let parametersToFetch = () => {
@@ -352,14 +365,14 @@ const getDeviceParameterInstances = async (raw) =>{
 
             let paths = supported_obj_path.split(".")
             if (paths[paths.length -2] !== "*"){
-                values[param.param_name] = {
+                paramsInfo[param.param_name] = {
                     "value_change":param["value_change"],
                     "value_type":param["value_type"],
                     "access": param["access"],
                     "value": "-",
                 }
             }else{
-                multiInstanceParamsInfo[param.param_name] = {
+                paramsInfo[param.param_name] = {
                     "value_change":param["value_change"],
                     "value_type":param["value_type"],
                     "access": param["access"],
@@ -381,8 +394,10 @@ const getDeviceParameterInstances = async (raw) =>{
 
         let result = await getDeviceParametersValue(raw)
         console.log("result:", result)
-
-        let setvalues = () => {result.req_path_results.map((x)=>{
+        console.log("/-------------------------------------------------------/")
+        let values = {}
+        console.log("VALUES:",values)
+        result.req_path_results.map((x)=>{
             if (!x.resolved_path_results){
                 return
             }
@@ -390,35 +405,50 @@ const getDeviceParameterInstances = async (raw) =>{
             let paths = x.requested_path.split(".")
             if(paths[paths.length -2] == "*"){
                 x.resolved_path_results.map(y=>{
-                    Object.keys(y.result_params).forEach((key, index) =>{
-                        if (!values[y.resolved_path]){
-                            values[y.resolved_path] = []
-                        }
-                        if (y.result_params[key] == ""){
-                            y.result_params[key] = "\"\""
-                        }
-                        multiInstanceParamsInfo[key].value = y.result_params[key]
-                        let obj = {};
-                        obj[key] = multiInstanceParamsInfo[key]
-                        values[y.resolved_path].push(obj)
-                    })
+                    console.log(y.result_params)
+                    console.log(y.resolved_path)
+                    let key = Object.keys(y.result_params)[0]
+                    console.log(key)
+                    console.log(paramsInfo[key].value)
+                    console.log(paramsInfo[key])
+                    console.log(y.result_params[key])
+                    console.log({[key]:paramsInfo[key]})
+                    console.log("OLHA AQUI, tem que tar diferente:",{...paramsInfo[key], value: y.result_params[key]})
+                    if (!values[y.resolved_path]){
+                        values[y.resolved_path] = []
+                    }
+                    if (y.result_params[key] == ""){
+                        y.result_params[key] = "\"\""
+                    }
+                    values[y.resolved_path].push({[key]:{...paramsInfo[key], value: y.result_params[key]}})
+                        // let obj = {};
+                        // obj[key] = paramsInfo[key]
+                        // obj[key].value = y.result_params[key]
+                        // values[y.resolved_path].push({[key]:obj[key]})
+                        // console.log("key",key)
+                        // console.log("obj[key]",obj[key])
+                        // console.log("obj[key].value",obj[key].value)
+                        // console.log("obj",obj)
+                        // console.log("values",values)
+                        // console.log("values[y.resolved_path]",values[y.resolved_path])
+                        // console.log("y.result_params[key]",y.result_params[key])
                 })
             }else{
                 Object.keys(x.resolved_path_results[0].result_params).forEach((key, index) =>{
                     if (x.resolved_path_results[0].result_params[key] != ""){
-                        values[key].value = x.resolved_path_results[0].result_params[key]
+                        paramsInfo[key].value = x.resolved_path_results[0].result_params[key]
                     }else{
-                        values[key].value = "\"\""
+                        paramsInfo[key].value = "\"\""
                     }
+                    values = paramsInfo
                 })
             }
 
-            return values
-        })}
-        console.log("VALUES:",values)
-        setvalues()
-        console.log(values)
-        setDeviceParametersValue(values)
+            console.log(values)
+            setDeviceParametersValue(values)
+        })
+        
+        console.log("/-------------------------------------------------------/")
         setDeviceParameters(content)
     }else{
         setDeviceParameters(content)
@@ -446,6 +476,7 @@ const getDeviceParameterInstances = async (raw) =>{
     }
 
   }
+  
 
   const showParameters = () => {
     return deviceParameters.req_obj_results.map((a,b)=>{
@@ -530,7 +561,7 @@ const getDeviceParameterInstances = async (raw) =>{
                         sx={{fontWeight:'bold'}}
                     />
                 </ListItem>
-                { x.supported_params && 
+                { x.supported_params && deviceParametersValue && 
                     <ShowParamsWithValues 
                     x={x} 
                     deviceParametersValue={deviceParametersValue} 
@@ -609,11 +640,78 @@ const getDeviceParameterInstances = async (raw) =>{
                         fullWidth
                         variant="standard"
                         defaultValue={parameterValue}
+                        autoComplete='off'
+                        onChange={(e)=>setParameterValueChange(e.target.value)}
                     />
                     </DialogContent>
                     <DialogActions>
                     <Button onClick={()=>{setOpen(false)}}>Cancel</Button>
-                    <Button onClick={()=>{setOpen(false)}}>Apply</Button>
+                    <Button onClick={async ()=>{
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", localStorage.getItem("token"));
+
+    let params = parameter.split(".")
+    let objToChange;
+    let parameterToChange;
+    console.log("params",params)
+    parameterToChange = params.pop()
+    objToChange = params.join(".")
+
+    var requestOptions = {
+        method: 'PUT',
+        headers: myHeaders,
+        redirect: 'follow',
+        body: JSON.stringify(
+            {
+                "allow_partial":true,
+                "update_objs":[
+                    {
+                        "obj_path":objToChange,
+                        "param_settings":[
+                            {
+                            "param":parameterToChange,
+                            "value":parameterValueChange,
+                            "required":true
+                            }
+                        ]
+                    }
+                ]
+            }
+        )
+    };
+
+    console.log(requestOptions.body)
+
+    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/device/${router.query.id[0]}/set`, requestOptions))
+    if (result.status != 200) {
+        throw new Error('Please check your email and password');
+    }else{
+        setDeviceParametersValue((prevState) => ({
+            ...prevState, [objToChange+"."]: prevState[objToChange+"."].map(el => {
+               Object.keys(el).forEach(key=>{
+                    // if (key === parameterToChange){
+                    //     return {...el, value: parameterValueChange}
+                    // }else{
+                        // console.log(el)
+                        // return el
+                    // }
+                })
+                if (el[parameterToChange] !== undefined){
+                    console.log(el[parameterToChange])
+                    el[parameterToChange].value = parameterValueChange
+                    return el
+                }else{
+                    console.log(el)
+                    return el
+                }
+            })
+        }));
+        console.log(deviceParametersValue)
+        setOpen(false)
+        return result.json()
+    }
+                    }}>Apply</Button>
                     </DialogActions>
                 </Dialog>
     </Card> 
