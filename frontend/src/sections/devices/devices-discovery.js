@@ -20,6 +20,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import PlusCircleIcon from '@heroicons/react/24/outline/PlusCircleIcon';
 import Pencil from "@heroicons/react/24/outline/PencilIcon"
 import ArrowUturnLeftIcon from '@heroicons/react/24/outline/ArrowUturnLeftIcon'
+import XMarkIcon from '@heroicons/react/24/outline/XMarkIcon';
+
 import { useRouter } from 'next/router';
 
 const AccessType = {
@@ -43,6 +45,7 @@ const ParamValueType = {
 }
 
 function ShowParamsWithValues({x, deviceParametersValue, setOpen, setParameter, setParameterValue}) {
+    console.log("HEY jow:", deviceParametersValue)
     let paths = x.supported_obj_path.split(".")
     const showDialog = (param, paramvalue) => {
         setParameter(param);
@@ -56,6 +59,8 @@ function ShowParamsWithValues({x, deviceParametersValue, setOpen, setParameter, 
 
     if(paths[paths.length -2] == "{i}"){
         return Object.keys(deviceParametersValue).map((paramKey, h)=>{
+            console.log(deviceParametersValue)
+            console.log(paramKey)
             return (
             <List dense={true} key={h}>
                 <ListItem
@@ -70,7 +75,8 @@ function ShowParamsWithValues({x, deviceParametersValue, setOpen, setParameter, 
                 sx={{fontWeight:'bold'}}
                 />
                 </ListItem>
-            {deviceParametersValue[paramKey].map((param, i) => {
+            {deviceParametersValue[paramKey].length > 0 ?
+            deviceParametersValue[paramKey].map((param, i) => {
                 return (
                 <List 
                 component="div" 
@@ -110,7 +116,7 @@ function ShowParamsWithValues({x, deviceParametersValue, setOpen, setParameter, 
                     </ListItem>
                 </List>
                 )
-            })}
+            }):<></>}
             </List>
             )
         })
@@ -168,6 +174,8 @@ const [parameterValue, setParameterValue] = useState(null)
 const [parameterValueChange, setParameterValueChange] = useState(null)
 const [deviceParametersValue, setDeviceParametersValue] = useState({})
 const [open, setOpen] = useState(false)
+const [errorModal, setErrorModal] = useState(false)
+const [errorModalText, setErrorModalText] = useState("")
 
 const initialize = async (raw) => {
     let content = await getDeviceParameters(raw)
@@ -399,6 +407,8 @@ const getDeviceParameterInstances = async (raw) =>{
         console.log("VALUES:",values)
         result.req_path_results.map((x)=>{
             if (!x.resolved_path_results){
+                values[x.requested_path] = {}
+                setDeviceParametersValue(values)
                 return
             }
 
@@ -413,7 +423,7 @@ const getDeviceParameterInstances = async (raw) =>{
                     console.log(paramsInfo[key])
                     console.log(y.result_params[key])
                     console.log({[key]:paramsInfo[key]})
-                    console.log("OLHA AQUI, tem que tar diferente:",{...paramsInfo[key], value: y.result_params[key]})
+                    console.log("Take a look here mate: ",{...paramsInfo[key], value: y.result_params[key]})
                     if (!values[y.resolved_path]){
                         values[y.resolved_path] = []
                     }
@@ -421,17 +431,6 @@ const getDeviceParameterInstances = async (raw) =>{
                         y.result_params[key] = "\"\""
                     }
                     values[y.resolved_path].push({[key]:{...paramsInfo[key], value: y.result_params[key]}})
-                        // let obj = {};
-                        // obj[key] = paramsInfo[key]
-                        // obj[key].value = y.result_params[key]
-                        // values[y.resolved_path].push({[key]:obj[key]})
-                        // console.log("key",key)
-                        // console.log("obj[key]",obj[key])
-                        // console.log("obj[key].value",obj[key].value)
-                        // console.log("obj",obj)
-                        // console.log("values",values)
-                        // console.log("values[y.resolved_path]",values[y.resolved_path])
-                        // console.log("y.result_params[key]",y.result_params[key])
                 })
             }else{
                 Object.keys(x.resolved_path_results[0].result_params).forEach((key, index) =>{
@@ -451,6 +450,7 @@ const getDeviceParameterInstances = async (raw) =>{
         console.log("/-------------------------------------------------------/")
         setDeviceParameters(content)
     }else{
+        console.log("fixme")
         setDeviceParameters(content)
     }
   }
@@ -476,8 +476,11 @@ const getDeviceParameterInstances = async (raw) =>{
     }
 
   }
-  
 
+  function isInteger(value) {
+    return /^\d+$/.test(value);
+  }
+  
   const showParameters = () => {
     return deviceParameters.req_obj_results.map((a,b)=>{
         return a.supported_objs.map((x,i)=> {
@@ -687,31 +690,82 @@ const getDeviceParameterInstances = async (raw) =>{
     if (result.status != 200) {
         throw new Error('Please check your email and password');
     }else{
-        setDeviceParametersValue((prevState) => ({
-            ...prevState, [objToChange+"."]: prevState[objToChange+"."].map(el => {
-               Object.keys(el).forEach(key=>{
-                    // if (key === parameterToChange){
-                    //     return {...el, value: parameterValueChange}
-                    // }else{
-                        // console.log(el)
-                        // return el
-                    // }
+        let response = await result.json()
+        let feedback = JSON.stringify(response, null, 2)
+
+        if (response.updated_obj_results[0].oper_status.OperStatus["OperSuccess"] === undefined) {
+            console.log("Error to set parameter change")
+            setOpen(false)
+            setErrorModalText(feedback)
+            setErrorModal(true)
+            return
+        }
+
+        //Means it has more than one instance
+        if(isInteger(params[params.length -1])){
+            setDeviceParametersValue((prevState) => ({
+                ...prevState, [objToChange+"."]: prevState[objToChange+"."].map(el => {
+                    if (el[parameterToChange] !== undefined){
+                        console.log(el[parameterToChange])
+                        el[parameterToChange].value = parameterValueChange
+                        return el
+                    }else{
+                        console.log(el)
+                        return el
+                    }
                 })
-                if (el[parameterToChange] !== undefined){
-                    console.log(el[parameterToChange])
-                    el[parameterToChange].value = parameterValueChange
-                    return el
-                }else{
-                    console.log(el)
-                    return el
-                }
-            })
-        }));
-        console.log(deviceParametersValue)
+            }));
+        }else{
+            setDeviceParametersValue((prevState) => ({
+                ...prevState, 
+                [parameterToChange] : {
+                    ...prevState[parameterToChange], 
+                    value: parameterValueChange}
+            }));
+        }
+
         setOpen(false)
-        return result.json()
     }
                     }}>Apply</Button>
+                    </DialogActions>
+                </Dialog>
+                <Dialog open={errorModal} 
+                    slotProps={{ backdrop: { style: { backgroundColor: 'rgba(255,255,255,0.5)' } } }}
+                    fullWidth={ true } 
+                    maxWidth={"md"}   
+                    scroll={"paper"}
+                    aria-labelledby="scroll-dialog-title"
+                    aria-describedby="scroll-dialog-description" 
+                >
+                <DialogTitle id="scroll-dialog-title">
+                <Box display="flex" alignItems="center">
+                    <Box flexGrow={1} >Response</Box>
+                    <Box>
+                        <IconButton >
+                                <SvgIcon 
+                                onClick={()=>{
+                                    setErrorModalText("")
+                                    setErrorModal(false)
+                                }}
+                                >
+                                < XMarkIcon/>
+                            </SvgIcon>
+                        </IconButton>
+                    </Box>
+                </Box>
+                </DialogTitle>    
+                    <DialogContent dividers={scroll === 'paper'}>
+                    <DialogContentText id="scroll-dialog-description"tabIndex={-1}>
+                    <pre style={{color: 'black'}}>
+                        {errorModalText}
+                    </pre>
+                    </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                    <Button onClick={()=>{
+                        setErrorModalText("")
+                        setErrorModal(false)
+                    }}>OK</Button>
                     </DialogActions>
                 </Dialog>
     </Card> 
