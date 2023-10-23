@@ -178,6 +178,25 @@ func (a *Api) deviceGetMsg(w http.ResponseWriter, r *http.Request) {
 	a.uspCall(msg, sn, w)
 }
 
+func (a *Api) deviceOperateMsg(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	sn := vars["sn"]
+
+	a.deviceExists(sn, w)
+
+	var receiver usp_msg.Operate
+
+	err := json.NewDecoder(r.Body).Decode(&receiver)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	msg := utils.NewOperateMsg(receiver)
+	a.uspCall(msg, sn, w)
+}
+
 func (a *Api) deviceDeleteMsg(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sn := vars["sn"]

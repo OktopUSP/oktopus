@@ -57,7 +57,8 @@ func StartApi(a Api) {
 	iot.HandleFunc("/{sn}/set", a.deviceUpdateMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/parameters", a.deviceGetSupportedParametersMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/instances", a.deviceGetParameterInstances).Methods("PUT")
-	iot.HandleFunc("/{sn}/update", a.deviceFwUpdate).Methods("PUT")
+	iot.HandleFunc("/{sn}/operate", a.deviceOperateMsg).Methods("PUT")
+	iot.HandleFunc("/{sn}/fw_update", a.deviceFwUpdate).Methods("PUT")
 	iot.HandleFunc("/{sn}/wifi", a.deviceWifi).Methods("PUT", "GET")
 
 	// Middleware for requests which requires user to be authenticated
