@@ -14,7 +14,8 @@ import {
   DialogContentText,
   DialogTitle,
   TextField,
-  Button
+  Button,
+  Backdrop,
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import PlusCircleIcon from '@heroicons/react/24/outline/PlusCircleIcon';
@@ -176,6 +177,7 @@ const [deviceParametersValue, setDeviceParametersValue] = useState({})
 const [open, setOpen] = useState(false)
 const [errorModal, setErrorModal] = useState(false)
 const [errorModalText, setErrorModalText] = useState("")
+const [showLoading, setShowLoading] = useState(false)
 
 const initialize = async (raw) => {
     let content = await getDeviceParameters(raw)
@@ -686,16 +688,19 @@ const getDeviceParameterInstances = async (raw) =>{
 
     console.log(requestOptions.body)
 
+    setOpen(false)
+    setShowLoading(true)
     let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/device/${router.query.id[0]}/set`, requestOptions))
     if (result.status != 200) {
+        setShowLoading(false)
         throw new Error('Please check your email and password');
     }else{
+        setShowLoading(false)
         let response = await result.json()
         let feedback = JSON.stringify(response, null, 2)
 
         if (response.updated_obj_results[0].oper_status.OperStatus["OperSuccess"] === undefined) {
             console.log("Error to set parameter change")
-            setOpen(false)
             setErrorModalText(feedback)
             setErrorModal(true)
             return
@@ -768,6 +773,16 @@ const getDeviceParameterInstances = async (raw) =>{
                     }}>OK</Button>
                     </DialogActions>
                 </Dialog>
+        <Backdrop
+            sx={{ 
+            color: '#fff', 
+            zIndex: (theme) => theme.zIndex.drawer + 1, 
+            overflow: 'hidden'
+            }}
+            open={showLoading}
+            >
+            <CircularProgress color="inherit" />
+        </Backdrop>
     </Card> 
     :
     <Box sx={{display:'flex',justifyContent:'center'}}>
