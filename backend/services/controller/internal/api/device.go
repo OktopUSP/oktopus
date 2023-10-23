@@ -88,44 +88,7 @@ func (a *Api) deviceFwUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	msg = utils.NewOperateMsg(receiver)
-	encodedMsg, err = proto.Marshal(&msg)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	record = utils.NewUspRecord(encodedMsg, sn)
-	tr369Message, err = proto.Marshal(&record)
-	if err != nil {
-		log.Fatalln("Failed to encode tr369 record:", err)
-	}
-
-	a.QMutex.Lock()
-	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
-	a.QMutex.Unlock()
-	log.Println("Sending Msg:", msg.Header.MsgId)
-	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
-
-	select {
-	case msg := <-a.MsgQueue[msg.Header.MsgId]:
-		log.Printf("Received Msg: %s", msg.Header.MsgId)
-		a.QMutex.Lock()
-		delete(a.MsgQueue, msg.Header.MsgId)
-		a.QMutex.Unlock()
-		log.Println("requests queue:", a.MsgQueue)
-		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetSetResp())
-		return
-	case <-time.After(time.Second * 55):
-		log.Printf("Request %s Timed Out", msg.Header.MsgId)
-		w.WriteHeader(http.StatusGatewayTimeout)
-		a.QMutex.Lock()
-		delete(a.MsgQueue, msg.Header.MsgId)
-		a.QMutex.Unlock()
-		log.Println("requests queue:", a.MsgQueue)
-		json.NewEncoder(w).Encode("Request Timed Out")
-		return
-	}
+	a.uspCall(msg, sn, w)
 }
 
 // Check which fw image is activated
@@ -160,45 +123,7 @@ func (a *Api) deviceGetSupportedParametersMsg(w http.ResponseWriter, r *http.Req
 	}
 
 	msg := utils.NewGetSupportedParametersMsg(receiver)
-	encodedMsg, err := proto.Marshal(&msg)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	record := utils.NewUspRecord(encodedMsg, sn)
-	tr369Message, err := proto.Marshal(&record)
-	if err != nil {
-		log.Fatalln("Failed to encode tr369 record:", err)
-	}
-
-	//a.Broker.Request(tr369Message, usp_msg.Header_GET, "oktopus/v1/agent/"+sn, "oktopus/v1/get/"+sn)
-	a.QMutex.Lock()
-	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
-	a.QMutex.Unlock()
-	log.Println("Sending Msg:", msg.Header.MsgId)
-	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
-
-	select {
-	case msg := <-a.MsgQueue[msg.Header.MsgId]:
-		log.Printf("Received Msg: %s", msg.Header.MsgId)
-		a.QMutex.Lock()
-		delete(a.MsgQueue, msg.Header.MsgId)
-		a.QMutex.Unlock()
-		log.Println("requests queue:", a.MsgQueue)
-		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetGetSupportedDmResp())
-		return
-	case <-time.After(time.Second * 55):
-		log.Printf("Request %s Timed Out", msg.Header.MsgId)
-		w.WriteHeader(http.StatusGatewayTimeout)
-		a.QMutex.Lock()
-		delete(a.MsgQueue, msg.Header.MsgId)
-		a.QMutex.Unlock()
-		log.Println("requests queue:", a.MsgQueue)
-		json.NewEncoder(w).Encode("Request Timed Out")
-		return
-	}
+	a.uspCall(msg, sn, w)
 }
 
 func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
@@ -231,45 +156,7 @@ func (a *Api) deviceCreateMsg(w http.ResponseWriter, r *http.Request) {
 	}
 
 	msg := utils.NewCreateMsg(receiver)
-	encodedMsg, err := proto.Marshal(&msg)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	record := utils.NewUspRecord(encodedMsg, sn)
-	tr369Message, err := proto.Marshal(&record)
-	if err != nil {
-		log.Fatalln("Failed to encode tr369 record:", err)
-	}
-
-	//a.Broker.Request(tr369Message, usp_msg.Header_GET, "oktopus/v1/agent/"+sn, "oktopus/v1/get/"+sn)
-	a.QMutex.Lock()
-	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
-	a.QMutex.Unlock()
-	log.Println("Sending Msg:", msg.Header.MsgId)
-	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
-
-	select {
-	case msg := <-a.MsgQueue[msg.Header.MsgId]:
-		log.Printf("Received Msg: %s", msg.Header.MsgId)
-		a.QMutex.Lock()
-		delete(a.MsgQueue, msg.Header.MsgId)
-		a.QMutex.Unlock()
-		log.Println("requests queue:", a.MsgQueue)
-		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetAddResp())
-		return
-	case <-time.After(time.Second * 55):
-		log.Printf("Request %s Timed Out", msg.Header.MsgId)
-		w.WriteHeader(http.StatusGatewayTimeout)
-		a.QMutex.Lock()
-		delete(a.MsgQueue, msg.Header.MsgId)
-		a.QMutex.Unlock()
-		log.Println("requests queue:", a.MsgQueue)
-		json.NewEncoder(w).Encode("Request Timed Out")
-		return
-	}
+	a.uspCall(msg, sn, w)
 }
 
 func (a *Api) deviceGetMsg(w http.ResponseWriter, r *http.Request) {
@@ -288,45 +175,7 @@ func (a *Api) deviceGetMsg(w http.ResponseWriter, r *http.Request) {
 	}
 
 	msg := utils.NewGetMsg(receiver)
-	encodedMsg, err := proto.Marshal(&msg)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	record := utils.NewUspRecord(encodedMsg, sn)
-	tr369Message, err := proto.Marshal(&record)
-	if err != nil {
-		log.Fatalln("Failed to encode tr369 record:", err)
-	}
-
-	a.QMutex.Lock()
-	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
-	a.QMutex.Unlock()
-
-	log.Println("Sending Msg:", msg.Header.MsgId)
-	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
-
-	select {
-	case msg := <-a.MsgQueue[msg.Header.MsgId]:
-		log.Printf("Received Msg: %s", msg.Header.MsgId)
-		a.QMutex.Lock()
-		delete(a.MsgQueue, msg.Header.MsgId)
-		a.QMutex.Unlock()
-		log.Println("requests queue:", a.MsgQueue)
-		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetGetResp())
-		return
-	case <-time.After(time.Second * 55):
-		log.Printf("Request %s Timed Out", msg.Header.MsgId)
-		w.WriteHeader(http.StatusGatewayTimeout)
-		a.QMutex.Lock()
-		delete(a.MsgQueue, msg.Header.MsgId)
-		a.QMutex.Unlock()
-		log.Println("requests queue:", a.MsgQueue)
-		json.NewEncoder(w).Encode("Request Timed Out")
-		return
-	}
+	a.uspCall(msg, sn, w)
 }
 
 func (a *Api) deviceDeleteMsg(w http.ResponseWriter, r *http.Request) {
@@ -344,45 +193,10 @@ func (a *Api) deviceDeleteMsg(w http.ResponseWriter, r *http.Request) {
 	}
 
 	msg := utils.NewDelMsg(receiver)
-	encodedMsg, err := proto.Marshal(&msg)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	record := utils.NewUspRecord(encodedMsg, sn)
-	tr369Message, err := proto.Marshal(&record)
-	if err != nil {
-		log.Fatalln("Failed to encode tr369 record:", err)
-	}
+	a.uspCall(msg, sn, w)
 
 	//a.Broker.Request(tr369Message, usp_msg.Header_GET, "oktopus/v1/agent/"+sn, "oktopus/v1/get/"+sn)
-	a.QMutex.Lock()
-	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
-	a.QMutex.Unlock()
-	log.Println("Sending Msg:", msg.Header.MsgId)
-	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
 
-	select {
-	case msg := <-a.MsgQueue[msg.Header.MsgId]:
-		log.Printf("Received Msg: %s", msg.Header.MsgId)
-		a.QMutex.Lock()
-		delete(a.MsgQueue, msg.Header.MsgId)
-		a.QMutex.Unlock()
-		log.Println("requests queue:", a.MsgQueue)
-		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetDeleteResp())
-		return
-	case <-time.After(time.Second * 55):
-		log.Printf("Request %s Timed Out", msg.Header.MsgId)
-		w.WriteHeader(http.StatusGatewayTimeout)
-		a.QMutex.Lock()
-		delete(a.MsgQueue, msg.Header.MsgId)
-		a.QMutex.Unlock()
-		log.Println("requests queue:", a.MsgQueue)
-		json.NewEncoder(w).Encode("Request Timed Out")
-		return
-	}
 }
 
 func (a *Api) deviceUpdateMsg(w http.ResponseWriter, r *http.Request) {
@@ -400,45 +214,7 @@ func (a *Api) deviceUpdateMsg(w http.ResponseWriter, r *http.Request) {
 	}
 
 	msg := utils.NewSetMsg(receiver)
-	encodedMsg, err := proto.Marshal(&msg)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	record := utils.NewUspRecord(encodedMsg, sn)
-	tr369Message, err := proto.Marshal(&record)
-	if err != nil {
-		log.Fatalln("Failed to encode tr369 record:", err)
-	}
-
-	//a.Broker.Request(tr369Message, usp_msg.Header_GET, "oktopus/v1/agent/"+sn, "oktopus/v1/get/"+sn)
-	a.QMutex.Lock()
-	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
-	a.QMutex.Unlock()
-	log.Println("Sending Msg:", msg.Header.MsgId)
-	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
-
-	select {
-	case msg := <-a.MsgQueue[msg.Header.MsgId]:
-		log.Printf("Received Msg: %s", msg.Header.MsgId)
-		a.QMutex.Lock()
-		delete(a.MsgQueue, msg.Header.MsgId)
-		a.QMutex.Unlock()
-		log.Println("requests queue:", a.MsgQueue)
-		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetSetResp())
-		return
-	case <-time.After(time.Second * 55):
-		log.Printf("Request %s Timed Out", msg.Header.MsgId)
-		w.WriteHeader(http.StatusGatewayTimeout)
-		a.QMutex.Lock()
-		delete(a.MsgQueue, msg.Header.MsgId)
-		a.QMutex.Unlock()
-		log.Println("requests queue:", a.MsgQueue)
-		json.NewEncoder(w).Encode("Request Timed Out")
-		return
-	}
+	a.uspCall(msg, sn, w)
 }
 
 func (a *Api) deviceExists(sn string, w http.ResponseWriter) {
@@ -469,42 +245,5 @@ func (a *Api) deviceGetParameterInstances(w http.ResponseWriter, r *http.Request
 	}
 
 	msg := utils.NewGetParametersInstancesMsg(receiver)
-	encodedMsg, err := proto.Marshal(&msg)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	record := utils.NewUspRecord(encodedMsg, sn)
-	tr369Message, err := proto.Marshal(&record)
-	if err != nil {
-		log.Fatalln("Failed to encode tr369 record:", err)
-	}
-
-	a.QMutex.Lock()
-	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
-	a.QMutex.Unlock()
-	log.Println("Sending Msg:", msg.Header.MsgId)
-	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
-
-	select {
-	case msg := <-a.MsgQueue[msg.Header.MsgId]:
-		log.Printf("Received Msg: %s", msg.Header.MsgId)
-		a.QMutex.Lock()
-		delete(a.MsgQueue, msg.Header.MsgId)
-		a.QMutex.Unlock()
-		log.Println("requests queue:", a.MsgQueue)
-		json.NewEncoder(w).Encode(msg.Body.GetResponse().GetGetInstancesResp())
-		return
-	case <-time.After(time.Second * 55):
-		log.Printf("Request %s Timed Out", msg.Header.MsgId)
-		w.WriteHeader(http.StatusGatewayTimeout)
-		a.QMutex.Lock()
-		delete(a.MsgQueue, msg.Header.MsgId)
-		a.QMutex.Unlock()
-		log.Println("requests queue:", a.MsgQueue)
-		json.NewEncoder(w).Encode("Request Timed Out")
-		return
-	}
+	a.uspCall(msg, sn, w)
 }
