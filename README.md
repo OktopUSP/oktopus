@@ -263,7 +263,7 @@ OBS: Do not use those instructions in production. To implement the project in pr
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <p>Are you going to use our project in your company? would like to talk about TR-369 and IoT management, we're online on <a href="https://join.slack.com/t/oktopustr-369/shared_invite/zt-1znmrbr52-3AXgOlSeQTPQW8_Qhn3C4g">Slack</a>.</p>
-<p>If you are interested in internal information about the team and our intentions, visit our <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>.[DEPRECATED]</p>
+<p>If you are interested in internal information about the team and our intentions, visit our <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>. [DEPRECATED]</p>
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 

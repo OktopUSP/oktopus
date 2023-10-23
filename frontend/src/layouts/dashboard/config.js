@@ -33,15 +33,15 @@ export const items = [
   //     </SvgIcon>
   //   )
   // },
-   {
-     title: 'Map',
-     path: '/map',
-     icon: (
-       <SvgIcon fontSize="small">
-        <MapIcon/>
-       </SvgIcon>
-     )
-   },
+  //  {
+  //    title: 'Map',
+  //    path: '/map',
+  //    icon: (
+  //      <SvgIcon fontSize="small">
+  //       <MapIcon/>
+  //      </SvgIcon>
+  //    )
+  //  },
   {
     title: 'Settings',
     path: '/settings',
