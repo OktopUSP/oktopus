@@ -2,6 +2,10 @@ package ws
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+	"time"
+
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/googollee/go-socket.io/engineio"
 	"github.com/googollee/go-socket.io/engineio/transport"
@@ -9,11 +13,9 @@ import (
 	"github.com/googollee/go-socket.io/engineio/transport/websocket"
 	"github.com/gorilla/mux"
 	"github.com/leandrofars/oktopus/internal/api/cors"
-	"log"
-	"net/http"
-	"time"
 )
 
+/* ----------- [Deprecated code] migrated to Socketio with NodeJs ----------- */
 func Ws() {
 	server := socketio.NewServer(&engineio.Options{
 		PingTimeout:  5 * time.Second,

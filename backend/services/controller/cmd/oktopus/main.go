@@ -49,7 +49,7 @@ func main() {
 		App variables priority:
 		1º - Flag through command line.
 		2º - Env variables.
-		3º - Default flag value
+		3º - Default flag value.
 	*/
 
 	log.Println("Starting Oktopus Project TR-369 Controller Version:", VERSION)
