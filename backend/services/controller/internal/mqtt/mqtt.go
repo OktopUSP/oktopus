@@ -2,6 +2,13 @@ package mqtt
 
 import (
 	"context"
+	"log"
+	"net/url"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/eclipse/paho.golang/autopaho"
 	"github.com/eclipse/paho.golang/paho"
 	"github.com/leandrofars/oktopus/internal/db"
@@ -9,12 +16,6 @@ import (
 	"github.com/leandrofars/oktopus/internal/usp_record"
 	"github.com/leandrofars/oktopus/internal/utils"
 	"google.golang.org/protobuf/proto"
-	"log"
-	"net/url"
-	"strconv"
-	"strings"
-	"sync"
-	"time"
 )
 
 type Mqtt struct {
@@ -59,7 +60,7 @@ func (m *Mqtt) Connect() {
 		ConnectRetryDelay: 5 * time.Second,
 		ConnectTimeout:    5 * time.Second,
 		OnConnectionUp: func(cm *autopaho.ConnectionManager, connAck *paho.Connack) {
-			log.Printf("Connected to broker--> %s:%s", m.Addr, m.Port)
+			log.Printf("Connected to MQTT broker--> %s:%s", m.Addr, m.Port)
 			m.Subscribe()
 		},
 		OnConnectError: func(err error) {
@@ -146,9 +147,9 @@ func (m *Mqtt) buildClientConfig(status, controller, apiMsg chan *paho.Publish) 
 		Router: singleHandler,
 		OnServerDisconnect: func(d *paho.Disconnect) {
 			if d.Properties != nil {
-				log.Printf("Requested disconnect: %s\n", clientConfig.ClientID, d.Properties.ReasonString)
+				log.Printf("Requested disconnect: %s\n , properties reason: %s\n", clientConfig.ClientID, d.Properties.ReasonString)
 			} else {
-				log.Printf("Requested disconnect; reason code: %d\n", clientConfig.ClientID, d.ReasonCode)
+				log.Printf("Requested disconnect; %s reason code: %d\n", clientConfig.ClientID, d.ReasonCode)
 			}
 		},
 		OnClientError: func(err error) {
