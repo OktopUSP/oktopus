@@ -4,11 +4,12 @@ package mtp
 import (
 	"log"
 	"os"
+	"sync"
 )
 
 /*
-	Message Transfer Protocol layer, which can use WebSockets, MQTT, COAP or STOMP; as defined in tr369 protocol.
-	It was made thinking in a broker architeture instead of a server-client p2p.
+Message Transfer Protocol layer, which can use WebSockets, MQTT, COAP or STOMP; as defined in tr369 protocol.
+It was made thinking in a broker architeture instead of a server-client p2p.
 */
 type Broker interface {
 	Connect()
@@ -22,17 +23,18 @@ type Broker interface {
 	//Request(msg []byte, msgType usp_msg.Header_MsgType, pubTopic string, subTopic string)
 }
 
-// Not used, since we are using a broker solution with MQTT.
+// Not used, since we are using a broker solution.
 type P2P interface {
 }
 
 // Start the service which enable the communication with IoTs (MTP protocol layer).
-func MtpService(b Broker, done chan os.Signal) {
+func MtpService(b Broker, done chan os.Signal, wg *sync.WaitGroup) {
 	b.Connect()
+	wg.Done()
 	go func() {
 		for range done {
 			b.Disconnect()
-			log.Println("Successfully disconnected to broker!")
+			log.Println("Successfully disconnected to MTPs!")
 
 			// Receives signal and then replicates it to the rest of the app.
 			done <- os.Interrupt

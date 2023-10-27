@@ -127,7 +127,7 @@ func (m *Mqtt) Publish(msg []byte, topic, respTopic string, retain bool) {
 /* -------------------------------------------------------------------------- */
 
 func (m *Mqtt) buildClientConfig(status, controller, apiMsg chan *paho.Publish) *paho.ClientConfig {
-	log.Println("Starting new mqtt client")
+	log.Println("Starting new MQTT client")
 	singleHandler := paho.NewSingleHandlerRouter(func(p *paho.Publish) {
 		if strings.Contains(p.Topic, "status") {
 			status <- p

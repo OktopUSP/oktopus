@@ -17,6 +17,7 @@ require (
 )
 
 require (
+	github.com/go-stomp/stomp v2.1.4+incompatible // indirect
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/gomodule/redigo v1.8.4 // indirect
