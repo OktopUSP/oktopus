@@ -5,7 +5,7 @@ import (
 	"net"
 	"os"
 
-	stomp_server "github.com/go-stomp/stomp/server"
+	"github.com/go-stomp/stomp/v3/server"
 	"github.com/joho/godotenv"
 )
 
@@ -47,14 +47,14 @@ func main() {
 		Passwd: os.Getenv("STOMP_PASSWORD"),
 	}
 
-	l, err := net.Listen("tcp", stomp_server.DefaultAddr)
+	l, err := net.Listen("tcp", server.DefaultAddr)
 	if err != nil {
 		log.Println("Error to open tcp port: ", err)
 	}
 
-	s := stomp_server.Server{
-		Addr:          stomp_server.DefaultAddr,
-		HeartBeat:     stomp_server.DefaultHeartBeat,
+	s := server.Server{
+		Addr:          server.DefaultAddr,
+		HeartBeat:     server.DefaultHeartBeat,
 		Authenticator: &creds,
 	}
 
