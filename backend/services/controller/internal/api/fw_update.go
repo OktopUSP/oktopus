@@ -19,7 +19,7 @@ type FwUpdate struct {
 func (a *Api) deviceFwUpdate(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sn := vars["sn"]
-	a.deviceExists(sn, w)
+	device := a.deviceExists(sn, w)
 
 	var payload FwUpdate
 
@@ -101,7 +101,7 @@ func (a *Api) deviceFwUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	msg = utils.NewOperateMsg(receiver)
-	a.uspCall(msg, sn, w)
+	a.uspCall(msg, sn, w, device)
 }
 
 // Check which fw image is activated

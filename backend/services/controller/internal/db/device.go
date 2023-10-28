@@ -1,10 +1,20 @@
 package db
 
 import (
+	"log"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
+)
+
+type MTP int32
+
+const (
+	UNDEFINED MTP = iota
+	MQTT
+	STOMP
+	WEBSOCKETS
 )
 
 type Device struct {
@@ -14,6 +24,7 @@ type Device struct {
 	Vendor   string
 	Version  string
 	Status   uint8
+	MTP      []map[string]string
 }
 
 func (d *Database) CreateDevice(device Device) error {
@@ -58,4 +69,18 @@ func (d *Database) RetrieveDevice(sn string) (Device, error) {
 
 func (d *Database) DeleteDevice() {
 
+}
+
+func (m MTP) String() string {
+	switch m {
+	case UNDEFINED:
+		return "unknown"
+	case MQTT:
+		return "mqtt"
+	case STOMP:
+		return "stomp"
+	case WEBSOCKETS:
+		return "websockets"
+	}
+	return "unknown"
 }

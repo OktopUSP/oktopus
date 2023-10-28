@@ -285,7 +285,12 @@ func (m *Mqtt) handleNewDevicesResponse(p []byte, sn string) {
 	device.Model = msg.ReqPathResults[1].ResolvedPathResults[0].ResultParams["ModelName"]
 	device.Version = msg.ReqPathResults[2].ResolvedPathResults[0].ResultParams["SoftwareVersion"]
 	device.SN = sn
-	device.Status = utils.Online
+
+	mtp := map[string]string{
+		db.MQTT.String(): "online",
+	}
+
+	device.MTP = append(device.MTP, mtp)
 
 	err = m.DB.CreateDevice(device)
 	if err != nil {

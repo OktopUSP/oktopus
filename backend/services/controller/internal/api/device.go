@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/leandrofars/oktopus/internal/db"
 	usp_msg "github.com/leandrofars/oktopus/internal/usp_message"
 	"github.com/leandrofars/oktopus/internal/utils"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,7 +15,7 @@ import (
 func (a *Api) deviceGetSupportedParametersMsg(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sn := vars["sn"]
-	a.deviceExists(sn, w)
+	device := a.deviceExists(sn, w)
 
 	var receiver usp_msg.GetSupportedDM
 
@@ -26,7 +27,7 @@ func (a *Api) deviceGetSupportedParametersMsg(w http.ResponseWriter, r *http.Req
 	}
 
 	msg := utils.NewGetSupportedParametersMsg(receiver)
-	a.uspCall(msg, sn, w)
+	a.uspCall(msg, sn, w, device)
 }
 
 func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
@@ -47,7 +48,7 @@ func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
 func (a *Api) deviceCreateMsg(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sn := vars["sn"]
-	a.deviceExists(sn, w)
+	device := a.deviceExists(sn, w)
 
 	var receiver usp_msg.Add
 
@@ -59,14 +60,14 @@ func (a *Api) deviceCreateMsg(w http.ResponseWriter, r *http.Request) {
 	}
 
 	msg := utils.NewCreateMsg(receiver)
-	a.uspCall(msg, sn, w)
+	a.uspCall(msg, sn, w, device)
 }
 
 func (a *Api) deviceGetMsg(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sn := vars["sn"]
 
-	a.deviceExists(sn, w)
+	device := a.deviceExists(sn, w)
 
 	var receiver usp_msg.Get
 
@@ -78,14 +79,14 @@ func (a *Api) deviceGetMsg(w http.ResponseWriter, r *http.Request) {
 	}
 
 	msg := utils.NewGetMsg(receiver)
-	a.uspCall(msg, sn, w)
+	a.uspCall(msg, sn, w, device)
 }
 
 func (a *Api) deviceOperateMsg(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sn := vars["sn"]
 
-	a.deviceExists(sn, w)
+	device := a.deviceExists(sn, w)
 
 	var receiver usp_msg.Operate
 
@@ -97,13 +98,13 @@ func (a *Api) deviceOperateMsg(w http.ResponseWriter, r *http.Request) {
 	}
 
 	msg := utils.NewOperateMsg(receiver)
-	a.uspCall(msg, sn, w)
+	a.uspCall(msg, sn, w, device)
 }
 
 func (a *Api) deviceDeleteMsg(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sn := vars["sn"]
-	a.deviceExists(sn, w)
+	device := a.deviceExists(sn, w)
 
 	var receiver usp_msg.Delete
 
@@ -115,7 +116,7 @@ func (a *Api) deviceDeleteMsg(w http.ResponseWriter, r *http.Request) {
 	}
 
 	msg := utils.NewDelMsg(receiver)
-	a.uspCall(msg, sn, w)
+	a.uspCall(msg, sn, w, device)
 
 	//a.Broker.Request(tr369Message, usp_msg.Header_GET, "oktopus/v1/agent/"+sn, "oktopus/v1/get/"+sn)
 
@@ -124,7 +125,7 @@ func (a *Api) deviceDeleteMsg(w http.ResponseWriter, r *http.Request) {
 func (a *Api) deviceUpdateMsg(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sn := vars["sn"]
-	a.deviceExists(sn, w)
+	device := a.deviceExists(sn, w)
 
 	var receiver usp_msg.Set
 
@@ -136,26 +137,26 @@ func (a *Api) deviceUpdateMsg(w http.ResponseWriter, r *http.Request) {
 	}
 
 	msg := utils.NewSetMsg(receiver)
-	a.uspCall(msg, sn, w)
+	a.uspCall(msg, sn, w, device)
 }
 
-func (a *Api) deviceExists(sn string, w http.ResponseWriter) {
-	_, err := a.Db.RetrieveDevice(sn)
+func (a *Api) deviceExists(sn string, w http.ResponseWriter) db.Device {
+	device, err := a.Db.RetrieveDevice(sn)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode("No device with serial number " + sn + " was found")
-			return
 		}
 		w.WriteHeader(http.StatusInternalServerError)
-		return
+		return device
 	}
+	return device
 }
 
 func (a *Api) deviceGetParameterInstances(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sn := vars["sn"]
-	a.deviceExists(sn, w)
+	device := a.deviceExists(sn, w)
 
 	var receiver usp_msg.GetInstances
 
@@ -167,5 +168,5 @@ func (a *Api) deviceGetParameterInstances(w http.ResponseWriter, r *http.Request
 	}
 
 	msg := utils.NewGetParametersInstancesMsg(receiver)
-	a.uspCall(msg, sn, w)
+	a.uspCall(msg, sn, w, device)
 }

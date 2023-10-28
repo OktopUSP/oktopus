@@ -94,7 +94,7 @@ func StartApi(a Api) {
 	log.Println("Running Api at port", a.Port)
 }
 
-func (a *Api) uspCall(msg usp_msg.Msg, sn string, w http.ResponseWriter) {
+func (a *Api) uspCall(msg usp_msg.Msg, sn string, w http.ResponseWriter, device db.Device) {
 
 	encodedMsg, err := proto.Marshal(&msg)
 	if err != nil {
@@ -113,6 +113,7 @@ func (a *Api) uspCall(msg usp_msg.Msg, sn string, w http.ResponseWriter) {
 	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
 	a.QMutex.Unlock()
 	log.Println("Sending Msg:", msg.Header.MsgId)
+	//TODO: Check what MTP the device is connected to
 	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
 
 	select {
