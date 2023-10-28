@@ -177,7 +177,7 @@ Currently, telecommunications giants and startups, publishing new software daily
 
 <ul><li><h4>Infrastructure:</h4></li></ul>
 
-![image](https://github.com/OktopUSP/oktopus/assets/83298718/86d0b39c-ca08-4954-8d51-bc9f55655c7a)
+![image](https://github.com/OktopUSP/oktopus/assets/83298718/b63ba300-c6e2-473b-9bfe-86b31f2b1276)
 
 <ul>
     <li>
