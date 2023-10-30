@@ -17,6 +17,7 @@ import {
   Button,
   Backdrop,
 } from '@mui/material';
+import ArrowRightIcon from '@heroicons/react/24/solid/ArrowRightIcon';
 import CircularProgress from '@mui/material/CircularProgress';
 import PlusCircleIcon from '@heroicons/react/24/outline/PlusCircleIcon';
 import Pencil from "@heroicons/react/24/outline/PencilIcon"
@@ -24,8 +25,25 @@ import ArrowUturnLeftIcon from '@heroicons/react/24/outline/ArrowUturnLeftIcon'
 import XMarkIcon from '@heroicons/react/24/outline/XMarkIcon';
 
 import { useRouter } from 'next/router';
+import TrashIcon from '@heroicons/react/24/outline/TrashIcon';
 
-const AccessType = {
+/*
+    OBJ_READ_ONLY (0)
+    OBJ_ADD_DELETE (1)
+    OBJ_ADD_ONLY (2)
+    OBJ_DELETE_ONLY (3)
+
+*/
+
+const ObjAccessType = {
+    ReadOnly: 0,
+    AddDelete: 1,
+    AddOnly: 2,
+    DeleteOnly:3,
+}
+
+
+const ParamAccessType = {
     ReadOnly: 0,
     ReadWrite: 1,
     WriteOnly: 2,
@@ -43,6 +61,110 @@ const ParamValueType = {
     String: 8,
     UnisgnedInt: 9,
     UnsignedLong: 10,
+}
+//TODO: refact all of this mess
+const addDeviceObj = async(obj, setShowLoading, router, updateDeviceParameters) => {
+    console.log("AddDeviceObj => obj = ", obj)
+    let raw = JSON.stringify(
+        {
+            "allow_partial": true,
+            "create_objs": [
+                {
+                    "obj_path": obj,
+                    //TODO: create queue and create new obj with parameters
+                    // "param_settings": [
+                    //     {
+                    //         "param": "Alias",
+                    //         "value": "test",
+                    //         "required": true
+                    //     }
+                    // ]
+                }
+            ]
+        }
+    )
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", localStorage.getItem("token"));
+
+    var requestOptions = {
+        method: 'PUT',
+        headers: myHeaders,
+        redirect: 'follow',
+        body: raw
+    };
+    setShowLoading(true)
+    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/device/${router.query.id[0]}/add`, requestOptions))
+    if (result.status != 200) {
+        setShowLoading(false)
+        throw new Error('Please check your email and password');
+    }else{
+        setShowLoading(false)
+        console.log(result.json())
+        updateDeviceParameters(obj+"*.")
+    }
+}
+
+function ShowPath({x,updateDeviceParameters,setShowLoading, router}) {
+    console.log(x)
+    console.log("x.supported_obj_path:", x.supported_obj_path)
+    console.log("x.access:", x.access)
+    if(x.supported_obj_path != "Device."){
+        if (x.access === ObjAccessType.ReadOnly || x.access === undefined){
+            return (
+                <IconButton onClick={()=>{
+                    console.log("x.supported_obj_path:",x.supported_obj_path)
+                    let supported_obj_path = x.supported_obj_path.replaceAll("{i}.","*.")
+                    updateDeviceParameters(supported_obj_path)
+                }}>
+            <SvgIcon>
+                <ArrowRightIcon></ArrowRightIcon>
+            </SvgIcon>
+            </IconButton>)
+        }else if (x.access === ObjAccessType.AddDelete){
+            console.log("addDelete")
+            return (
+                <div style={{justifyContent:"center", display:'flex'}}>
+                    <IconButton>
+                    <SvgIcon onClick={()=>addDeviceObj(
+                        x.supported_obj_path.replace("{i}.",""),
+                        setShowLoading, router, updateDeviceParameters)}>
+                    <PlusCircleIcon></PlusCircleIcon>
+                    </SvgIcon>
+                    </IconButton>
+                    <IconButton>
+                    <SvgIcon>
+                    <TrashIcon></TrashIcon>
+                    </SvgIcon>
+                    </IconButton>
+                    <IconButton onClick={()=>{
+                    console.log("x.supported_obj_path:",x.supported_obj_path)
+                    let supported_obj_path = x.supported_obj_path.replaceAll("{i}.","*.")
+                    updateDeviceParameters(supported_obj_path)
+                }}>
+            <SvgIcon>
+                <ArrowRightIcon></ArrowRightIcon>
+            </SvgIcon>
+            </IconButton>
+                </div>
+            )
+        }else if (x.access === ObjAccessType.AddOnly){
+            return <IconButton>
+                <SvgIcon 
+                onClick={()=>addDeviceObj(x.supported_obj_path.replace("{i}.",""),
+                setShowLoading, router, updateDeviceParameters)}>
+                <PlusCircleIcon></PlusCircleIcon>
+                </SvgIcon>
+                </IconButton>
+        }else if (x.access === ObjAccessType.DeleteOnly){
+            return <IconButton>
+                <SvgIcon>
+                <TrashIcon></TrashIcon>
+                </SvgIcon>
+                </IconButton>
+        }
+    }
+    return <></>
 }
 
 function ShowParamsWithValues({x, deviceParametersValue, setOpen, setParameter, setParameterValue}) {
@@ -95,7 +217,7 @@ function ShowParamsWithValues({x, deviceParametersValue, setOpen, setParameter, 
                         secondaryAction={
                             <div>
                                 {Object.values(param)[0].value}
-                                {Object.values(param)[0].access > AccessType.ReadOnly && <IconButton>
+                                {Object.values(param)[0].access > ParamAccessType.ReadOnly && <IconButton>
                                 <SvgIcon sx={{width:'20px'}}
                                 onClick={()=>{
                                     showDialog(
@@ -140,7 +262,7 @@ function ShowParamsWithValues({x, deviceParametersValue, setOpen, setParameter, 
                         secondaryAction={
                             <div>
                                 {deviceParametersValue[y.param_name].value}
-                                {deviceParametersValue[y.param_name].access > AccessType.ReadOnly && <IconButton>
+                                {deviceParametersValue[y.param_name].access > ParamAccessType.ReadOnly && <IconButton>
                                 <SvgIcon sx={{width:'20px'}}
                                 onClick={()=>{
                                     showDialog(
@@ -347,6 +469,7 @@ const getDeviceParameterInstances = async (raw) =>{
     //     setDeviceParametersValue(values)
   }
 
+
   const updateDeviceParameters = async (param) => {
     console.log("UpdateDeviceParameters => param = ", param)
     let raw = JSON.stringify({
@@ -544,18 +667,7 @@ const getDeviceParameterInstances = async (raw) =>{
                         </SvgIcon>
                         </IconButton>
                         :
-                        <IconButton onClick={()=>{
-                            console.log("x.supported_obj_path:",x.supported_obj_path)
-                            let supported_obj_path = x.supported_obj_path.replaceAll("{i}.","*.")
-                            updateDeviceParameters(supported_obj_path)
-                        }}>
-                            <SvgIcon>
-                                {
-                                x.supported_obj_path != "Device." && 
-                                <PlusCircleIcon></PlusCircleIcon>
-                                }
-                            </SvgIcon>
-                        </IconButton>
+                        <ShowPath x={x} setShowLoading={setShowLoading} updateDeviceParameters={updateDeviceParameters} router={router}></ShowPath>
                     }
                     sx={{
                         boxShadow: 'rgba(149, 157, 165, 0.2) 0px 0px 5px;'
