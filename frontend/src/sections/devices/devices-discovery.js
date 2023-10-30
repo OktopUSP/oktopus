@@ -105,6 +105,50 @@ const addDeviceObj = async(obj, setShowLoading, router, updateDeviceParameters) 
     }
 }
 
+const deleteDeviceObj = async(obj, setShowLoading, router, updateDeviceParameters) => {
+    console.log("deleteDeviceObj => obj = ", obj)
+    let raw = JSON.stringify(
+        {
+            "allow_partial": true,
+            "obj_paths": [
+                obj
+            ]
+        }
+    )
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", localStorage.getItem("token"));
+
+    var requestOptions = {
+        method: 'PUT',
+        headers: myHeaders,
+        redirect: 'follow',
+        body: raw
+    };
+    setShowLoading(true)
+    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/device/${router.query.id[0]}/del`, requestOptions))
+    if (result.status != 200) {
+        setShowLoading(false)
+        throw new Error('Please check your email and password');
+    }else{
+        setShowLoading(false)
+        console.log(result.json())
+
+        let paths = obj.split(".")
+        console.log("paths:",paths)
+
+        let pathsToJump = 2
+        if (paths[paths.length -2] == "*"){
+            pathsToJump = 3
+        }
+        
+        paths.splice(paths.length - pathsToJump, pathsToJump)
+        let pathToFetch = paths.join(".")
+        
+        updateDeviceParameters(pathToFetch)
+    }
+}
+
 function ShowPath({x,updateDeviceParameters,setShowLoading, router}) {
     console.log(x)
     console.log("x.supported_obj_path:", x.supported_obj_path)
@@ -132,11 +176,6 @@ function ShowPath({x,updateDeviceParameters,setShowLoading, router}) {
                     <PlusCircleIcon></PlusCircleIcon>
                     </SvgIcon>
                     </IconButton>
-                    <IconButton>
-                    <SvgIcon>
-                    <TrashIcon></TrashIcon>
-                    </SvgIcon>
-                    </IconButton>
                     <IconButton onClick={()=>{
                     console.log("x.supported_obj_path:",x.supported_obj_path)
                     let supported_obj_path = x.supported_obj_path.replaceAll("{i}.","*.")
@@ -156,18 +195,18 @@ function ShowPath({x,updateDeviceParameters,setShowLoading, router}) {
                 <PlusCircleIcon></PlusCircleIcon>
                 </SvgIcon>
                 </IconButton>
-        }else if (x.access === ObjAccessType.DeleteOnly){
-            return <IconButton>
-                <SvgIcon>
-                <TrashIcon></TrashIcon>
-                </SvgIcon>
-                </IconButton>
         }
     }
     return <></>
 }
 
-function ShowParamsWithValues({x, deviceParametersValue, setOpen, setParameter, setParameterValue}) {
+function ShowParamsWithValues({
+    x, deviceParametersValue, 
+    setOpen, setParameter, 
+    setParameterValue, deviceParameters, 
+    setShowLoading, router,
+    updateDeviceParameters
+}) {
     console.log("HEY jow:", deviceParametersValue)
     let paths = x.supported_obj_path.split(".")
     const showDialog = (param, paramvalue) => {
@@ -182,8 +221,11 @@ function ShowParamsWithValues({x, deviceParametersValue, setOpen, setParameter, 
 
     if(paths[paths.length -2] == "{i}"){
         return Object.keys(deviceParametersValue).map((paramKey, h)=>{
-            console.log(deviceParametersValue)
-            console.log(paramKey)
+            console.log("deviceParametersValue:", deviceParametersValue)
+            console.log("paramKey:", paramKey)
+            console.log("deviceParameters.req_obj_results[0].supported_objs[h]?.access:", deviceParameters.req_obj_results[0].supported_objs[h]?.access)
+            let obj = deviceParameters.req_obj_results[0].supported_objs[0]
+            let access = obj?.access
             return (
             <List dense={true} key={h}>
                 <ListItem
@@ -192,6 +234,21 @@ function ShowParamsWithValues({x, deviceParametersValue, setOpen, setParameter, 
                         boxShadow: 'rgba(149, 157, 165, 0.2) 0px 0px 5px;',
                         pl: 4,
                     }}
+                    secondaryAction={
+                        access > ObjAccessType.ReadOnly &&
+                        <IconButton onClick={()=>{
+                            deleteDeviceObj(
+                                paramKey,
+                                setShowLoading,
+                                router,
+                                updateDeviceParameters
+                            )
+                        }}>
+                        <SvgIcon>
+                            <TrashIcon></TrashIcon>
+                        </SvgIcon>
+                        </IconButton>
+                    }
                 >
                 <ListItemText
                 primary={<b>{paramKey}</b>}
@@ -383,47 +440,47 @@ const getDeviceParameterInstances = async (raw) =>{
 //     })
 //   }
   // Multi instance not used, found better way to get values
-  const updateDeviceParametersMultiInstance = async (param) =>{
-    console.log("UpdateDeviceParametersMultiInstance => param = ", param)
+//   const updateDeviceParametersMultiInstance = async (param) =>{
+//     console.log("UpdateDeviceParametersMultiInstance => param = ", param)
 
-    let raw = JSON.stringify({
-        "obj_paths": [param],
-        "first_level_only" : true,
-        "return_commands" : true,
-        "return_events" : true,
-        "return_params" : true 
-    })
+//     let raw = JSON.stringify({
+//         "obj_paths": [param],
+//         "first_level_only" : true,
+//         "return_commands" : true,
+//         "return_events" : true,
+//         "return_params" : true 
+//     })
 
-    let response = await getDeviceParameterInstances(raw)
-    console.log("response:", response)
+//     let response = await getDeviceParameterInstances(raw)
+//     console.log("response:", response)
 
-    let instancesToGet = []
-    if (response.req_path_results[0].curr_insts) {
-        let supportedParams = response.req_path_results[0].curr_insts
-        let instances = () => {
-            for (let i =0; i < supportedParams.length ;i++){
-                instancesToGet.push(supportedParams[i].instantiated_obj_path)
-            }
-        }
-        instances()
-    }else{
-        instancesToGet.push(response.req_path_results[0].requested_path)
-    }
+//     let instancesToGet = []
+//     if (response.req_path_results[0].curr_insts) {
+//         let supportedParams = response.req_path_results[0].curr_insts
+//         let instances = () => {
+//             for (let i =0; i < supportedParams.length ;i++){
+//                 instancesToGet.push(supportedParams[i].instantiated_obj_path)
+//             }
+//         }
+//         instances()
+//     }else{
+//         instancesToGet.push(response.req_path_results[0].requested_path)
+//     }
 
-    let rawInP = JSON.stringify({
-        "obj_paths": instancesToGet,
-        "first_level_only" : true,
-        "return_commands" : true,
-        "return_events" : true,
-        "return_params" : true 
-    })
+//     let rawInP = JSON.stringify({
+//         "obj_paths": instancesToGet,
+//         "first_level_only" : true,
+//         "return_commands" : true,
+//         "return_events" : true,
+//         "return_params" : true 
+//     })
 
-    let resultParams = await getDeviceParameters(rawInP)
-    console.log("result params:", resultParams)
-    setDeviceParameters(resultParams)
+//     let resultParams = await getDeviceParameters(rawInP)
+//     console.log("result params:", resultParams)
+//     setDeviceParameters(resultParams)
 
 
-    let paramsToFetch = []
+//     let paramsToFetch = []
 
     // console.log("parameters to fetch: ", paramsToFetch)
 
@@ -467,7 +524,7 @@ const getDeviceParameterInstances = async (raw) =>{
 
     //     setDeviceParameters(resultParams)
     //     setDeviceParametersValue(values)
-  }
+//  }
 
 
   const updateDeviceParameters = async (param) => {
@@ -685,6 +742,10 @@ const getDeviceParameterInstances = async (raw) =>{
                     setOpen={setOpen} 
                     setParameter={setParameter}
                     setParameterValue={setParameterValue}
+                    deviceParameters={deviceParameters}
+                    setShowLoading={setShowLoading}
+                    router={router}
+                    updateDeviceParameters={updateDeviceParameters}
                     />
                 }
                 { x.supported_commands &&
