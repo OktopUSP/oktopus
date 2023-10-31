@@ -50,6 +50,7 @@ func StartApi(a Api) {
 	authentication.HandleFunc("/admin/register", a.registerAdminUser).Methods("POST")
 	authentication.HandleFunc("/admin/exists", a.adminUserExists).Methods("GET")
 	iot := r.PathPrefix("/api/device").Subrouter()
+	//TODO: create query for devices
 	iot.HandleFunc("", a.retrieveDevices).Methods("GET")
 	iot.HandleFunc("/{sn}/get", a.deviceGetMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/add", a.deviceCreateMsg).Methods("PUT")
@@ -60,18 +61,24 @@ func StartApi(a Api) {
 	iot.HandleFunc("/{sn}/operate", a.deviceOperateMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/fw_update", a.deviceFwUpdate).Methods("PUT")
 	iot.HandleFunc("/{sn}/wifi", a.deviceWifi).Methods("PUT", "GET")
+	mtp := r.PathPrefix("/api/mtp").Subrouter()
+	mtp.HandleFunc("/mqtt", a.MqttInfo).Methods("GET")
+	users := r.PathPrefix("/api/users").Subrouter()
+	users.HandleFunc("", a.retrieveUsers).Methods("GET")
 
-	// Middleware for requests which requires user to be authenticated
+	/* ----- Middleware for requests which requires user to be authenticated ---- */
 	iot.Use(func(handler http.Handler) http.Handler {
 		return middleware.Middleware(handler)
 	})
 
-	users := r.PathPrefix("/api/users").Subrouter()
-	users.HandleFunc("", a.retrieveUsers).Methods("GET")
+	mtp.Use(func(handler http.Handler) http.Handler {
+		return middleware.Middleware(handler)
+	})
 
 	users.Use(func(handler http.Handler) http.Handler {
 		return middleware.Middleware(handler)
 	})
+	/* -------------------------------------------------------------------------- */
 
 	// Verifies CORS configs for requests
 	corsOpts := cors.GetCorsConfig()
