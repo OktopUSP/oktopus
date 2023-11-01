@@ -10,10 +10,10 @@ import (
 )
 
 type mqttInfo struct {
-	Rtt time.Duration
+	MqttRtt time.Duration
 }
 
-func (a *Api) MqttInfo(w http.ResponseWriter, r *http.Request) {
+func (a *Api) mtpInfo(w http.ResponseWriter, r *http.Request) {
 	//TODO: address with value from env or something like that
 	conn, err := net.Dial("tcp", "127.0.0.1:1883")
 	if err != nil {
@@ -31,7 +31,7 @@ func (a *Api) MqttInfo(w http.ResponseWriter, r *http.Request) {
 	}
 	rtt := time.Duration(info.Rtt) * time.Microsecond
 	json.NewEncoder(w).Encode(mqttInfo{
-		Rtt: rtt / 1000,
+		MqttRtt: rtt / 1000,
 	})
 }
 

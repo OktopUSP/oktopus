@@ -62,7 +62,12 @@ func StartApi(a Api) {
 	iot.HandleFunc("/{sn}/fw_update", a.deviceFwUpdate).Methods("PUT")
 	iot.HandleFunc("/{sn}/wifi", a.deviceWifi).Methods("PUT", "GET")
 	mtp := r.PathPrefix("/api/mtp").Subrouter()
-	mtp.HandleFunc("/mqtt", a.MqttInfo).Methods("GET")
+	mtp.HandleFunc("", a.mtpInfo).Methods("GET")
+	dash := r.PathPrefix("/api/info").Subrouter()
+	dash.HandleFunc("/vendors", a.vendorsInfo).Methods("GET")
+	dash.HandleFunc("/status", a.statusInfo).Methods("GET")
+	dash.HandleFunc("/device_class", a.productClassInfo).Methods("GET")
+	dash.HandleFunc("/general", a.generalInfo).Methods("GET")
 	users := r.PathPrefix("/api/users").Subrouter()
 	users.HandleFunc("", a.retrieveUsers).Methods("GET")
 
@@ -72,6 +77,10 @@ func StartApi(a Api) {
 	})
 
 	mtp.Use(func(handler http.Handler) http.Handler {
+		return middleware.Middleware(handler)
+	})
+
+	dash.Use(func(handler http.Handler) http.Handler {
 		return middleware.Middleware(handler)
 	})
 

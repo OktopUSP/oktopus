@@ -18,13 +18,14 @@ const (
 )
 
 type Device struct {
-	SN       string
-	Model    string
-	Customer string
-	Vendor   string
-	Version  string
-	Status   uint8
-	MTP      []map[string]string
+	SN           string
+	Model        string
+	Customer     string
+	Vendor       string
+	Version      string
+	ProductClass string
+	Status       uint8
+	MTP          []map[string]string
 }
 
 func (d *Database) CreateDevice(device Device) error {

@@ -247,6 +247,7 @@ func (m *Mqtt) handleNewDevice(deviceMac string) {
 								"Device.DeviceInfo.ModelName",
 								"Device.DeviceInfo.SoftwareVersion",
 								"Device.DeviceInfo.SerialNumber",
+								"Device.DeviceInfo.ProductClass",
 							},
 							MaxDepth: 1,
 						},
@@ -284,6 +285,7 @@ func (m *Mqtt) handleNewDevicesResponse(p []byte, sn string) {
 	device.Vendor = msg.ReqPathResults[0].ResolvedPathResults[0].ResultParams["Manufacturer"]
 	device.Model = msg.ReqPathResults[1].ResolvedPathResults[0].ResultParams["ModelName"]
 	device.Version = msg.ReqPathResults[2].ResolvedPathResults[0].ResultParams["SoftwareVersion"]
+	device.ProductClass = msg.ReqPathResults[4].ResolvedPathResults[0].ResultParams["ProductClass"]
 	device.SN = sn
 
 	mtp := map[string]string{
@@ -291,6 +293,7 @@ func (m *Mqtt) handleNewDevicesResponse(p []byte, sn string) {
 	}
 
 	device.MTP = append(device.MTP, mtp)
+	device.Status = utils.Online
 
 	err = m.DB.CreateDevice(device)
 	if err != nil {
