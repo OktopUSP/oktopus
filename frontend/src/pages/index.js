@@ -1,22 +1,95 @@
 import Head from 'next/head';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { subDays, subHours } from 'date-fns';
-import { Box, Container, Unstable_Grid2 as Grid } from '@mui/material';
+import { 
+  Box, 
+  Container,
+  CircularProgress, 
+  Unstable_Grid2 as Grid } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { OverviewBudget } from 'src/sections/overview/overview-budget';
-import { OverviewLatestOrders } from 'src/sections/overview/overview-latest-orders';
-import { OverviewLatestProducts } from 'src/sections/overview/overview-latest-products';
-import { OverviewSales } from 'src/sections/overview/overview-sales';
 import { OverviewTasksProgress } from 'src/sections/overview/overview-tasks-progress';
 import { OverviewTotalCustomers } from 'src/sections/overview/overview-total-customers';
-import { OverviewTotalProfit } from 'src/sections/overview/overview-total-profit';
 import { OverviewTraffic } from 'src/sections/overview/overview-traffic';
+import { useRouter } from 'next/router';
 
 const now = new Date();
 
 const Page = () => {
+
+  const router = useRouter()
+
+  const [generalInfo, setGeneralInfo] = useState(null)
+  const [devicesStatus, setDevicesStatus] = useState([0,0])
+  const [devicesCount, setDevicesCount] = useState(0)
+  const [productClassLabels, setProductClassLabels] = useState(['-'])
+  const [productClassValues, setProductClassValues] = useState(['0'])
+  const [vendorLabels, setVendorLabels] = useState(['-'])
+  const [vendorValues, setVendorValues] = useState([0])
+
+  const fetchGeneralInfo = async () => {
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", localStorage.getItem("token"));
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow',
+    };
+
+    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/info/general`, requestOptions))
+    if (result.status === 401){
+    router.push("/auth/login")
+    }else{
+      let content = await result.json()
+      console.log("general info result:", content)
+      let totalDevices = content.StatusCount.Offline + content.StatusCount.Online
+      setDevicesCount(totalDevices)
+
+      let onlinePercentage = ((content.StatusCount.Online * 100)/totalDevices)
+      console.log("ONLINE AND OFFLINE:",onlinePercentage,100 - onlinePercentage)
+      setDevicesStatus([onlinePercentage, 100 - onlinePercentage])
+
+      let prodClassLabels = []
+      let prodClassValues = []
+      content.ProductClassCount?.map((p)=>{
+        if (p.productClass === ""){
+          prodClassLabels.push("unknown")
+        }else{
+          prodClassLabels.push(p.productClass)
+        }
+        prodClassValues.push(p.count)
+      })
+      setProductClassLabels(prodClassLabels)
+      setProductClassValues(prodClassValues)
+      console.log("productClassLabels:", prodClassLabels)
+      console.log("productClassValues:", productClassValues)
+
+      let vLabels = []
+      let vValues = []
+      content.VendorsCount?.map((p)=>{
+        if (p.vendor === ""){
+          vLabels.push("unknown")
+        }else{
+          vLabels.push(p.vendor)
+        }
+        vValues.push(p.count)
+      })
+      setVendorLabels(vLabels)
+      setVendorValues(vValues)
+      console.log("vendorLabels:", vLabels)
+      console.log("vendorValues:", vendorValues)
+
+      setGeneralInfo(content)
+    }
+
+  }
+
+  useEffect(()=>{
+    fetchGeneralInfo()
+  },[])
   
-  return(
+  return(generalInfo ?
   <>
     <Head>
       <title>
@@ -47,10 +120,10 @@ const Page = () => {
             lg={3}
           >
             <OverviewTotalCustomers
-              difference={16}
+              //difference={16}
               positive={false}
               sx={{ height: '100%' }}
-              value="1.6k"
+              value={devicesCount}
             />
           </Grid>
           <Grid
@@ -60,7 +133,7 @@ const Page = () => {
           >
             <OverviewTasksProgress
               sx={{ height: '100%' }}
-              value={75.5}
+              value={generalInfo.MqttRtt}
             />
           </Grid>
           <Grid
@@ -74,8 +147,8 @@ const Page = () => {
             lg={4}
           >
           <OverviewTraffic
-          chartSeries={[63, 15, 22]}
-          labels={['Cameras', 'Routers', 'Sensors']}
+          chartSeries={vendorValues}
+          labels={vendorLabels}
           sx={{ height: '100%' }}
           title={'Vendors'}
           />
@@ -85,7 +158,7 @@ const Page = () => {
             lg={4}
           >
           <OverviewTraffic
-          chartSeries={[88, 22]}
+          chartSeries={devicesStatus}
           labels={['Online', 'Offline']}
           sx={{ height: '100%' }}
           title={'Status'}
@@ -97,8 +170,8 @@ const Page = () => {
             lg={4}
           >
             <OverviewTraffic
-              chartSeries={[63, 15, 22]}
-              labels={['Cameras', 'Routers', 'Sensors']}
+              chartSeries={productClassValues}
+              labels={productClassLabels}
               sx={{ height: '100%' }}
               title={'Devices Type'}
             />
@@ -112,7 +185,9 @@ const Page = () => {
         </Grid>
       </Container>
     </Box>
-  </>)
+  </>:    <Box sx={{display:'flex',justifyContent:'center'}}>
+        <CircularProgress color="inherit" />
+    </Box>)
 };
 
 Page.getLayout = (page) => (

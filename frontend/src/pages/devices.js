@@ -4,8 +4,10 @@ import { Box, Container, Unstable_Grid2 as Grid } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { OverviewLatestOrders } from 'src/sections/overview/overview-latest-orders';
 import { useAuth } from 'src/hooks/use-auth';
+import { useRouter } from 'next/router';
 
 const Page = () => {
+  const router = useRouter()
   const auth = useAuth();
   const [devices, setDevices] = useState([]);
 
@@ -28,9 +30,17 @@ const Page = () => {
     }
 
     fetch(process.env.NEXT_PUBLIC_REST_ENPOINT+'/device', requestOptions)
-      .then(response => response.json())
-      .then(json => setDevices(json))
-      .catch(error => console.error('Error:', error));
+      .then(response => {
+        if (response.status === 401)
+          router.push("/auth/login")
+        return response.json()
+      })
+      .then(json => {
+        return setDevices(json)
+      })
+      .catch(error => {
+        return console.error('Error:', error)
+      });
   }, [auth.user]);
 
   return (

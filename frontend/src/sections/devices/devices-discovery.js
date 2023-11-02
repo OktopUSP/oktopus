@@ -378,7 +378,9 @@ const getDeviceParameters = async (raw) =>{
     let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/device/${router.query.id[0]}/parameters`, requestOptions))
     if (result.status != 200) {
         throw new Error('Please check your email and password');
-    }else{
+    }else if (result.status === 401){
+    router.push("/auth/login")
+}else{
         return result.json()
     }
 }
@@ -398,7 +400,9 @@ const getDeviceParameterInstances = async (raw) =>{
     let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/device/${router.query.id[0]}/instances`, requestOptions))
     if (result.status != 200) {
         throw new Error('Please check your email and password');
-    }else{
+    }else if (result.status === 401){
+    router.push("/auth/login")
+}else{
         return result.json()
     }
 }
@@ -653,7 +657,9 @@ const getDeviceParameterInstances = async (raw) =>{
     let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/device/${router.query.id[0]}/get`, requestOptions))
     if (result.status != 200) {
         throw new Error('Please check your email and password');
-    }else{
+    }else if (result.status === 401){
+    router.push("/auth/login")
+}else{
         return result.json()
     }
 
