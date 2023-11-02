@@ -52,14 +52,20 @@ const Page = () => {
 
       let prodClassLabels = []
       let prodClassValues = []
+      let prodClassValue = 0
       content.ProductClassCount?.map((p)=>{
         if (p.productClass === ""){
           prodClassLabels.push("unknown")
         }else{
           prodClassLabels.push(p.productClass)
         }
-        prodClassValues.push(p.count)
+        prodClassValue += p.count
       })
+
+      content.ProductClassCount?.map((p)=>{
+        prodClassValues.push(p.count * 100 / prodClassValue)
+      })
+      
       setProductClassLabels(prodClassLabels)
       setProductClassValues(prodClassValues)
       console.log("productClassLabels:", prodClassLabels)
@@ -67,14 +73,20 @@ const Page = () => {
 
       let vLabels = []
       let vValues = []
+      let vValue = 0
       content.VendorsCount?.map((p)=>{
         if (p.vendor === ""){
           vLabels.push("unknown")
         }else{
           vLabels.push(p.vendor)
         }
-        vValues.push(p.count)
+        vValue = vValue + p.count
       })
+
+      content.VendorsCount?.map((p)=>{
+        vValues.push(p.count * 100 / vValue)
+      })
+
       setVendorLabels(vLabels)
       setVendorValues(vValues)
       console.log("vendorLabels:", vLabels)
