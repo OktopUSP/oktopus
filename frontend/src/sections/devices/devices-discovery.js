@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import ArrowRightIcon from '@heroicons/react/24/solid/ArrowRightIcon';
 import CircularProgress from '@mui/material/CircularProgress';
+import PlayCircle from '@heroicons/react/24/outline/PlayCircleIcon'
 import PlusCircleIcon from '@heroicons/react/24/outline/PlusCircleIcon';
 import Pencil from "@heroicons/react/24/outline/PencilIcon"
 import ArrowUturnLeftIcon from '@heroicons/react/24/outline/ArrowUturnLeftIcon'
@@ -26,6 +27,7 @@ import XMarkIcon from '@heroicons/react/24/outline/XMarkIcon';
 
 import { useRouter } from 'next/router';
 import TrashIcon from '@heroicons/react/24/outline/TrashIcon';
+import PlayCircleIcon from '@heroicons/react/24/outline/PlayCircleIcon';
 
 /*
     OBJ_READ_ONLY (0)
@@ -150,9 +152,9 @@ const deleteDeviceObj = async(obj, setShowLoading, router, updateDeviceParameter
 }
 
 function ShowPath({x,updateDeviceParameters,setShowLoading, router}) {
-    console.log(x)
-    console.log("x.supported_obj_path:", x.supported_obj_path)
-    console.log("x.access:", x.access)
+    // console.log(x)
+    // console.log("x.supported_obj_path:", x.supported_obj_path)
+    // console.log("x.access:", x.access)
     if(x.supported_obj_path != "Device."){
         if (x.access === ObjAccessType.ReadOnly || x.access === undefined){
             return (
@@ -205,7 +207,8 @@ function ShowParamsWithValues({
     setOpen, setParameter, 
     setParameterValue, deviceParameters, 
     setShowLoading, router,
-    updateDeviceParameters
+    updateDeviceParameters, deviceCommands,
+    openCommandDialog
 }) {
     console.log("HEY jow:", deviceParametersValue)
     let paths = x.supported_obj_path.split(".")
@@ -297,50 +300,121 @@ function ShowParamsWithValues({
                 </List>
                 )
             }):<></>}
-            </List>
-            )
-        })
-    }else{
-        return x.supported_params.map((y, index)=>{
-            return (
-                <List 
-                    component="div" 
-                    disablePadding 
-                    dense={true}
-                    key={y.param_name}
-                    >
+            {
+              deviceCommands && 
+              Object.keys(deviceCommands).map(commando =>{
+                console.log("Comando:", commando)
+                return <List 
+                component="div" 
+                disablePadding 
+                dense={true}
+                key={commando}
+                >
                     <ListItem
-                        key={index}
+                        key={commando}
                         divider={true}
                         sx={{
                             boxShadow: 'rgba(149, 157, 165, 0.2) 0px 0px 5px;',
                             pl: 4 
                         }}
                         secondaryAction={
-                            <div>
-                                {deviceParametersValue[y.param_name].value}
-                                {deviceParametersValue[y.param_name].access > ParamAccessType.ReadOnly && <IconButton>
-                                <SvgIcon sx={{width:'20px'}}
-                                onClick={()=>{
-                                    showDialog(
-                                        x.supported_obj_path + y.param_name,
-                                        deviceParametersValue[y.param_name].value)
-                                }
-                                }>
-                                 
-                                    <Pencil></Pencil>
-                                
+                            <IconButton>
+                                <SvgIcon>
+                                    <PlayCircleIcon>
+                                    </PlayCircleIcon>
                                 </SvgIcon>
-                                </IconButton>}
-                            </div>
+                            </IconButton>
                         }
                     >
                         <ListItemText
-                            primary={y.param_name}
+                            primary={commando}
                         />
                     </ListItem>
-                </List>)
-            })
+                </List>
+              })
+            }
+            </List>
+            )
+        })
+    }else{
+        return (
+            <>
+            {x.supported_params && x.supported_params.map((y, index)=>{
+                return (
+                    <List 
+                        component="div" 
+                        disablePadding 
+                        dense={true}
+                        key={y.param_name}
+                        >
+                        <ListItem
+                            key={index}
+                            divider={true}
+                            sx={{
+                                boxShadow: 'rgba(149, 157, 165, 0.2) 0px 0px 5px;',
+                                pl: 4 
+                            }}
+                            secondaryAction={
+                                <div>
+                                    {deviceParametersValue[y.param_name].value}
+                                    {deviceParametersValue[y.param_name].access > ParamAccessType.ReadOnly && <IconButton>
+                                    <SvgIcon sx={{width:'20px'}}
+                                    onClick={()=>{
+                                        showDialog(
+                                            x.supported_obj_path + y.param_name,
+                                            deviceParametersValue[y.param_name].value)
+                                    }
+                                    }>
+                                    
+                                        <Pencil></Pencil>
+                                    
+                                    </SvgIcon>
+                                    </IconButton>}
+                                </div>
+                            }
+                        >
+                            <ListItemText
+                                primary={y.param_name}
+                            />
+                        </ListItem>
+                    </List>
+                )
+            })}
+            {
+              deviceCommands && 
+              Object.keys(deviceCommands).map(commando =>{
+                console.log("Comando:", commando)
+                return <List 
+                component="div" 
+                disablePadding 
+                dense={true}
+                key={commando}
+                >
+                    <ListItem
+                        key={commando}
+                        divider={true}
+                        sx={{
+                            boxShadow: 'rgba(149, 157, 165, 0.2) 0px 0px 5px;',
+                            pl: 4 
+                        }}
+                        secondaryAction={
+                            <IconButton>
+                                <SvgIcon>
+                                    <PlayCircleIcon>
+                                    </PlayCircleIcon>
+                                </SvgIcon>
+                            </IconButton>
+                        }
+                    >
+                        <ListItemText
+                            primary={commando}
+                        />
+                    </ListItem>
+                </List>
+              })
+            }
+            </>
+        )
     }
 }
 
@@ -348,6 +422,7 @@ export const DevicesDiscovery = () => {
 
 const router = useRouter()
 
+const [deviceCommands, setDeviceCommands] = useState({})
 const [deviceParameters, setDeviceParameters] = useState(null)
 const [parameter, setParameter] = useState(null)
 const [parameterValue, setParameterValue] = useState(null)
@@ -357,10 +432,35 @@ const [open, setOpen] = useState(false)
 const [errorModal, setErrorModal] = useState(false)
 const [errorModalText, setErrorModalText] = useState("")
 const [showLoading, setShowLoading] = useState(false)
+const [openCommandDialog, setOpenCommandDialog] = useState(false)
+const [deviceCommandToExecute, setDeviceCommandToExecute] = useState(null)
+const [inputArgsValue, setInputArgsValue] = useState({})
+
+
+// const initDeviceCommands = (content) => {
+//     let supportedCommands = content?.req_obj_results[0].supported_objs[0].supported_commands
+    
+//     if (supportedCommands === undefined){
+//         return paramsToFetch
+//     }
+
+//     let commands = {}
+
+//     for(let i =0; i < supportedCommands.length; i++){
+//         let command = supportedCommands[i]
+//         commands[command.command_name] = {
+//             "type":command["command_type"]
+//         }
+//     }
+
+//     console.log("commands:", commands)
+//     setDeviceCommands(commands)
+// }   
 
 const initialize = async (raw) => {
     let content = await getDeviceParameters(raw)
     setDeviceParameters(content)
+    //initDeviceCommands(content)
 }
 
 const getDeviceParameters = async (raw) =>{
@@ -377,14 +477,16 @@ const getDeviceParameters = async (raw) =>{
 
     let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/device/${router.query.id[0]}/parameters`, requestOptions))
     if (result.status != 200) {
-        throw new Error('Please check your email and password');
-    }else if (result.status === 401){
-    router.push("/auth/login")
-}else{
+        if (result.status === 401){
+            router.push("/auth/login")
+        }
+        console.log('Please check your email and password');
+    }else {
         return result.json()
     }
 }
 
+/*
 const getDeviceParameterInstances = async (raw) =>{
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -405,8 +507,7 @@ const getDeviceParameterInstances = async (raw) =>{
 }else{
         return result.json()
     }
-}
-
+}*/
 
   useEffect(()=> {
 
@@ -546,8 +647,11 @@ const getDeviceParameterInstances = async (raw) =>{
     console.log("content:",content)
 
     let paramsInfo = {}
+    let commandsInfo = {}
 
     let supportedParams = content.req_obj_results[0].supported_objs[0].supported_params
+    let supportedCommands = content.req_obj_results[0].supported_objs[0].supported_commands
+
     let parametersToFetch = () => {
         let paramsToFetch = []
         for (let i =0; i < supportedParams.length ;i++){
@@ -557,23 +661,25 @@ const getDeviceParameterInstances = async (raw) =>{
             
             paramsToFetch.push(supported_obj_path+param.param_name)
 
-            let paths = supported_obj_path.split(".")
-            if (paths[paths.length -2] !== "*"){
-                paramsInfo[param.param_name] = {
-                    "value_change":param["value_change"],
-                    "value_type":param["value_type"],
-                    "access": param["access"],
-                    "value": "-",
-                }
-            }else{
-                paramsInfo[param.param_name] = {
-                    "value_change":param["value_change"],
-                    "value_type":param["value_type"],
-                    "access": param["access"],
-                    "value":"-",
-                }
+            paramsInfo[param.param_name] = {
+                "value_change":param["value_change"],
+                "value_type":param["value_type"],
+                "access": param["access"],
+                "value": "-",
             }
         }
+
+        if (supportedCommands === undefined){
+            return paramsToFetch
+        }
+
+        for(let i =0; i < supportedCommands.length; i++){
+            let command = supportedCommands[i]
+            commandsInfo[command.command_name] = {
+                "type":command["command_type"]
+            }
+        }
+
         return paramsToFetch
     }
 
@@ -589,7 +695,10 @@ const getDeviceParameterInstances = async (raw) =>{
         let result = await getDeviceParametersValue(raw)
         console.log("result:", result)
         console.log("/-------------------------------------------------------/")
+
         let values = {}
+        let commands = {}
+
         console.log("VALUES:",values)
         result.req_path_results.map((x)=>{
             if (!x.resolved_path_results){
@@ -601,21 +710,28 @@ const getDeviceParameterInstances = async (raw) =>{
             let paths = x.requested_path.split(".")
             if(paths[paths.length -2] == "*"){
                 x.resolved_path_results.map(y=>{
-                    console.log(y.result_params)
-                    console.log(y.resolved_path)
+                    // console.log(y.result_params)
+                    // console.log(y.resolved_path)
                     let key = Object.keys(y.result_params)[0]
-                    console.log(key)
-                    console.log(paramsInfo[key].value)
-                    console.log(paramsInfo[key])
-                    console.log(y.result_params[key])
-                    console.log({[key]:paramsInfo[key]})
+                    // console.log(key)
+                    // console.log(paramsInfo[key].value)
+                    // console.log(paramsInfo[key])
+                    // console.log(y.result_params[key])
+                    // console.log({[key]:paramsInfo[key]})
+
                     console.log("Take a look here mate: ",{...paramsInfo[key], value: y.result_params[key]})
                     if (!values[y.resolved_path]){
                         values[y.resolved_path] = []
                     }
+
+                    if (!commands[y.resolved_path]){
+                        commands[y.resolved_path] = []
+                    }
+
                     if (y.result_params[key] == ""){
                         y.result_params[key] = "\"\""
                     }
+                    
                     values[y.resolved_path].push({[key]:{...paramsInfo[key], value: y.result_params[key]}})
                 })
             }else{
@@ -629,8 +745,10 @@ const getDeviceParameterInstances = async (raw) =>{
                 })
             }
 
-            console.log(values)
+            console.log("values:", values)
             setDeviceParametersValue(values)
+            console.log("commands:", commandsInfo)
+            setDeviceCommands(commandsInfo)
         })
         
         console.log("/-------------------------------------------------------/")
@@ -668,8 +786,17 @@ const getDeviceParameterInstances = async (raw) =>{
   function isInteger(value) {
     return /^\d+$/.test(value);
   }
+
+  const inputjow = () => {
+    if (inputArgsValue === ""){
+        return {"":""}
+    }else{
+        return inputArgsValue
+    }
+  }
   
   const showParameters = () => {
+
     return deviceParameters.req_obj_results.map((a,b)=>{
         return a.supported_objs.map((x,i)=> {
 
@@ -741,7 +868,7 @@ const getDeviceParameterInstances = async (raw) =>{
                         sx={{fontWeight:'bold'}}
                     />
                 </ListItem>
-                { x.supported_params && deviceParametersValue && 
+                {   x.supported_params &&
                     <ShowParamsWithValues 
                     x={x} 
                     deviceParametersValue={deviceParametersValue} 
@@ -752,15 +879,18 @@ const getDeviceParameterInstances = async (raw) =>{
                     setShowLoading={setShowLoading}
                     router={router}
                     updateDeviceParameters={updateDeviceParameters}
+                    deviceCommands={deviceCommands}
+                    openCommandDialog={openCommandDialog}
                     />
                 }
-                { x.supported_commands &&
+                { x.supported_commands && Object.keys(deviceCommands).length == 0 &&
                     x.supported_commands.map((y)=>{
                         return <List 
                         component="div" 
                         disablePadding 
                         dense={true}
                         key={y.command_name}
+                        
                         >
                         <ListItem
                             key={i}
@@ -769,6 +899,26 @@ const getDeviceParameterInstances = async (raw) =>{
                                 boxShadow: 'rgba(149, 157, 165, 0.2) 0px 0px 5px;',
                                 pl: 4 
                             }}
+                            secondaryAction={
+                                <IconButton onClick={()=> {
+                                    setDeviceCommandToExecute(
+                                        {
+                                            [x.supported_obj_path+y.command_name]:
+                                            {"input_arg_names":
+                                                [
+                                                    y.input_arg_names
+                                                ]
+                                            }
+                                        }
+                                    )
+                                    setOpenCommandDialog(true)
+                                    }}>
+                                    <SvgIcon>
+                                        <PlayCircleIcon >
+                                        </PlayCircleIcon>
+                                    </SvgIcon>
+                                </IconButton>
+                            }
                         >
                             <ListItemText
                                 primary={y.command_name}
@@ -925,12 +1075,11 @@ const getDeviceParameterInstances = async (raw) =>{
                 <Box display="flex" alignItems="center">
                     <Box flexGrow={1} >Response</Box>
                     <Box>
-                        <IconButton >
-                                <SvgIcon 
-                                onClick={()=>{
+                        <IconButton onClick={()=>{
                                     setErrorModalText("")
                                     setErrorModal(false)
-                                }}
+                                }}>
+                                <SvgIcon 
                                 >
                                 < XMarkIcon/>
                             </SvgIcon>
@@ -952,6 +1101,88 @@ const getDeviceParameterInstances = async (raw) =>{
                     }}>OK</Button>
                     </DialogActions>
                 </Dialog>
+                {deviceCommandToExecute && <Dialog open={openCommandDialog} 
+                    slotProps={{ backdrop: { style: { backgroundColor: 'rgba(255,255,255,0.5)' } } }}
+                    fullWidth={ true } 
+                    maxWidth={"md"}   
+                    scroll={"paper"}
+                    aria-labelledby="scroll-dialog-title"
+                    aria-describedby="scroll-dialog-description" 
+                >
+                <DialogTitle id="scroll-dialog-title">
+                {Object.keys(deviceCommandToExecute)[0]}
+                </DialogTitle>    
+                    <DialogContent dividers={scroll === 'paper'}>
+                    {deviceCommandToExecute[Object.keys(deviceCommandToExecute)[0]].input_arg_names[0]!=undefined && <DialogContentText id="scroll-dialog-description" tabIndex={-1}>
+                    Input Arguments:
+                    </DialogContentText>}
+                    {deviceCommandToExecute[Object.keys(deviceCommandToExecute)[0]].input_arg_names[0] !=undefined && 
+                    deviceCommandToExecute[Object.keys(deviceCommandToExecute)[0]].input_arg_names?.map(arg => {
+                        return <TextField
+                        autoFocus
+                        margin="dense"
+                        id={arg}
+                        label={arg}
+                        type="text"
+                        onChange={(e)=> {setInputArgsValue(prevState=>{
+                            return {...prevState, [arg] : e.target.value}
+                        })}}
+                        onClick={()=>{console.log(deviceCommandToExecute)}}
+                        value={inputArgsValue[arg]}
+                      />
+                    })}
+                    </DialogContent>
+                    <DialogActions>
+                    <Button onClick={()=>{
+                        setInputArgsValue("")
+                        setDeviceCommandToExecute(null)
+                        setOpenCommandDialog(false)
+                    }}>Cancel</Button>
+                    <Button onClick={async ()=>{
+                       let raw = JSON.stringify(
+                        {
+                            "command": Object.keys(deviceCommandToExecute)[0],
+                            "input_args": inputjow(),
+                            "send_resp": true
+                        }
+                       )
+                       console.log("deviceOperate => obj = ", raw)
+                       var myHeaders = new Headers();
+                       myHeaders.append("Content-Type", "application/json");
+                       myHeaders.append("Authorization", localStorage.getItem("token"));
+                   
+                       var requestOptions = {
+                           method: 'PUT',
+                           headers: myHeaders,
+                           redirect: 'follow',
+                           body: raw
+                       };
+                       setShowLoading(true)
+                       let result = await fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/device/${router.query.id[0]}/operate`, requestOptions)
+                       let content = await result.json()
+                       if (result.status != 200) {
+                           setShowLoading(false)
+                           if (result.status === 401){
+                            router.push("/auth/login")
+                            }
+                            setInputArgsValue("")
+                            setDeviceCommandToExecute(null)
+                            setOpenCommandDialog(false)
+                            setShowLoading(false)
+                       }else{
+                            setInputArgsValue("")
+                            setDeviceCommandToExecute(null)
+                            setOpenCommandDialog(false)
+                            setShowLoading(false)
+                            if (content.operation_results[0].OperationResp.CmdFailure != undefined){
+                                setErrorModalText(JSON.stringify(content, null, 2))
+                                setErrorModal(true)
+                                return
+                            }
+                       }
+                    }}>Apply</Button>
+                    </DialogActions>
+                </Dialog>}
         <Backdrop
             sx={{ 
             color: '#fff', 

@@ -99,7 +99,7 @@ export const OverviewLatestOrders = (props) => {
                     <TableCell>
                     <SvgIcon 
                       fontSize="small" 
-                      sx={{cursor:'pointer'}} 
+                      sx={{cursor: order.Status !== 2 && 'pointer'}} 
                       onClick={()=>{
                           if (order.Status !== 2){
                             router.push("devices/"+order.SN+"/discovery")
