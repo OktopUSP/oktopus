@@ -1,11 +1,13 @@
 package db
 
 import (
+	"log"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
 )
 
+// TODO: fix this function to also change device status at different mtp
 func (d *Database) UpdateStatus(sn string, status uint8) error {
 	var result bson.M
 	err := d.devices.FindOneAndUpdate(d.ctx, bson.D{{"sn", sn}}, bson.D{{"$set", bson.D{{"status", status}}}}).Decode(&result)

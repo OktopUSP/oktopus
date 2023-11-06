@@ -15,6 +15,19 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+type WiFi struct {
+	SSID                 string   `json:"ssid"`
+	Password             string   `json:"password"`
+	Security             string   `json:"security"`
+	SecurityCapabilities []string `json:"securityCapabilities"`
+	AutoChannelEnable    bool     `json:"autoChannelEnable"`
+	Channel              int      `json:"channel"`
+	ChannelBandwidth     string   `json:"channelBandwidth"`
+	FrequencyBand        string   `json:"frequencyBand"`
+	//PossibleChannels     		[]int    `json:"PossibleChannels"`
+	SupportedChannelBandwidths []string `json:"supportedChannelBandwidths"`
+}
+
 func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sn := vars["sn"]

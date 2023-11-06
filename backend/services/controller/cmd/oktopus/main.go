@@ -15,10 +15,10 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/leandrofars/oktopus/internal/api"
 	"github.com/leandrofars/oktopus/internal/db"
-	usp_msg "github.com/leandrofars/oktopus/internal/usp_message"
-
 	"github.com/leandrofars/oktopus/internal/mqtt"
 	"github.com/leandrofars/oktopus/internal/mtp"
+	"github.com/leandrofars/oktopus/internal/stomp"
+	usp_msg "github.com/leandrofars/oktopus/internal/usp_message"
 )
 
 const VERSION = "0.0.1"
@@ -49,13 +49,13 @@ func main() {
 		App variables priority:
 		1º - Flag through command line.
 		2º - Env variables.
-		3º - Default flag value
+		3º - Default flag value.
 	*/
 
 	log.Println("Starting Oktopus Project TR-369 Controller Version:", VERSION)
 	// fl_endpointId := flag.String("endpoint_id", "proto::oktopus-controller", "Defines the enpoint id the Agent must trust on.")
-	flDevicesTopic := flag.String("d", lookupEnvOrString("DEVICES_STATUS_TOPIC", "oktopus/+/status/+"), "That's the topic mqtt broker end new devices info.")
-	flSubTopic := flag.String("sub", lookupEnvOrString("DEVICE_PUB_TOPIC", "oktopus/+/controller/+"), "That's the topic agent must publish to, and the controller keeps on listening.")
+	flDevicesTopic := flag.String("d", lookupEnvOrString("DEVICES_STATUS_TOPIC", "oktopus/+/status/+"), "That's the topic mqtt broker send new devices info.")
+	flSubTopic := flag.String("sub", lookupEnvOrString("DEVICE_PUB_TOPIC", "oktopus/+/controller/+"), "That's the topic agent must publish to")
 	flBrokerAddr := flag.String("a", lookupEnvOrString("BROKER_ADDR", "localhost"), "Mqtt broker adrress")
 	flBrokerPort := flag.String("p", lookupEnvOrString("BROKER_PORT", "1883"), "Mqtt broker port")
 	flTlsCert := flag.Bool("tls", lookupEnvOrBool("BROKER_TLS", false), "Connect to broker over TLS")
@@ -65,6 +65,11 @@ func main() {
 	flBrokerQos := flag.Int("q", lookupEnvOrInt("BROKER_QOS", 0), "Quality of service of mqtt messages delivery")
 	flAddrDB := flag.String("mongo", lookupEnvOrString("MONGO_URI", "mongodb://localhost:27017"), "MongoDB URI")
 	flApiPort := flag.String("ap", lookupEnvOrString("REST_API_PORT", "8000"), "Rest api port")
+	flStompAddr := flag.String("stomp", lookupEnvOrString("STOMP_ADDR", "127.0.0.1:61613"), "Stomp broker address")
+	flStompUser := flag.String("stomp_user", lookupEnvOrString("STOMP_USERNAME", ""), "Stomp broker username")
+	flStompPasswd := flag.String("stomp_passwd", lookupEnvOrString("STOMP_PASSWORD", ""), "Stomp broker password")
+	flDisableStomp := flag.Bool("stomp_disable", lookupEnvOrBool("STOMP_DISABLE", false), "Disable STOMP MTP")
+	flDisableMqtt := flag.Bool("mqtt_disable", lookupEnvOrBool("MQTT_DISABLE", false), "Disable MQTT MTP")
 	flHelp := flag.Bool("help", false, "Help")
 
 	flag.Parse()
@@ -81,26 +86,65 @@ func main() {
 	database := db.NewDatabase(ctx, *flAddrDB)
 	apiMsgQueue := make(map[string](chan usp_msg.Msg))
 	var m sync.Mutex
+
 	/*
 	 If you want to use another message protocol just make it implement Broker interface.
 	*/
-	mqttClient := mqtt.Mqtt{
-		Addr:         *flBrokerAddr,
-		Port:         *flBrokerPort,
-		Id:           *flBrokerClientId,
-		User:         *flBrokerUsername,
-		Passwd:       *flBrokerPassword,
-		Ctx:          ctx,
-		QoS:          *flBrokerQos,
-		SubTopic:     *flSubTopic,
-		DevicesTopic: *flDevicesTopic,
-		TLS:          *flTlsCert,
-		DB:           database,
-		MsgQueue:     apiMsgQueue,
-		QMutex:       &m,
+	log.Println("Start MTP protocols: MQTT | Websockets | STOMP")
+
+	if *flDisableMqtt && *flDisableStomp {
+		log.Println("ERROR: you have to enable at least one MTP")
+		os.Exit(0)
 	}
 
-	mtp.MtpService(&mqttClient, done)
+	wg := new(sync.WaitGroup)
+	wg.Add(2)
+
+	var stompClient stomp.Stomp
+	var mqttClient mqtt.Mqtt
+
+	go func() {
+		mqttClient = mqtt.Mqtt{
+			Addr:         *flBrokerAddr,
+			Port:         *flBrokerPort,
+			Id:           *flBrokerClientId,
+			User:         *flBrokerUsername,
+			Passwd:       *flBrokerPassword,
+			Ctx:          ctx,
+			QoS:          *flBrokerQos,
+			SubTopic:     *flSubTopic,
+			DevicesTopic: *flDevicesTopic,
+			TLS:          *flTlsCert,
+			DB:           database,
+			MsgQueue:     apiMsgQueue,
+			QMutex:       &m,
+		}
+
+		if !*flDisableMqtt {
+			// MQTT will try connect to broker forever
+			go mtp.MtpService(&mqttClient, done, wg)
+		} else {
+			wg.Done()
+		}
+	}()
+
+	go func() {
+		stompClient = stomp.Stomp{
+			Addr:     *flStompAddr,
+			Username: *flStompUser,
+			Password: *flStompPasswd,
+		}
+
+		if !*flDisableStomp {
+			// STOMP will try to connect for a bunch of times and then exit
+			go mtp.MtpService(&stompClient, done, wg)
+		} else {
+			wg.Done()
+		}
+	}()
+
+	wg.Wait()
+
 	a := api.NewApi(*flApiPort, database, &mqttClient, apiMsgQueue, &m)
 	api.StartApi(a)
 
@@ -133,7 +177,7 @@ func lookupEnvOrBool(key string, defaultVal bool) bool {
 	if val, _ := os.LookupEnv(key); val != "" {
 		v, err := strconv.ParseBool(val)
 		if err != nil {
-			log.Fatalf("LookupEnvOrInt[%s]: %v", key, err)
+			log.Fatalf("LookupEnvOrBool[%s]: %v", key, err)
 		}
 		return v
 	}

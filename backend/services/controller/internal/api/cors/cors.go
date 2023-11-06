@@ -1,16 +1,17 @@
 package cors
 
 import (
-	"github.com/rs/cors"
+	"log"
 	"net/http"
 	"os"
 	"strings"
-	"fmt"
+
+	"github.com/rs/cors"
 )
 
 func GetCorsConfig() cors.Cors {
 	allowedOrigins := getCorsEnvConfig()
-	fmt.Println(allowedOrigins)
+	log.Println("API CORS - AllowedOrigins:", allowedOrigins)
 	return *cors.New(cors.Options{
 		AllowedOrigins: allowedOrigins,
 		AllowedMethods: []string{
