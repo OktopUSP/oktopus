@@ -1122,6 +1122,7 @@ const getDeviceParameterInstances = async (raw) =>{
                         autoFocus
                         margin="dense"
                         id={arg}
+                        key={arg}
                         label={arg}
                         type="text"
                         onChange={(e)=> {setInputArgsValue(prevState=>{
