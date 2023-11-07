@@ -65,7 +65,9 @@ export const Layout = withAuthGuard((props) => {
       right:"5px",
       cursor:"pointer"
       }}>
-        <Link href='https://github.com/OktopUSP/oktopus' target='blank'>
+        <Link 
+        href='https://github.com/OktopUSP/oktopus' 
+        target='blank'>
         <Image 
         alt="github logo"
         src="/assets/general/github-mark.png" 
