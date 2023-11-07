@@ -27,6 +27,7 @@ const Page = () => {
   const [vendorValues, setVendorValues] = useState([0])
 
   const fetchGeneralInfo = async () => {
+
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", localStorage.getItem("token"));
@@ -48,11 +49,18 @@ const Page = () => {
 
       let onlinePercentage = ((content.StatusCount.Online * 100)/totalDevices)
       console.log("ONLINE AND OFFLINE:",onlinePercentage,100 - onlinePercentage)
-      setDevicesStatus([onlinePercentage, 100 - onlinePercentage])
+      
+      if(Number.isInteger(onlinePercentage)){
+        setDevicesStatus([onlinePercentage, 100 - onlinePercentage])
+      }else{
+        onlinePercentage = Number(onlinePercentage.toFixed(1))
+        setDevicesStatus([onlinePercentage, 100 - onlinePercentage])
+      }
 
       let prodClassLabels = []
       let prodClassValues = []
       let prodClassValue = 0
+      
       content.ProductClassCount?.map((p)=>{
         if (p.productClass === ""){
           prodClassLabels.push("unknown")
@@ -63,7 +71,12 @@ const Page = () => {
       })
 
       content.ProductClassCount?.map((p)=>{
-        prodClassValues.push(p.count * 100 / prodClassValue)
+        let percentageValue = p.count * 100 / prodClassValue
+        if (Number.isInteger(percentageValue)){
+          prodClassValues.push(percentageValue)
+        }else{
+          prodClassValues.push(Number(percentageValue.toFixed(1)))
+        }
       })
       
       setProductClassLabels(prodClassLabels)
@@ -84,13 +97,19 @@ const Page = () => {
       })
 
       content.VendorsCount?.map((p)=>{
-        vValues.push(p.count * 100 / vValue)
+        let percentageValue = p.count * 100 / vValue
+        if (Number.isInteger(percentageValue)){
+          vValues.push(percentageValue)
+        }else{
+          vValues.push(Number(percentageValue.toFixed(1)))
+        }
       })
 
       setVendorLabels(vLabels)
       setVendorValues(vValues)
+
       console.log("vendorLabels:", vLabels)
-      console.log("vendorValues:", vendorValues)
+      console.log("vendorValues:", vValues)
 
       setGeneralInfo(content)
     }
