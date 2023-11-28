@@ -42,20 +42,24 @@ func (d *Database) CreateDevice(device Device) error {
 	log.Printf("Device %s already existed, and got replaced for new info", device.SN)
 	return err
 }
+func (d *Database) RetrieveDevices(filter bson.A) ([]Device, error) {
+	cursor, err := d.devices.Aggregate(d.ctx, filter)
 
-func (d *Database) RetrieveDevices() ([]Device, error) {
 	var results []Device
-	//TODO: filter devices by user ownership
-	cursor, err := d.devices.Find(d.ctx, bson.D{}, nil)
-	if err != nil {
-		log.Println(err)
-		return nil, err
+
+	for cursor.Next(d.ctx) {
+		var device Device
+
+		err := cursor.Decode(&device)
+		if err != nil {
+			log.Println("Error to decode device info fields")
+			continue
+		}
+
+		results = append(results, device)
 	}
-	if err = cursor.All(d.ctx, &results); err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	return results, nil
+
+	return results, err
 }
 
 func (d *Database) RetrieveDevice(sn string) (Device, error) {
@@ -66,6 +70,11 @@ func (d *Database) RetrieveDevice(sn string) (Device, error) {
 		log.Println(err)
 	}
 	return result, err
+}
+
+func (d *Database) RetrieveDevicesCount(filter bson.M) (int64, error) {
+	count, err := d.devices.CountDocuments(d.ctx, filter)
+	return count, err
 }
 
 func (d *Database) DeleteDevice() {
