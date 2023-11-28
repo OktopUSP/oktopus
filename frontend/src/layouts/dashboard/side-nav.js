@@ -1,6 +1,7 @@
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import PropTypes from 'prop-types';
+import Link from 'next/link'
 import ArrowTopRightOnSquareIcon from '@heroicons/react/24/solid/ArrowTopRightOnSquareIcon';
 import ChevronUpDownIcon from '@heroicons/react/24/solid/ChevronUpDownIcon';
 import {
@@ -66,11 +67,13 @@ export const SideNav = (props) => {
               p: '12px'
             }}
           >
+         <Link href="https://oktopus.app.br" target="_blank">
             <div style={{display:'flex',justifyContent:'center'}}>
               <img src="/assets/oktopus.png" 
               width={'60%'}
               />
             </div>
+          </Link>
             <SvgIcon
               fontSize="small"
               sx={{ color: 'neutral.500' }}
