@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import NextLink from 'next/link';
+import Link from 'next/link'
 import { Box, Typography, Unstable_Grid2 as Grid } from '@mui/material';
 import { Logo } from 'src/components/logo';
 
@@ -69,10 +70,12 @@ export const Layout = (props) => {
           }}
         >
           <Box sx={{ p: 3 }}>
+          <Link href="https://oktopus.app.br" target="_blank">
             <img
               alt=""
               src="/assets/oktopus.png"
             />
+          </Link>
              <Typography
               align="center"
               sx={{ mb: 3 }}
