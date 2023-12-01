@@ -52,6 +52,7 @@ func StartApi(a Api) {
 	iot := r.PathPrefix("/api/device").Subrouter()
 	//TODO: create query for devices
 	iot.HandleFunc("", a.retrieveDevices).Methods("GET")
+	iot.HandleFunc("/{id}", a.retrieveDevices).Methods("GET")
 	iot.HandleFunc("/{sn}/get", a.deviceGetMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/add", a.deviceCreateMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/del", a.deviceDeleteMsg).Methods("PUT")
