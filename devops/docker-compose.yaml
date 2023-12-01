@@ -62,7 +62,7 @@ services:
         ipv4_address: 172.16.235.5
 
   frontend:
-    image: 'node:14.20'
+    image: 'node:16.20.2'
     container_name: frontend
     tty: true
     stdin_open: true
