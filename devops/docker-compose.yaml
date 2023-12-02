@@ -1,7 +1,7 @@
 services:
 
   oktopustr369:
-      image: 'golang:1.18'
+      image: 'golang:1.21.4'
       container_name: oktopustr369
       tty: true
       stdin_open: true
@@ -32,7 +32,7 @@ services:
         ipv4_address: 172.16.235.3
 
   mochi:
-    image: 'golang:1.18'
+    image: 'golang:1.21.4'
     container_name: mochi
     tty: true
     stdin_open: true
@@ -48,7 +48,7 @@ services:
         ipv4_address: 172.16.235.4
 
   socketio:
-    image: 'node:14.20'
+    image: 'node:16.20.2'
     container_name: socketio
     tty: true
     stdin_open: true
