@@ -41,6 +41,10 @@ const Page = () => {
     let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/info/general`, requestOptions))
     if (result.status === 401){
     router.push("/auth/login")
+    }else if (result.status != 200){
+      console.log("Status:", result.status)
+      let content = await result.json()
+      console.log("Message:", content)
     }else{
       let content = await result.json()
       console.log("general info result:", content)
@@ -154,7 +158,7 @@ const Page = () => {
               //difference={16}
               positive={false}
               sx={{ height: '100%' }}
-              value={devicesCount}
+              value={devicesCount.toString()}
             />
           </Grid>
           <Grid
