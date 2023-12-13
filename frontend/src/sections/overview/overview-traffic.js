@@ -59,7 +59,16 @@ const useChartOptions = (labels,title) => {
       theme.palette.success.main,
       theme.palette.error.main,
     ]
-  }else{
+  }else if(title === "Vendors"){
+    options.colors = [
+      theme.palette.graphics.dark,
+      theme.palette.graphics.darkest,
+      theme.palette.graphics.light,
+      theme.palette.graphics.main,
+      theme.palette.graphics.lightest, 
+    ]
+  }
+  else{
     options.colors = [
       theme.palette.primary.main,
       theme.palette.info.main,

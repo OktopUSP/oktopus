@@ -64,7 +64,15 @@ export const error = withAlphas({
   lightest: '#FEF3F2',
   light: '#FEE4E2',
   main: '#F04438',
-  dark: '#B42318',
+  dark: '#29ADB2',
   darkest: '#7A271A',
   contrastText: '#FFFFFF'
+});
+
+export const graphics = withAlphas({
+  lightest: '#9EC8B9',
+  light: '#706233',
+  main: '#1B4242',
+  dark: '#FFC5C5',
+  darkest: '#7071E8'
 });
