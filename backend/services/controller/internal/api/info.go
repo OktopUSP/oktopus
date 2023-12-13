@@ -60,24 +60,21 @@ func (a *Api) generalInfo(w http.ResponseWriter, r *http.Request) {
 	result.VendorsCount = vendorcount
 	result.ProductClassCount = productclasscount
 
-	/* ------------ TODO: [mqtt rtt] create common function for this ------------ */
-	//TODO: address with value from env or something like that
-	conn, err := net.Dial("tcp", "127.0.0.1:1883")
+	conn, err := net.Dial("tcp", a.Mqtt.Addr+":"+a.Mqtt.Port)
 	if err != nil {
-		json.NewEncoder(w).Encode("Error to connect to broker")
 		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode("Error to connect to broker: " + err.Error())
 		return
 	}
 	defer conn.Close()
 
 	info, err := tcpInfo(conn.(*net.TCPConn))
 	if err != nil {
-		json.NewEncoder(w).Encode("Error to get TCP socket info")
 		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode("Error to get TCP socket info")
 		return
 	}
 	rtt := time.Duration(info.Rtt) * time.Microsecond
-	/* -------------------------------------------------------------------------- */
 
 	result.MqttRtt = rtt / 1000
 
@@ -85,8 +82,6 @@ func (a *Api) generalInfo(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-
-	return
 }
 
 func (a *Api) vendorsInfo(w http.ResponseWriter, r *http.Request) {
@@ -100,8 +95,6 @@ func (a *Api) vendorsInfo(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-
-	return
 }
 
 func (a *Api) productClassInfo(w http.ResponseWriter, r *http.Request) {
@@ -115,8 +108,6 @@ func (a *Api) productClassInfo(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-
-	return
 }
 
 func (a *Api) statusInfo(w http.ResponseWriter, r *http.Request) {
@@ -141,6 +132,4 @@ func (a *Api) statusInfo(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-
-	return
 }
