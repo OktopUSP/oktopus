@@ -11,6 +11,7 @@ import (
 	"github.com/leandrofars/oktopus/internal/api/cors"
 	"github.com/leandrofars/oktopus/internal/api/middleware"
 	"github.com/leandrofars/oktopus/internal/db"
+	"github.com/leandrofars/oktopus/internal/mqtt"
 	"github.com/leandrofars/oktopus/internal/mtp"
 	usp_msg "github.com/leandrofars/oktopus/internal/usp_message"
 	"github.com/leandrofars/oktopus/internal/utils"
@@ -23,6 +24,7 @@ type Api struct {
 	Broker   mtp.Broker
 	MsgQueue map[string](chan usp_msg.Msg)
 	QMutex   *sync.Mutex
+	Mqtt     mqtt.Mqtt
 }
 
 const REQUEST_TIMEOUT = time.Second * 30
@@ -32,13 +34,14 @@ const (
 	AdminUser
 )
 
-func NewApi(port string, db db.Database, b mtp.Broker, msgQueue map[string](chan usp_msg.Msg), m *sync.Mutex) Api {
+func NewApi(port string, db db.Database, mqtt *mqtt.Mqtt, msgQueue map[string](chan usp_msg.Msg), m *sync.Mutex) Api {
 	return Api{
 		Port:     port,
 		Db:       db,
-		Broker:   b,
+		Broker:   mqtt,
 		MsgQueue: msgQueue,
 		QMutex:   m,
+		Mqtt:     *mqtt,
 	}
 }
 

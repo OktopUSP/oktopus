@@ -40,9 +40,9 @@ func (d *Database) RetrieveVendorsInfo() ([]VendorsCount, error) {
 		log.Println(err)
 		return nil, err
 	}
-	for _, result := range results {
-		log.Println(result)
-	}
+	// for _, result := range results {
+	// 	log.Println(result)
+	// }
 	return results, nil
 }
 
@@ -65,9 +65,9 @@ func (d *Database) RetrieveStatusInfo() ([]StatusCount, error) {
 		log.Println(err)
 		return nil, err
 	}
-	for _, result := range results {
-		log.Println(result)
-	}
+	// for _, result := range results {
+	// 	log.Println(result)
+	// }
 	return results, nil
 }
 
@@ -90,8 +90,8 @@ func (d *Database) RetrieveProductsClassInfo() ([]ProductClassCount, error) {
 		log.Println(err)
 		return nil, err
 	}
-	for _, result := range results {
-		log.Println(result)
-	}
+	// for _, result := range results {
+	// 	log.Println(result)
+	// }
 	return results, nil
 }
