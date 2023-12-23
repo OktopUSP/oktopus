@@ -3,9 +3,9 @@ module github.com/leandrofars/oktopus
 go 1.18
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/eclipse/paho.golang v0.10.0
 	github.com/go-stomp/stomp v2.1.4+incompatible
+	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/google/uuid v1.3.0
 	github.com/googollee/go-socket.io v1.7.0
 	github.com/gorilla/mux v1.8.0
