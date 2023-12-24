@@ -98,6 +98,7 @@ func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode("Unable to get devices count from database")
+		return
 	}
 
 	skip := page_number * (page_size - 1)
@@ -122,12 +123,15 @@ func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(devices)
+	err = json.NewEncoder(w).Encode(map[string]interface{}{
+		"pages":   total / page_size,
+		"page":    page_number,
+		"size":    page_size,
+		"devices": devices,
+	})
 	if err != nil {
 		log.Println(err)
 	}
-
-	return
 }
 
 func (a *Api) deviceCreateMsg(w http.ResponseWriter, r *http.Request) {
