@@ -2,10 +2,11 @@ package api
 
 import (
 	"encoding/json"
-	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"net/http"
 	"strconv"
+
+	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/gorilla/mux"
 	"github.com/leandrofars/oktopus/internal/db"
@@ -37,11 +38,15 @@ func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
 	const PAGE_SIZE_DEFAULT = 20
 
 	// Get specific device
-	id := mux.Vars(r)["id"]
+	id := r.URL.Query().Get("id")
 	if id != "" {
 		device, err := a.Db.RetrieveDevice(id)
 		if err != nil {
-			log.Println(err)
+			if err == mongo.ErrNoDocuments {
+				json.NewEncoder(w).Encode("Device id: " + id + " not found")
+				return
+			}
+			json.NewEncoder(w).Encode(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
