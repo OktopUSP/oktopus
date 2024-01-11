@@ -4,6 +4,12 @@
 <br/>
 <ul>
     <li>
+        <h4>Overview:</h4>
+    </li>
+</ul> 
+<img src="https://github.com/OktopUSP/oktopus/assets/83298718/11401f40-2e73-4610-97bb-29fea7e1e5e0"/>
+<ul>
+    <li>
         <h4>Introduction:</h4>
     </li>
 </ul>        
