@@ -1,6 +1,5 @@
 <p align="center">
-<img src="https://github.com/OktopUSP/oktopus/assets/83298718/fc05c512-951d-448c-8c31-1e0881783460"/>
-</p>
+<img src="https://github.com/OktopUSP/oktopus/assets/83298718/fc05c512-951d-448c-8c31-1e0881783460"/></p>
 <br/>
 <ul>
     <li>
@@ -8,6 +7,7 @@
     </li>
 </ul> 
 <img src="https://github.com/OktopUSP/oktopus/assets/83298718/11401f40-2e73-4610-97bb-29fea7e1e5e0"/>
+image source = <a href="https://oktopus.app.br/controller">https://oktopus.app.br/controller</a>
 <ul>
     <li>
         <h4>Introduction:</h4>
