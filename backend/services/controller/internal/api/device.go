@@ -64,7 +64,7 @@ func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
 
 	var page_number int64
 	if page_n == "" {
-		page_number = 1
+		page_number = 0
 	} else {
 		page_number, err = strconv.ParseInt(page_n, 10, 64)
 		if err != nil {
