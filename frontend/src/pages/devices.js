@@ -9,7 +9,8 @@ import {
   InputAdornment,
   SvgIcon,
   Stack,
-  Pagination
+  Pagination,
+  CircularProgress
 } from '@mui/material';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
@@ -24,10 +25,11 @@ const Page = () => {
   const [deviceFound, setDeviceFound] = useState(false)
   const [pages, setPages] = useState(0);
   const [page, setPage] = useState(null);
+  const [Loading, setLoading] = useState(true);
 
 
   useEffect(() => {
-
+    setLoading(true)
     if (auth.user.token) {
       console.log("auth.user.token =", auth.user.token)
     }else{
@@ -54,6 +56,7 @@ const Page = () => {
         setPages(json.pages + 1)
         setPage(json.page)
         setDevices(json.devices)
+        setLoading(false)
         return setDeviceFound(true)
       })
       .catch(error => {
@@ -61,12 +64,14 @@ const Page = () => {
       });
   }, [auth.user]);
 
-  const handleChangePage = (e) => {
-    console.log("new page: ", e.target.value)
-    //TODO: Handle page change
+  const handleChangePage = (event, value) => {
+    console.log("new page: ", value)
+    setPage(value)
+    fetchDevicePerPage(value)
   }
 
-  const fetchDevicePerId = async (id) => {
+  const fetchDevicePerPage = async (p) => {
+    setLoading(true)
 
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -78,8 +83,39 @@ const Page = () => {
       redirect: 'follow'
     }
 
+    p = p - 1
+    p = p.toString()
+
+    fetch(process.env.NEXT_PUBLIC_REST_ENPOINT+'/device?page_number='+p, requestOptions)
+    .then(response => {
+      if (response.status === 401)
+        router.push("/auth/login")
+      return response.json()
+    })
+    .then(json => {
+      setDevices(json.devices)
+      setLoading(false)
+      return
+    })
+    .catch(error => {
+      return console.error('Error:', error)
+    });
+  }
+
+  const fetchDevicePerId = async (id) => {
+    setLoading(true)
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", auth.user.token);
+
+    var requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+      redirect: 'follow'
+    }
+
     if (id == ""){
-      fetch(process.env.NEXT_PUBLIC_REST_ENPOINT+'/device', requestOptions)
+      return fetch(process.env.NEXT_PUBLIC_REST_ENPOINT+'/device', requestOptions)
       .then(response => {
         if (response.status === 401)
           router.push("/auth/login")
@@ -89,6 +125,7 @@ const Page = () => {
         setPages(json.pages + 1)
         setPage(json.page)
         setDevices(json.devices)
+        setLoading(false)
         return setDeviceFound(true)
       })
       .catch(error => {
@@ -100,10 +137,10 @@ const Page = () => {
     if (response.status === 401)
       router.push("/auth/login")
     let json = await response.json()
-    if (json.device != undefined){
-      setDevices({"devices":[
-        json.device
-      ]})
+    if (json.MTP != undefined){
+      setDevices([json])
+      setDeviceFound(true)
+      setLoading(false)
       setPages(1)
       setPage(1)
     }else{
@@ -111,6 +148,7 @@ const Page = () => {
       setDevices([])
       setPages(1)
       setPage(1)
+      setLoading(false)
     }
 
   }
@@ -162,10 +200,12 @@ const Page = () => {
           />
         </Grid>
         {deviceFound ?
+          ( !Loading ?
           <OverviewLatestOrders
             orders={devices}
             sx={{ height: '100%' }}
-          />
+          /> : <CircularProgress></CircularProgress>
+          )
         :
         <Box
           sx={{
