@@ -245,7 +245,6 @@ OBS: Do not use those instructions in production. To implement the project in pr
         <img src="https://github.com/OktopUSP/oktopus/assets/83298718/4599d566-eada-4313-8ae1-31dae82391de"/>
         <img src="https://github.com/OktopUSP/oktopus/assets/83298718/501b4ccd-6147-4957-9096-695134e34b5e"/>
     </li>
-    <h4>Agent Simulation:</h4>
     <p>
     In case you want a more complete and real-world simulation of devices you might use <a href="https://github.com/OktopUSP/agent-sim">Oktopus TR-369 Agent Simulator</a>.
     </p>
