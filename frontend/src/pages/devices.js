@@ -54,7 +54,7 @@ const Page = () => {
       })
       .then(json => {
         setPages(json.pages + 1)
-        setPage(json.page)
+        setPage(json.page +1)
         setDevices(json.devices)
         setLoading(false)
         return setDeviceFound(true)
