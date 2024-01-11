@@ -109,9 +109,12 @@ func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
 	//TODO: Create filters
 	//TODO: Create sorting
 
+	sort := bson.M{}
+	sort["status"] = 1
+
 	filter := bson.A{
 		//bson.M{"$match": filter},
-		//bson.M{"$sort": sort},
+		bson.M{"$sort": sort}, // shows online devices first
 		bson.M{"$skip": skip},
 		bson.M{"$limit": page_size},
 	}
