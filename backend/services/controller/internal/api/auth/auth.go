@@ -2,9 +2,12 @@ package auth
 
 import (
 	"errors"
-	"github.com/dgrijalva/jwt-go"
+	"fmt"
+	"log"
 	"os"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func getJwtKey() []byte {
@@ -18,16 +21,17 @@ func getJwtKey() []byte {
 type JWTClaim struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 func GenerateJWT(email string, username string) (tokenString string, err error) {
 	expirationTime := time.Now().Add(4 * time.Hour)
 	claims := &JWTClaim{
-		Email:    email,
-		Username: username,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
+		username,
+		email,
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expirationTime),
+			Issuer:    "Oktopus",
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -40,19 +44,23 @@ func ValidateToken(signedToken string) (email string, err error) {
 		signedToken,
 		&JWTClaim{},
 		func(token *jwt.Token) (interface{}, error) {
+			// Don't forget to validate the alg is what you expect:
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			}
+
+			// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
 			return getJwtKey(), nil
 		},
 	)
 	if err != nil {
+		log.Println(err)
 		return
 	}
+
 	claims, ok := token.Claims.(*JWTClaim)
 	if !ok {
 		err = errors.New("couldn't parse claims")
-		return
-	}
-	if claims.ExpiresAt < time.Now().Local().Unix() {
-		err = errors.New("token expired")
 		return
 	}
 

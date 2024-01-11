@@ -1,7 +1,13 @@
 <p align="center">
-<img src="https://github.com/OktopUSP/oktopus/assets/83298718/fc05c512-951d-448c-8c31-1e0881783460"/>
-</p>
+<img src="https://github.com/OktopUSP/oktopus/assets/83298718/fc05c512-951d-448c-8c31-1e0881783460"/></p>
 <br/>
+<ul>
+    <li>
+        <h4>Overview:</h4>
+    </li>
+</ul> 
+<img src="https://github.com/OktopUSP/oktopus/assets/83298718/11401f40-2e73-4610-97bb-29fea7e1e5e0"/>
+image source = <a href="https://oktopus.app.br/controller">https://oktopus.app.br/controller</a>
 <ul>
     <li>
         <h4>Introduction:</h4>
@@ -239,7 +245,6 @@ OBS: Do not use those instructions in production. To implement the project in pr
         <img src="https://github.com/OktopUSP/oktopus/assets/83298718/4599d566-eada-4313-8ae1-31dae82391de"/>
         <img src="https://github.com/OktopUSP/oktopus/assets/83298718/501b4ccd-6147-4957-9096-695134e34b5e"/>
     </li>
-    <h4>Agent Simulation:</h4>
     <p>
     In case you want a more complete and real-world simulation of devices you might use <a href="https://github.com/OktopUSP/agent-sim">Oktopus TR-369 Agent Simulator</a>.
     </p>
