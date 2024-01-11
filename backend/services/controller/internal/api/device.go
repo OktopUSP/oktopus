@@ -2,10 +2,11 @@ package api
 
 import (
 	"encoding/json"
-	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"net/http"
 	"strconv"
+
+	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/gorilla/mux"
 	"github.com/leandrofars/oktopus/internal/db"
@@ -37,11 +38,15 @@ func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
 	const PAGE_SIZE_DEFAULT = 20
 
 	// Get specific device
-	id := mux.Vars(r)["id"]
+	id := r.URL.Query().Get("id")
 	if id != "" {
 		device, err := a.Db.RetrieveDevice(id)
 		if err != nil {
-			log.Println(err)
+			if err == mongo.ErrNoDocuments {
+				json.NewEncoder(w).Encode("Device id: " + id + " not found")
+				return
+			}
+			json.NewEncoder(w).Encode(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -93,6 +98,7 @@ func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode("Unable to get devices count from database")
+		return
 	}
 
 	skip := page_number * (page_size - 1)
@@ -117,12 +123,15 @@ func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(devices)
+	err = json.NewEncoder(w).Encode(map[string]interface{}{
+		"pages":   total / page_size,
+		"page":    page_number,
+		"size":    page_size,
+		"devices": devices,
+	})
 	if err != nil {
 		log.Println(err)
 	}
-
-	return
 }
 
 func (a *Api) deviceCreateMsg(w http.ResponseWriter, r *http.Request) {
