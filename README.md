@@ -7,7 +7,7 @@
     </li>
 </ul>        
 <p>
-This repository aims to promote the development of a multi-vendor management platform for IoTs. Any device that follows the TR-369 protocol can be managed. The main objective is to facilitate and unify device management, which generates countless benefits for the end user and service providers, suppressing the demands that today's technologies require: device interconnection, data collection, speed, availability and more.
+This repository aims to promote the development of a multi-vendor management platform for CPEs and IoTs. Any device that follows the TR-369 protocol can be managed. The main objective is to facilitate and unify device management, which generates countless benefits for the end user and service providers, suppressing the demands that today's technologies require: device interconnection, data collection, speed, availability and more.
 </p>
 <ul>
     <li>
@@ -170,7 +170,13 @@ Currently, telecommunications giants and startups, publishing new software daily
     </li>
 </ul>
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+<ul><li><h4>Sponsors:</h4></li></ul>
 
+<p>If you'd like to know how to donate to the project, email <a href="mailto=leandro@oktopustr369.com">leandro@oktopustr369.com</a> or hit the Sponsor button in this page. Every contribution is welcome, and the resources will help the project to move on.</p>
+<ul><li><h4>Companies that use:</h4></li></ul>
+
+<p>If you are a user of this project and would like your company logo displayed above here, please email <a href="mailto=leandro@oktopustr369.com">leandro@oktopustr369.com</a> with your request.</p>
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -226,7 +232,7 @@ leandro@leandro-laptop:~$ cd oktopus/backend/services/socketio && npm i && npm s
 leandro@leandro-laptop:~$ cd oktopus/frontend && npm i && npm run dev</pre>
         </li>       
     </ul>
-OBS: Do not use those instructions in production. To implement the project in production you might use more resources that are already avaiable in Oktopus, but would take longer to explain in this README. Soon, there will be more help and explanations about those extra needed configs. 
+
 </li>
     <li>
       <h4>Device test agent (obuspa):</h4>
