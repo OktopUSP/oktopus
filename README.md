@@ -173,10 +173,10 @@ Currently, telecommunications giants and startups, publishing new software daily
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 <ul><li><h4>Sponsors:</h4></li></ul>
 
-<p>If you'd like to know how to donate to the project, email <a href="mailto=leandro@oktopustr369.com">leandro@oktopustr369.com</a> or hit the Sponsor button in this page. Every contribution is welcome, and the resources will help the project to move on. In case you want, your photo or company logo can be displayed above.</p>
+<p>If you'd like to know how to donate to the project, email <a href="">leandro@oktopustr369.com</a> or hit the Sponsor button in this page. Every contribution is welcome, and the resources will help the project to move on. In case you want, your photo or company logo can be displayed above.</p>
 <ul><li><h4>Companies that use:</h4></li></ul>
 
-<p>If you are a user of this project and would like your company logo displayed above here, please email <a href="mailto=leandro@oktopustr369.com">leandro@oktopustr369.com</a> with your request.</p>
+<p>If you are a user of this project and would like your company logo displayed above here, please email <a href="">leandro@oktopustr369.com</a> with your request.</p>
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
