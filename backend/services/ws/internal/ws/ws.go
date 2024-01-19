@@ -18,7 +18,12 @@ func StartNewServer() {
 	r := mux.NewRouter()
 	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 
-		conn, err := upgrader.Upgrade(w, r, nil)
+		header := http.Header{
+			"Sec-Websocket-Protocol": {"v1.usp"},
+			"Sec-Websocket-Version":  {"13"},
+		}
+
+		conn, err := upgrader.Upgrade(w, r, header)
 		if err != nil {
 			log.Println(err)
 		}
