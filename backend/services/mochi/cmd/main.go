@@ -4,17 +4,18 @@ import (
 	"bytes"
 	"crypto/tls"
 	"flag"
-	rv8 "github.com/go-redis/redis/v8"
-	"github.com/mochi-co/mqtt/v2"
-	"github.com/mochi-co/mqtt/v2/hooks/storage/redis"
-	"github.com/mochi-co/mqtt/v2/packets"
-	"github.com/rs/zerolog"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
+
+	rv8 "github.com/go-redis/redis/v8"
+	"github.com/mochi-co/mqtt/v2"
+	"github.com/mochi-co/mqtt/v2/hooks/storage/redis"
+	"github.com/mochi-co/mqtt/v2/packets"
+	"github.com/rs/zerolog"
 
 	"github.com/mochi-co/mqtt/v2/hooks/auth"
 	"github.com/mochi-co/mqtt/v2/listeners"
@@ -145,6 +146,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+		log.Println("Websockets is running without TLS at port " + *wsAddr)
 	}
 
 	if *infoAddr != "" {
