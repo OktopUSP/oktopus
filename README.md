@@ -249,7 +249,7 @@ leandro@leandro-laptop:~$ cd oktopus/frontend && npm i && npm run dev</pre>
 
 <a href="https://www.inango.com/"><img src="https://github.com/OktopUSP/oktopus/assets/83298718/3b3e65d9-33fa-46c4-8b24-f9e2a84a04a6" width="125px"/></a>
 
-<p>If you'd like to know how to donate, start a partnership or somehow to contribute to the project, email <a href="">leandro@oktopustr369.com</a>, every contribution is welcome, and the resources will help the project to move on. Also, if your company uses this project and you'd like your logo to appear up here, contact us.
+<p>If you'd like to know how to donate above <a href="https://github.com/sponsors/leandrofars">Github Sponsors</a> values, start a partnership or somehow to contribute to the project, email <a href="">leandro@oktopustr369.com</a>, every contribution is welcome, and the resources will help the project to move on. Also, if your company uses this project and you'd like your logo to appear up here, contact us.
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
