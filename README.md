@@ -245,7 +245,7 @@ leandro@leandro-laptop:~$ cd oktopus/frontend && npm i && npm run dev</pre>
 
 <ul><li><h4>Sponsors:</h4></li></ul>
 
-<ul><li><h4>Companies that use:</h4></li></ul>
+<ul><li><h4>Companies that use Oktopus:</h4></li></ul>
 
 <a href="https://www.inango.com/"><img src="https://github.com/OktopUSP/oktopus/assets/83298718/3b3e65d9-33fa-46c4-8b24-f9e2a84a04a6" width="125px"/></a>
 
