@@ -171,14 +171,6 @@ Currently, telecommunications giants and startups, publishing new software daily
 </ul>
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
-<ul><li><h4>Sponsors:</h4></li></ul>
-
-<p>If you'd like to know how to donate to the project, email <a href="">leandro@oktopustr369.com</a> or hit the Sponsor button in this page. Every contribution is welcome, and the resources will help the project to move on. In case you want, your photo or company logo can be displayed above.</p>
-<ul><li><h4>Companies that use:</h4></li></ul>
-
-<p>If you are a user of this project and would like your company logo displayed above here, please email <a href="">leandro@oktopustr369.com</a> with your request.</p>
-
---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <ul><li><h4>Infrastructure:</h4></li></ul>
 
@@ -248,6 +240,16 @@ leandro@leandro-laptop:~$ cd oktopus/frontend && npm i && npm run dev</pre>
     In case you want a more complete and real-world simulation of devices you might use <a href="https://github.com/OktopUSP/agent-sim">Oktopus TR-369 Agent Simulator</a>.
     </p>
 </ul>
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<ul><li><h4>Sponsors:</h4></li></ul>
+
+<ul><li><h4>Companies that use:</h4></li></ul>
+
+<a href="https://www.inango.com/"><img src="https://github.com/OktopUSP/oktopus/assets/83298718/3b3e65d9-33fa-46c4-8b24-f9e2a84a04a6" width="125px"/></a>
+
+<p>If you'd like to know how to donate, start a partnership or somehow to contribute to the project, email <a href="">leandro@oktopustr369.com</a>, every contribution is welcome, and the resources will help the project to move on. Also, if your company uses this project and you'd like your logo to appear up here, contact us.
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
