@@ -7,7 +7,7 @@
     </li>
 </ul>        
 <p>
-This repository aims to promote the development of a multi-vendor management platform for IoTs. Any device that follows the TR-369 protocol can be managed. The main objective is to facilitate and unify device management, which generates countless benefits for the end user and service providers, suppressing the demands that today's technologies require: device interconnection, data collection, speed, availability and more.
+This repository aims to promote the development of a multi-vendor management platform for CPEs and IoTs. Any device that follows the TR-369 protocol can be managed. The main objective is to facilitate and unify device management, which generates countless benefits for the end user and service providers, suppressing the demands that today's technologies require: device interconnection, data collection, speed, availability and more.
 </p>
 <ul>
     <li>
@@ -170,8 +170,6 @@ Currently, telecommunications giants and startups, publishing new software daily
     </li>
 </ul>
 
-
-
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <ul><li><h4>Infrastructure:</h4></li></ul>
@@ -226,7 +224,7 @@ leandro@leandro-laptop:~$ cd oktopus/backend/services/socketio && npm i && npm s
 leandro@leandro-laptop:~$ cd oktopus/frontend && npm i && npm run dev</pre>
         </li>       
     </ul>
-OBS: Do not use those instructions in production. To implement the project in production you might use more resources that are already avaiable in Oktopus, but would take longer to explain in this README. Soon, there will be more help and explanations about those extra needed configs. 
+
 </li>
     <li>
       <h4>Device test agent (obuspa):</h4>
@@ -242,6 +240,16 @@ OBS: Do not use those instructions in production. To implement the project in pr
     In case you want a more complete and real-world simulation of devices you might use <a href="https://github.com/OktopUSP/agent-sim">Oktopus TR-369 Agent Simulator</a>.
     </p>
 </ul>
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<ul><li><h4>Sponsors:</h4></li></ul>
+
+<ul><li><h4>Companies that use Oktopus:</h4></li></ul>
+
+<a href="https://www.inango.com/"><img src="https://github.com/OktopUSP/oktopus/assets/83298718/3b3e65d9-33fa-46c4-8b24-f9e2a84a04a6" width="125px"/></a>
+
+<p>If you'd like to know how to donate, start a partnership or somehow to contribute to the project, email <a href="">leandro@oktopustr369.com</a>, every contribution is welcome, and the resources will help the project to move on. Also, if your company uses this project and you'd like your logo to appear up here, contact us.
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
