@@ -255,28 +255,9 @@ leandro@leandro-laptop:~$ cd oktopus/frontend && npm i && npm run dev</pre>
 
 <ul>
     <li>
-        <h4>Roadmap:</h4>
-        <p>
-            The project goals are organized with milestones that have a due date, just like a sprint. Those issues grouped in milestones are done and have their status updated in a kanban board.
-        </p>
-        <ul>
-            <li> 
-            <a href="https://github.com/OktopUSP/oktopus/milestones">Milestones </a>
-            </li>
-            <li> 
-            <a href="https://github.com/orgs/OktopUSP/projects/1/views/2">Kanban Board </a>
-            </li>
-        </ul>
-    </li>
-</ul>
-
---------------------------------------------------------------------------------------------------------------------------------------------------------
-
-<ul>
-    <li>
         <h4>💼 Commercial Support:</h4>
         <p>
-            Our controller has an open-source software license, meaning you can modify/study the code and use it for free. You can perform all the configurations, allocate servers, and set it up on your network with the classic 'do it yourself' approach, or save time and money: contact us for a quote and get commercial support.
+            Our solution has an open-source software license, meaning you can modify/study the code and use it for free. You can perform all the configurations, allocate servers, and set it up on your network with the classic "do it yourself" approach, or save time and money: contact us for a quote and get commercial support.
         </p>
         <ul>
             <li> 
@@ -297,6 +278,25 @@ leandro@leandro-laptop:~$ cd oktopus/frontend && npm i && npm run dev</pre>
         </ul>
         <p>Contact <a href="">leandro@oktopustr369.com</a> via email and get a quote.</p>
     </li> 
+</ul>
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<ul>
+    <li>
+        <h4>Roadmap:</h4>
+        <p>
+            The project goals are organized with milestones that have a due date, just like a sprint. Those issues grouped in milestones are done and have their status updated in a kanban board.
+        </p>
+        <ul>
+            <li> 
+            <a href="https://github.com/OktopUSP/oktopus/milestones">Milestones </a>
+            </li>
+            <li> 
+            <a href="https://github.com/orgs/OktopUSP/projects/1/views/2">Kanban Board </a>
+            </li>
+        </ul>
+    </li>
 </ul>
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
