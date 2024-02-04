@@ -28,18 +28,12 @@ func StartNewServer() {
 			log.Println(err)
 		}
 		for {
-			messageType, p, err := conn.ReadMessage()
+			_, p, err := conn.ReadMessage()
 			if err != nil {
-				log.Println(err)
+				log.Println("Error to read message:", err)
 				return
 			}
-			log.Println(string(p))
-
-			if err := conn.WriteMessage(messageType, p); err != nil {
-				log.Println(err)
-				return
-			}
-
+			log.Println("Message", string(p))
 		}
 	})
 
