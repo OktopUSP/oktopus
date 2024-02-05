@@ -1,47 +1,33 @@
 package ws
 
+// Websockets server implementation inspired by https://github.com/gorilla/websocket/tree/main/examples/chat
+
 import (
 	"log"
 	"net/http"
 
+	"github.com/OktopUSP/oktopus/ws/internal/ws/handler"
 	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin:     func(r *http.Request) bool { return true },
-}
-
+// Starts New Websockets Server
 func StartNewServer() {
+	// Initialize handlers of websockets events
+	go handler.InitHandlers()
+
 	r := mux.NewRouter()
-	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-
-		header := http.Header{
-			"Sec-Websocket-Protocol": {"v1.usp"},
-			"Sec-Websocket-Version":  {"13"},
-		}
-
-		conn, err := upgrader.Upgrade(w, r, header)
-		if err != nil {
-			log.Println(err)
-		}
-		for {
-			_, p, err := conn.ReadMessage()
-			if err != nil {
-				log.Println("Error to read message:", err)
-				return
-			}
-			log.Println("Message", string(p))
-		}
+	r.HandleFunc("/ws/agent", func(w http.ResponseWriter, r *http.Request) {
+		handler.ServeAgent(w, r)
+	})
+	r.HandleFunc("/ws/controller", func(w http.ResponseWriter, r *http.Request) {
+		//TODO: Implement controller handler
 	})
 
 	log.Println("Websockets server running")
 
+	// Blocks application running until it receives a KILL signal
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
-
 }
