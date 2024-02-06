@@ -86,6 +86,7 @@ func (m *Mqtt) Connect() {
 }
 
 func (m *Mqtt) Disconnect() {
+	log.Println("Disconnecting from MQTT broker...")
 	err := c.Disconnect(m.Ctx)
 	if err != nil {
 		log.Fatalf("failed to send Disconnect: %s", err)
