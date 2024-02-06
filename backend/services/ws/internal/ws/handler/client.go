@@ -130,8 +130,27 @@ func (c *Client) writePump() {
 	}
 }
 
+// Handle USP Controller events
+func ServeController(w http.ResponseWriter, r *http.Request, token string) {
+	recv_token := r.URL.Query().Get("token")
+	if recv_token != token {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("Unauthorized"))
+		return
+	}
+
+	_, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+}
+
 // Handle USP Agent events
 func ServeAgent(w http.ResponseWriter, r *http.Request) {
+
+	//TODO: find out a way to authenticate agents
+
 	header := http.Header{
 		"Sec-Websocket-Protocol": {uspVersion},
 		"Sec-Websocket-Version":  {wsVersion},
