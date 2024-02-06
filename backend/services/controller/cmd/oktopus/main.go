@@ -22,6 +22,7 @@ import (
 	"github.com/leandrofars/oktopus/internal/ws"
 )
 
+// TODO: refact where this version number comes from
 const VERSION = "0.0.1"
 
 func main() {
@@ -44,6 +45,7 @@ func main() {
 	// Locks app running until it receives a stop command as Ctrl+C.
 	signal.Notify(done, syscall.SIGINT)
 
+	//TODO: refact app confiurations and env loading to another package
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	/*
@@ -200,6 +202,8 @@ func main() {
 	log.Println("(⌐■_■) Oktopus is out!")
 
 }
+
+//TODO: refact functions below to another package
 
 func lookupEnvOrString(key string, defaultVal string) string {
 	if val, _ := os.LookupEnv(key); val != "" {
