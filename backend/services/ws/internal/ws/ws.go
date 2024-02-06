@@ -6,12 +6,13 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/OktopUSP/oktopus/ws/internal/config"
 	"github.com/OktopUSP/oktopus/ws/internal/ws/handler"
 	"github.com/gorilla/mux"
 )
 
 // Starts New Websockets Server
-func StartNewServer() {
+func StartNewServer(c config.Config) {
 	// Initialize handlers of websockets events
 	go handler.InitHandlers()
 
@@ -20,14 +21,15 @@ func StartNewServer() {
 		handler.ServeAgent(w, r)
 	})
 	r.HandleFunc("/ws/controller", func(w http.ResponseWriter, r *http.Request) {
-		//TODO: Implement controller handler
+		handler.ServeController(w, r, c.Token)
 	})
 
 	log.Println("Websockets server running")
 
-	// Blocks application running until it receives a KILL signal
-	err := http.ListenAndServe(":8080", r)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
+	go func() {
+		err := http.ListenAndServe(c.Port, r)
+		if err != nil {
+			log.Fatal("ListenAndServe: ", err)
+		}
+	}()
 }
