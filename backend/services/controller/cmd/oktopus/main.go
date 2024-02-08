@@ -103,7 +103,7 @@ func main() {
 	*/
 	log.Println("Start MTP protocols: MQTT | Websockets | STOMP")
 
-	if *flDisableMqtt && *flDisableStomp {
+	if *flDisableMqtt && *flDisableStomp && *flDisableWs {
 		log.Println("ERROR: you have to enable at least one MTP")
 		os.Exit(0)
 	}
@@ -175,6 +175,7 @@ func main() {
 			Route: *flWsRoute,
 			Auth:  *flWsAuth,
 			TLS:   *flWsTls,
+			DB:    database,
 			Ctx:   ctx,
 		}
 
