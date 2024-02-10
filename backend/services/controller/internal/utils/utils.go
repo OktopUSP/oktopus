@@ -1,18 +1,14 @@
 package utils
 
 import (
+	"net"
+
 	"github.com/google/uuid"
 	usp_msg "github.com/leandrofars/oktopus/internal/usp_message"
 	"github.com/leandrofars/oktopus/internal/usp_record"
-	"net"
 )
 
-// Status are saved at database as numbers
-const (
-	Online = iota
-	Associating
-	Offline
-)
+//TODO: change usp utils related to another package
 
 // Get interfaces MACs, and the first interface MAC is gonna be used as mqtt clientId
 func GetMacAddr() ([]string, error) {

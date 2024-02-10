@@ -12,6 +12,7 @@ import (
 	"github.com/eclipse/paho.golang/autopaho"
 	"github.com/eclipse/paho.golang/paho"
 	"github.com/leandrofars/oktopus/internal/db"
+	"github.com/leandrofars/oktopus/internal/mtp/handler"
 	usp_msg "github.com/leandrofars/oktopus/internal/usp_message"
 	"github.com/leandrofars/oktopus/internal/usp_record"
 	"github.com/leandrofars/oktopus/internal/utils"
@@ -184,7 +185,8 @@ func (m *Mqtt) messageHandler(status, controller, apiMsg chan *paho.Publish) {
 			}
 			if payload == ONLINE {
 				log.Println("Device connected:", device)
-				m.handleNewDevice(device)
+				tr369Message := handler.HandleNewDevice(device)
+				m.Publish(tr369Message, "oktopus/v1/agent/"+device, "oktopus/v1/controller/"+device, false)
 				//m.deleteRetainedMessage(d, device)
 			} else if payload == OFFLINE {
 				log.Println("Device disconnected:1", device)
@@ -196,7 +198,11 @@ func (m *Mqtt) messageHandler(status, controller, apiMsg chan *paho.Publish) {
 		case c := <-controller:
 			topic := c.Topic
 			sn := strings.Split(topic, "/")
-			m.handleNewDevicesResponse(c.Payload, sn[3])
+			device := handler.HandleNewDevicesResponse(c.Payload, sn[3], db.MQTT)
+			err := m.DB.CreateDevice(device)
+			if err != nil {
+				log.Fatal(err)
+			}
 		case api := <-apiMsg:
 			log.Println("Handle api request")
 			m.handleApiRequest(api.Payload)
@@ -232,79 +238,9 @@ func (m *Mqtt) handleApiRequest(api []byte) {
 	}
 }
 
-func (m *Mqtt) handleNewDevice(deviceMac string) {
-	payload := usp_msg.Msg{
-		Header: &usp_msg.Header{
-			MsgId:   "uniqueIdentifierForThismessage",
-			MsgType: usp_msg.Header_GET,
-		},
-		Body: &usp_msg.Body{
-			MsgBody: &usp_msg.Body_Request{
-				Request: &usp_msg.Request{
-					ReqType: &usp_msg.Request_Get{
-						Get: &usp_msg.Get{
-							ParamPaths: []string{
-								"Device.DeviceInfo.Manufacturer",
-								"Device.DeviceInfo.ModelName",
-								"Device.DeviceInfo.SoftwareVersion",
-								"Device.DeviceInfo.SerialNumber",
-								"Device.DeviceInfo.ProductClass",
-							},
-							MaxDepth: 1,
-						},
-					},
-				},
-			},
-		},
-	}
-	teste, _ := proto.Marshal(&payload)
-	record := utils.NewUspRecord(teste, deviceMac)
-
-	tr369Message, err := proto.Marshal(&record)
-	if err != nil {
-		log.Fatalln("Failed to encode tr369 record:", err)
-	}
-	m.Publish(tr369Message, "oktopus/v1/agent/"+deviceMac, "oktopus/v1/controller/"+deviceMac, false)
-}
-
-func (m *Mqtt) handleNewDevicesResponse(p []byte, sn string) {
-	var record usp_record.Record
-	var message usp_msg.Msg
-
-	err := proto.Unmarshal(p, &record)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = proto.Unmarshal(record.GetNoSessionContext().Payload, &message)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var device db.Device
-	msg := message.Body.MsgBody.(*usp_msg.Body_Response).Response.GetGetResp()
-
-	device.Vendor = msg.ReqPathResults[0].ResolvedPathResults[0].ResultParams["Manufacturer"]
-	device.Model = msg.ReqPathResults[1].ResolvedPathResults[0].ResultParams["ModelName"]
-	device.Version = msg.ReqPathResults[2].ResolvedPathResults[0].ResultParams["SoftwareVersion"]
-	device.ProductClass = msg.ReqPathResults[4].ResolvedPathResults[0].ResultParams["ProductClass"]
-	device.SN = sn
-
-	mtp := map[string]string{
-		db.MQTT.String(): "online",
-	}
-
-	device.MTP = append(device.MTP, mtp)
-	device.Status = utils.Online
-
-	err = m.DB.CreateDevice(device)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func (m *Mqtt) handleDevicesDisconnect(p string) {
 	// Update status of device at database
-	err := m.DB.UpdateStatus(p, utils.Offline)
+	err := m.DB.UpdateStatus(p, db.Offline, db.MQTT)
 	if err != nil {
 		log.Fatal(err)
 	}

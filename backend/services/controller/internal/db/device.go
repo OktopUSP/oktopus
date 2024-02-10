@@ -17,6 +17,14 @@ const (
 	WEBSOCKETS
 )
 
+type Status uint8
+
+const (
+	Offline Status = iota
+	Associating
+	Online
+)
+
 type Device struct {
 	SN           string
 	Model        string
@@ -24,14 +32,38 @@ type Device struct {
 	Vendor       string
 	Version      string
 	ProductClass string
-	Status       uint8
-	MTP          []map[string]string
+	Status       Status
+	Mqtt         Status
+	Stomp        Status
+	Websockets   Status
 }
 
+// TODO: don't change device status of other MTP
 func (d *Database) CreateDevice(device Device) error {
 	var result bson.M
+	var deviceExistent Device
+
+	/* ------------------ Do not overwrite status of other mtp ------------------ */
+	err := d.devices.FindOne(d.ctx, bson.D{{"sn", device.SN}}, nil).Decode(&deviceExistent)
+	if err != nil && err != mongo.ErrNoDocuments {
+		log.Println(err)
+		return err
+	}
+
+	if deviceExistent.Mqtt == Online {
+		device.Mqtt = Online
+	}
+	if deviceExistent.Stomp == Online {
+		device.Stomp = Online
+	}
+	if deviceExistent.Websockets == Online {
+		device.Websockets = Online
+	}
+	/* -------------------------------------------------------------------------- */
+
 	opts := options.FindOneAndReplace().SetUpsert(true)
-	err := d.devices.FindOneAndReplace(d.ctx, bson.D{{"sn", device.SN}}, device, opts).Decode(&result)
+
+	err = d.devices.FindOneAndReplace(d.ctx, bson.D{{"sn", device.SN}}, device, opts).Decode(&result)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			log.Printf("New device %s added to database", device.SN)

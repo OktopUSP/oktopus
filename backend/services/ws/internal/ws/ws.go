@@ -14,14 +14,14 @@ import (
 // Starts New Websockets Server
 func StartNewServer(c config.Config) {
 	// Initialize handlers of websockets events
-	go handler.InitHandlers()
+	go handler.InitHandlers(c.ControllerEID)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/ws/agent", func(w http.ResponseWriter, r *http.Request) {
-		handler.ServeAgent(w, r)
+		handler.ServeAgent(w, r, c.ControllerEID)
 	})
 	r.HandleFunc("/ws/controller", func(w http.ResponseWriter, r *http.Request) {
-		handler.ServeController(w, r, c.Token)
+		handler.ServeController(w, r, c.Token, c.ControllerEID, c.Auth)
 	})
 
 	log.Println("Websockets server running")

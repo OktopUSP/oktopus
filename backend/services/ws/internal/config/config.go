@@ -11,8 +11,10 @@ import (
 )
 
 type Config struct {
-	Port  string // server port: e.g. ":8080"
-	Token string // controller auth token
+	Port          string // server port: e.g. ":8080"
+	Auth          bool   // server auth enable/disable
+	Token         string // controller auth token
+	ControllerEID string // controller endpoint id
 }
 
 func NewConfig() Config {
@@ -32,6 +34,8 @@ func NewConfig() Config {
 	/* ------------------------------ define flags ------------------------------ */
 	flPort := flag.String("port", lookupEnvOrString("SERVER_PORT", ":8080"), "Server port")
 	flToken := flag.String("token", lookupEnvOrString("SERVER_AUTH_TOKEN", ""), "Controller auth token")
+	flAuth := flag.Bool("auth", lookupEnvOrBool("SERVER_AUTH_ENABLE", false), "Server auth enable/disable")
+	flControllerEid := flag.String("controller-eid", lookupEnvOrString("CONTROLLER_EID", "oktopusController"), "Controller eid")
 	flHelp := flag.Bool("help", false, "Help")
 	flag.Parse()
 	/* -------------------------------------------------------------------------- */
@@ -42,8 +46,10 @@ func NewConfig() Config {
 	}
 
 	return Config{
-		Port:  *flPort,
-		Token: *flToken,
+		Port:          *flPort,
+		Token:         *flToken,
+		Auth:          *flAuth,
+		ControllerEID: *flControllerEid,
 	}
 }
 
