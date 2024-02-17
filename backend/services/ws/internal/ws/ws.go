@@ -24,12 +24,19 @@ func StartNewServer(c config.Config) {
 		handler.ServeController(w, r, c.Token, c.ControllerEID, c.Auth)
 	})
 
-	log.Println("Websockets server running")
-
 	go func() {
-		err := http.ListenAndServe(c.Port, r)
-		if err != nil {
-			log.Fatal("ListenAndServe: ", err)
+		if c.Tls {
+			log.Println("Websockets server running with TLS")
+			err := http.ListenAndServeTLS(c.Port, "cert.pem", "key.pem", r)
+			if err != nil {
+				log.Fatal("ListenAndServeTLS: ", err)
+			}
+		} else {
+			log.Println("Websockets server running")
+			err := http.ListenAndServe(c.Port, r)
+			if err != nil {
+				log.Fatal("ListenAndServe: ", err)
+			}
 		}
 	}()
 }

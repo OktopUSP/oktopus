@@ -15,6 +15,7 @@ type Config struct {
 	Auth          bool   // server auth enable/disable
 	Token         string // controller auth token
 	ControllerEID string // controller endpoint id
+	Tls           bool   // enable/diable websockets server tls
 }
 
 func NewConfig() Config {
@@ -36,6 +37,7 @@ func NewConfig() Config {
 	flToken := flag.String("token", lookupEnvOrString("SERVER_AUTH_TOKEN", ""), "Controller auth token")
 	flAuth := flag.Bool("auth", lookupEnvOrBool("SERVER_AUTH_ENABLE", false), "Server auth enable/disable")
 	flControllerEid := flag.String("controller-eid", lookupEnvOrString("CONTROLLER_EID", "oktopusController"), "Controller eid")
+	flTls := flag.Bool("tls", lookupEnvOrBool("SERVER_TLS_ENABLE", false), "Enable/diable websockets server tls")
 	flHelp := flag.Bool("help", false, "Help")
 	flag.Parse()
 	/* -------------------------------------------------------------------------- */
@@ -50,6 +52,7 @@ func NewConfig() Config {
 		Token:         *flToken,
 		Auth:          *flAuth,
 		ControllerEID: *flControllerEid,
+		Tls:           *flTls,
 	}
 }
 
