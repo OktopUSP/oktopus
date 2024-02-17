@@ -7,12 +7,13 @@ services:
       stdin_open: true
       volumes:
       - ../:/app/oktopus
-      command: bash -c "cd /app/oktopus/backend/services/controller && go run cmd/oktopus/main.go -mongo mongodb://172.16.235.2:27017 -a 172.16.235.4 -p 1883"
+      command: bash -c "cd /app/oktopus/backend/services/controller && go run cmd/oktopus/main.go -mongo mongodb://172.16.235.2:27017 -a 172.16.235.4 -p 1883 -ws_addr 172.16.235.8"
       ports:
       - 8000:8000
       depends_on:
       - mongodb
       - mochi
+      - websockets
       networks:
         usp_network:
           ipv4_address: 172.16.235.7
@@ -38,7 +39,7 @@ services:
     stdin_open: true
     volumes:
     - ../:/app/oktopus
-    command: bash -c "cd /app/oktopus/backend/services/mochi/cmd/ && go run main.go -redis 'redis:6379'"
+    command: bash -c "cd /app/oktopus/backend/services/mochi/cmd/ && go run main.go -redis 'redis:6379' -info :8081"
     ports:
     - 1883:1883
     depends_on:
@@ -46,6 +47,20 @@ services:
     networks:
       usp_network:
         ipv4_address: 172.16.235.4
+
+  websockets:
+    image: 'golang:1.21.6'
+    container_name: websockets
+    tty: true
+    stdin_open: true
+    volumes:
+    - ../:/app/oktopus
+    command: bash -c "cd /app/oktopus/backend/services/ws/ && go run cmd/main.go"
+    ports:
+    - 8080:8080
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.8
 
   socketio:
     image: 'node:16.20.2'
