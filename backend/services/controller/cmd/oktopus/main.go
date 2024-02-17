@@ -77,6 +77,7 @@ func main() {
 	flWsPort := flag.String("ws_port", lookupEnvOrString("WS_PORT", "8080"), "Websocket server port")
 	flWsRoute := flag.String("ws_route", lookupEnvOrString("WS_ROUTE", "/ws/controller"), "Websocket server route")
 	flWsTls := flag.Bool("ws_tls", lookupEnvOrBool("WS_TLS", false), "Websocket server tls")
+	flWsSkipVerify := flag.Bool("ws_skip_verify", lookupEnvOrBool("WS_SKIP_VERIFY", false), "Websocket skip tls certificate verify")
 	flDisableWs := flag.Bool("ws_disable", lookupEnvOrBool("WS_DISABLE", false), "Disable WS MTP")
 	flDisableStomp := flag.Bool("stomp_disable", lookupEnvOrBool("STOMP_DISABLE", false), "Disable STOMP MTP")
 	flDisableMqtt := flag.Bool("mqtt_disable", lookupEnvOrBool("MQTT_DISABLE", false), "Disable MQTT MTP")
@@ -169,14 +170,15 @@ func main() {
 
 	go func() {
 		wsClient = ws.Ws{
-			Addr:  *flWsAddr,
-			Port:  *flWsPort,
-			Token: *flWsToken,
-			Route: *flWsRoute,
-			Auth:  *flWsAuth,
-			TLS:   *flWsTls,
-			DB:    database,
-			Ctx:   ctx,
+			Addr:               *flWsAddr,
+			Port:               *flWsPort,
+			Token:              *flWsToken,
+			Route:              *flWsRoute,
+			Auth:               *flWsAuth,
+			TLS:                *flWsTls,
+			InsecureSkipVerify: *flWsSkipVerify,
+			DB:                 database,
+			Ctx:                ctx,
 		}
 
 		wsDone = make(chan os.Signal, 1)
