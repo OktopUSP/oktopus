@@ -45,33 +45,51 @@ func (d *Database) CreateDevice(device Device) error {
 
 	/* ------------------ Do not overwrite status of other mtp ------------------ */
 	err := d.devices.FindOne(d.ctx, bson.D{{"sn", device.SN}}, nil).Decode(&deviceExistent)
-	if err != nil && err != mongo.ErrNoDocuments {
-		log.Println(err)
-		return err
-	}
-
-	if deviceExistent.Mqtt == Online {
-		device.Mqtt = Online
-	}
-	if deviceExistent.Stomp == Online {
-		device.Stomp = Online
-	}
-	if deviceExistent.Websockets == Online {
-		device.Websockets = Online
+	if err == nil {
+		if deviceExistent.Mqtt == Online {
+			device.Mqtt = Online
+		}
+		if deviceExistent.Stomp == Online {
+			device.Stomp = Online
+		}
+		if deviceExistent.Websockets == Online {
+			device.Websockets = Online
+		}
+	} else {
+		if err != nil && err != mongo.ErrNoDocuments {
+			log.Println(err)
+			return err
+		}
 	}
 	/* -------------------------------------------------------------------------- */
 
-	opts := options.FindOneAndReplace().SetUpsert(true)
+	callback := func(sessCtx mongo.SessionContext) (interface{}, error) {
+		// Important: You must pass sessCtx as the Context parameter to the operations for them to be executed in the
+		// transaction.
+		opts := options.FindOneAndReplace().SetUpsert(true)
 
-	err = d.devices.FindOneAndReplace(d.ctx, bson.D{{"sn", device.SN}}, device, opts).Decode(&result)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			log.Printf("New device %s added to database", device.SN)
-			return nil
+		err = d.devices.FindOneAndReplace(d.ctx, bson.D{{"sn", device.SN}}, device, opts).Decode(&result)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				log.Printf("New device %s added to database", device.SN)
+				return nil, nil
+			}
+			return nil, err
 		}
-		log.Fatal(err)
+		log.Printf("Device %s already existed, and got replaced for new info", device.SN)
+		return nil, nil
 	}
-	log.Printf("Device %s already existed, and got replaced for new info", device.SN)
+
+	session, err := d.client.StartSession()
+	if err != nil {
+		return err
+	}
+	defer session.EndSession(d.ctx)
+
+	_, err = session.WithTransaction(d.ctx, callback)
+	if err != nil {
+		return err
+	}
 	return err
 }
 func (d *Database) RetrieveDevices(filter bson.A) ([]Device, error) {
