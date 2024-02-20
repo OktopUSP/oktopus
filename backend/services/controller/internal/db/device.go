@@ -43,6 +43,9 @@ func (d *Database) CreateDevice(device Device) error {
 	var result bson.M
 	var deviceExistent Device
 
+	d.m.Lock()
+	defer d.m.Unlock()
+
 	/* ------------------ Do not overwrite status of other mtp ------------------ */
 	err := d.devices.FindOne(d.ctx, bson.D{{"sn", device.SN}}, nil).Decode(&deviceExistent)
 	if err == nil {

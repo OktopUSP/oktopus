@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"log"
+	"sync"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -16,6 +17,7 @@ type Database struct {
 	devices *mongo.Collection
 	users   *mongo.Collection
 	ctx     context.Context
+	m       *sync.Mutex
 }
 
 func NewDatabase(ctx context.Context, mongoUri string) Database {
@@ -43,6 +45,8 @@ func NewDatabase(ctx context.Context, mongoUri string) Database {
 	db.devices = devices
 	db.users = users
 	db.ctx = ctx
+	db.m = &sync.Mutex{}
+
 	return db
 }
 

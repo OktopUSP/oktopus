@@ -11,6 +11,8 @@ import (
 func (d *Database) UpdateStatus(sn string, status Status, mtp MTP) error {
 	var result Device
 
+	d.m.Lock()
+	defer d.m.Unlock()
 	err := d.devices.FindOne(d.ctx, bson.D{{"sn", sn}}, nil).Decode(&result)
 	if err != nil {
 		log.Println(err)
