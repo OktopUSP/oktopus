@@ -10,6 +10,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"github.com/leandrofars/oktopus/internal/db"
 	usp_msg "github.com/leandrofars/oktopus/internal/usp_message"
 	"github.com/leandrofars/oktopus/internal/utils"
 	"google.golang.org/protobuf/proto"
@@ -31,7 +32,7 @@ type WiFi struct {
 func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sn := vars["sn"]
-	a.deviceExists(sn, w)
+	device := a.deviceExists(sn, w)
 
 	if r.Method == http.MethodGet {
 		msg := utils.NewGetMsg(usp_msg.Get{
@@ -69,7 +70,14 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 		a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
 		a.QMutex.Unlock()
 		log.Println("Sending Msg:", msg.Header.MsgId)
-		a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
+
+		if device.Mqtt == db.Online {
+			a.Mqtt.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
+		} else if device.Websockets == db.Online {
+			a.Websockets.Publish(tr369Message, "", "", false)
+		} else if device.Stomp == db.Online {
+			//TODO: send stomp message
+		}
 
 		//TODO: verify in protocol and in other models, the Device.Wifi parameters. Maybe in the future, to use SSIDReference from AccessPoint
 		select {

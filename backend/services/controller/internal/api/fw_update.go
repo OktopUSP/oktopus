@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/leandrofars/oktopus/internal/db"
 	usp_msg "github.com/leandrofars/oktopus/internal/usp_message"
 	"github.com/leandrofars/oktopus/internal/utils"
 	"google.golang.org/protobuf/proto"
@@ -51,7 +52,14 @@ func (a *Api) deviceFwUpdate(w http.ResponseWriter, r *http.Request) {
 	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
 	a.QMutex.Unlock()
 	log.Println("Sending Msg:", msg.Header.MsgId)
-	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
+
+	if device.Mqtt == db.Online {
+		a.Mqtt.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
+	} else if device.Websockets == db.Online {
+		a.Websockets.Publish(tr369Message, "", "", false)
+	} else if device.Stomp == db.Online {
+		//TODO: send stomp message
+	}
 
 	var getMsgAnswer *usp_msg.GetResp
 

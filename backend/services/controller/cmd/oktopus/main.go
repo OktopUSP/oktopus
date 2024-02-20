@@ -179,6 +179,8 @@ func main() {
 			InsecureSkipVerify: *flWsSkipVerify,
 			DB:                 database,
 			Ctx:                ctx,
+			MsgQueue:           apiMsgQueue,
+			QMutex:             &m,
 		}
 
 		wsDone = make(chan os.Signal, 1)
@@ -192,7 +194,7 @@ func main() {
 
 	wg.Wait()
 
-	a := api.NewApi(*flApiPort, database, &mqttClient, apiMsgQueue, &m)
+	a := api.NewApi(*flApiPort, database, &mqttClient, apiMsgQueue, &m, wsClient) //TODO: websockets instance
 	api.StartApi(a)
 
 	<-done

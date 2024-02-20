@@ -232,6 +232,7 @@ func (a *Api) deviceUpdateMsg(w http.ResponseWriter, r *http.Request) {
 	a.uspCall(msg, sn, w, device)
 }
 
+// TODO: react this function, return err and deal with it in the caller, remove header superfluos
 func (a *Api) deviceExists(sn string, w http.ResponseWriter) db.Device {
 	device, err := a.Db.RetrieveDevice(sn)
 	if err != nil {

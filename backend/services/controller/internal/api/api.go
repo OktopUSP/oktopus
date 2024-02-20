@@ -12,19 +12,19 @@ import (
 	"github.com/leandrofars/oktopus/internal/api/middleware"
 	"github.com/leandrofars/oktopus/internal/db"
 	"github.com/leandrofars/oktopus/internal/mqtt"
-	"github.com/leandrofars/oktopus/internal/mtp"
 	usp_msg "github.com/leandrofars/oktopus/internal/usp_message"
 	"github.com/leandrofars/oktopus/internal/utils"
+	"github.com/leandrofars/oktopus/internal/ws"
 	"google.golang.org/protobuf/proto"
 )
 
 type Api struct {
-	Port     string
-	Db       db.Database
-	Broker   mtp.Broker
-	MsgQueue map[string](chan usp_msg.Msg)
-	QMutex   *sync.Mutex
-	Mqtt     mqtt.Mqtt
+	Port       string
+	Db         db.Database
+	MsgQueue   map[string](chan usp_msg.Msg)
+	QMutex     *sync.Mutex
+	Mqtt       *mqtt.Mqtt
+	Websockets *ws.Ws
 }
 
 const REQUEST_TIMEOUT = time.Second * 30
@@ -34,14 +34,14 @@ const (
 	AdminUser
 )
 
-func NewApi(port string, db db.Database, mqtt *mqtt.Mqtt, msgQueue map[string](chan usp_msg.Msg), m *sync.Mutex) Api {
+func NewApi(port string, db db.Database, mqtt *mqtt.Mqtt, msgQueue map[string](chan usp_msg.Msg), m *sync.Mutex, w ws.Ws) Api {
 	return Api{
-		Port:     port,
-		Db:       db,
-		Broker:   mqtt,
-		MsgQueue: msgQueue,
-		QMutex:   m,
-		Mqtt:     *mqtt,
+		Port:       port,
+		Db:         db,
+		MsgQueue:   msgQueue,
+		QMutex:     m,
+		Mqtt:       mqtt,
+		Websockets: &w,
 	}
 }
 
@@ -133,8 +133,14 @@ func (a *Api) uspCall(msg usp_msg.Msg, sn string, w http.ResponseWriter, device 
 	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
 	a.QMutex.Unlock()
 	log.Println("Sending Msg:", msg.Header.MsgId)
-	//TODO: Check what MTP the device is connected to
-	a.Broker.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
+
+	if device.Mqtt == db.Online {
+		a.Mqtt.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
+	} else if device.Websockets == db.Online {
+		a.Websockets.Publish(tr369Message, "", "", false)
+	} else if device.Stomp == db.Online {
+		//TODO: send stomp message
+	}
 
 	select {
 	case msg := <-a.MsgQueue[msg.Header.MsgId]:

@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/leandrofars/oktopus/internal/db"
 	"github.com/leandrofars/oktopus/internal/mtp/handler"
+	usp_msg "github.com/leandrofars/oktopus/internal/usp_message"
 	"github.com/leandrofars/oktopus/internal/usp_record"
 
 	"google.golang.org/protobuf/proto"
@@ -29,6 +30,8 @@ type Ws struct {
 	NewDeviceQueue     map[string]string
 	NewDevQMutex       *sync.Mutex
 	DB                 db.Database
+	MsgQueue           map[string](chan usp_msg.Msg)
+	QMutex             *sync.Mutex
 }
 
 const (
@@ -204,7 +207,20 @@ func (w *Ws) Subscribe() {
 				continue
 			}
 
-			//TODO: send message to Api Msg Queue
+			log.Println("Handle api request")
+			var msg usp_msg.Msg
+			err = proto.Unmarshal(record.GetNoSessionContext().Payload, &msg)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			if _, ok := w.MsgQueue[msg.Header.MsgId]; ok {
+				//m.QMutex.Lock()
+				w.MsgQueue[msg.Header.MsgId] <- msg
+				//m.QMutex.Unlock()
+			} else {
+				log.Printf("Message answer to request %s arrived too late", msg.Header.MsgId)
+			}
 
 		}
 
