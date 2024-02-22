@@ -194,8 +194,8 @@ Currently, telecommunications giants and startups, publishing new software daily
         <h4>Developer:</h4>
 Run app using Docker:
 <pre>
-leandro@leandro-laptop:~$ cd oktopus/devops
-leandro@leandro-laptop:~/oktopus/devops$ docker compose up
+user@user-laptop:~$ cd oktopus/devops
+user@user-laptop:~/oktopus/devops$ docker compose up
 </pre>
     </li>
     <li>
@@ -206,39 +206,46 @@ Basic manual compilation and run:
         </li>
         <li>
         Mqtt broker:
-            <pre>leandro@leandro-laptop:~$ cd oktopus/backend/services/mochi/ && go run cmd/main.go -redis "127.0.0.1:6379"</pre>
+            <pre>user@user-laptop:~$ cd oktopus/backend/services/mochi/ && go run cmd/main.go -redis "127.0.0.1:6379"</pre>
         </li>
         <li>
         TR-369 controller:
             <pre>
-leandro@leandro-laptop:~$ cd oktopus/backend/services/controller/ && go run cmd/oktopus/main.go -u root -P root -mongo "mongodb://127.0.0.1:27017"</pre>
+user@user-laptop:~$ cd oktopus/backend/services/controller/ && go run cmd/oktopus/main.go -u root -P root -mongo "mongodb://127.0.0.1:27017"</pre>
         </li>
         <li>
         Socketio server:
             <pre>
-leandro@leandro-laptop:~$ cd oktopus/backend/services/socketio && npm i && npm start</pre>
+user@user-laptop:~$ cd oktopus/backend/services/socketio && npm i && npm start</pre>
+        </li>
+        <li>
+        Websockets server:
+            <pre>
+user@user-laptop:~$ cd oktopus/backend/services/ws && go run cmd/main.go</pre>
         </li>
         <li>
         Frontend:
             <pre>
-leandro@leandro-laptop:~$ cd oktopus/frontend && npm i && npm run dev</pre>
+user@user-laptop:~$ cd oktopus/frontend && npm i && npm run dev</pre>
         </li>       
     </ul>
 
 </li>
     <li>
       <h4>Device test agent (obuspa):</h4>
-        <p>You might follow the instructions to build <a href="https://github.com/BroadbandForum/obuspa">obuspa</a> at their repo QUICK_START_GUIDE.md and remember to define 'INCLUDE_PROGRAMMATIC_FACTORY_RESET' at <a href="https://github.com/BroadbandForum/obuspa/blob/master/src/vendor/vendor_defs.h">'vendor_defs.h'</a> inside src/vendor folder, also advice you to build it with make tool.</p>
+        <p><b>
+        P.S: This guide in here is too simple, and at the same time hard, because you have to compile obuspa C code yourself, for an easier, more complete and real-world simulation of devices you might use <a href="https://github.com/OktopUSP/agent-sim">Oktopus TR-369 Agent Simulator</a>.
+        </b></p>
+        <p>Follow the instructions to build <a href="https://github.com/BroadbandForum/obuspa">obuspa</a> at their repo QUICK_START_GUIDE.md and remember to define 'INCLUDE_PROGRAMMATIC_FACTORY_RESET' at <a href="https://github.com/BroadbandForum/obuspa/blob/master/src/vendor/vendor_defs.h">'vendor_defs.h'</a> inside src/vendor folder, also advice you to build it with make tool.</p>
         <p>You can customize <a href="https://github.com/OktopUSP/oktopus/tree/main/agent/oktopus-mqtt-obuspa.txt">'oktopus-mqtt-obuspa.txt'</a> accordingly to your needs, there you can change broker address, client password, and etc. '-i' option defines the interface your usp packets will go through, in this case it's localhost, also keep in mind that after you run obuspa if you made a change to 'oktopus-mqtt-obuspa.txt' and want it to take effect you must delete '/usr/local/var/obuspa/usp.db' file before running the agent again (docs provide you other methods to do it too).'-r' option defines the config file you want the agent to use. </p>
-        <p>Run agent:</p>
-        <pre>leandro@leandro-laptop:~/oktopus$ obuspa -p -v 4 -r agent/oktopus-mqtt-obuspa.txt -i lo</pre>
+        <p>Run MQTT agent:</p>
+        <pre>user@user-laptop:~/oktopus$ obuspa -p -v 4 -r agent/oktopus-mqtt-obuspa.txt -i lo</pre>
+        <p>Run Websockets agent:</p>
+        <pre>user@user-laptop:~/oktopus$ obuspa -p -v 4 -r agent/oktopus-websockets-obuspa.txt -i lo</pre>
         <p>Obuspa has a lot of info and docs at their repo, which shows you many options to set your environment and customize agent to your embedded project. This basic agent has the purpose to test oktopus connection and shows an idea of how it's like with true devices, although with those, you're able to explore much more parameters and execute lots of configurations. Obuspa has default parameters and mocked info:</p>
         <img src="https://github.com/OktopUSP/oktopus/assets/83298718/4599d566-eada-4313-8ae1-31dae82391de"/>
         <img src="https://github.com/OktopUSP/oktopus/assets/83298718/501b4ccd-6147-4957-9096-695134e34b5e"/>
     </li>
-    <p>
-    In case you want a more complete and real-world simulation of devices you might use <a href="https://github.com/OktopUSP/agent-sim">Oktopus TR-369 Agent Simulator</a>.
-    </p>
 </ul>
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------

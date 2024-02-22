@@ -23,7 +23,7 @@ type Broker interface {
 	//Request(msg []byte, msgType usp_msg.Header_MsgType, pubTopic string, subTopic string)
 }
 
-// Not used, since we are using a broker solution.
+// Not used, since we are using a broker approach.
 type P2P interface {
 }
 
@@ -31,14 +31,7 @@ type P2P interface {
 func MtpService(b Broker, done chan os.Signal, wg *sync.WaitGroup) {
 	b.Connect()
 	wg.Done()
-	go func() {
-		for range done {
-			b.Disconnect()
-			log.Println("Successfully disconnected to MTPs!")
-
-			// Receives signal and then replicates it to the rest of the app.
-			done <- os.Interrupt
-		}
-	}()
-	//b.Subscribe()
+	<-done
+	log.Println("Disconnect of MTP!")
+	b.Disconnect()
 }

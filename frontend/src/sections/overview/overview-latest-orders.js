@@ -22,17 +22,17 @@ import { useRouter } from 'next/router';
 
 const statusMap = {
   1: 'warning',
-  0: 'success',
-  2: 'error'
+  2: 'success',
+  0: 'error'
 };
 
 const status = (s)=>{
   if (s == 0){
-    return "Online"
+    return "Offline"
   } else if (s == 1){
     return "Associating"
   }else if (s==2){
-    return "Offline"
+    return "Online"
   }else {
     return "Unknown"
   }
@@ -99,9 +99,9 @@ export const OverviewLatestOrders = (props) => {
                     <TableCell>
                     <SvgIcon 
                       fontSize="small" 
-                      sx={{cursor: order.Status !== 2 && 'pointer'}} 
+                      sx={{cursor: order.Status == 2 && 'pointer'}} 
                       onClick={()=>{
-                          if (order.Status !== 2){
+                          if (order.Status == 2){
                             router.push("devices/"+order.SN+"/discovery")
                           }
                         }

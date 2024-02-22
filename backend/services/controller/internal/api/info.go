@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/leandrofars/oktopus/internal/db"
-	"github.com/leandrofars/oktopus/internal/utils"
 )
 
 type StatusCount struct {
@@ -23,6 +22,7 @@ type GeneralInfo struct {
 	VendorsCount      []db.VendorsCount
 }
 
+// TODO: fix when mqtt broker is not set don't break api
 func (a *Api) generalInfo(w http.ResponseWriter, r *http.Request) {
 
 	var result GeneralInfo
@@ -49,10 +49,10 @@ func (a *Api) generalInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, v := range statuscount {
-		switch v.Status {
-		case utils.Online:
+		switch db.Status(v.Status) {
+		case db.Online:
 			result.StatusCount.Online = v.Count
-		case utils.Offline:
+		case db.Offline:
 			result.StatusCount.Offline = v.Count
 		}
 	}
@@ -120,10 +120,10 @@ func (a *Api) statusInfo(w http.ResponseWriter, r *http.Request) {
 
 	var status StatusCount
 	for _, v := range vendors {
-		switch v.Status {
-		case utils.Online:
+		switch db.Status(v.Status) {
+		case db.Online:
 			status.Online = v.Count
-		case utils.Offline:
+		case db.Offline:
 			status.Offline = v.Count
 		}
 	}

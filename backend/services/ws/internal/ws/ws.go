@@ -1,53 +1,42 @@
 package ws
 
+// Websockets server implementation inspired by https://github.com/gorilla/websocket/tree/main/examples/chat
+
 import (
 	"log"
 	"net/http"
 
+	"github.com/OktopUSP/oktopus/ws/internal/config"
+	"github.com/OktopUSP/oktopus/ws/internal/ws/handler"
 	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin:     func(r *http.Request) bool { return true },
-}
+// Starts New Websockets Server
+func StartNewServer(c config.Config) {
+	// Initialize handlers of websockets events
+	go handler.InitHandlers(c.ControllerEID)
 
-func StartNewServer() {
 	r := mux.NewRouter()
-	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-
-		header := http.Header{
-			"Sec-Websocket-Protocol": {"v1.usp"},
-			"Sec-Websocket-Version":  {"13"},
-		}
-
-		conn, err := upgrader.Upgrade(w, r, header)
-		if err != nil {
-			log.Println(err)
-		}
-		for {
-			messageType, p, err := conn.ReadMessage()
-			if err != nil {
-				log.Println(err)
-				return
-			}
-			log.Println(string(p))
-
-			if err := conn.WriteMessage(messageType, p); err != nil {
-				log.Println(err)
-				return
-			}
-
-		}
+	r.HandleFunc("/ws/agent", func(w http.ResponseWriter, r *http.Request) {
+		handler.ServeAgent(w, r, c.ControllerEID)
+	})
+	r.HandleFunc("/ws/controller", func(w http.ResponseWriter, r *http.Request) {
+		handler.ServeController(w, r, c.Token, c.ControllerEID, c.Auth)
 	})
 
-	log.Println("Websockets server running")
-
-	err := http.ListenAndServe(":8080", r)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
-
+	go func() {
+		if c.Tls {
+			log.Println("Websockets server running with TLS")
+			err := http.ListenAndServeTLS(c.Port, "cert.pem", "key.pem", r)
+			if err != nil {
+				log.Fatal("ListenAndServeTLS: ", err)
+			}
+		} else {
+			log.Println("Websockets server running")
+			err := http.ListenAndServe(c.Port, r)
+			if err != nil {
+				log.Fatal("ListenAndServe: ", err)
+			}
+		}
+	}()
 }

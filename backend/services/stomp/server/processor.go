@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"net"
 	"strings"
 	"time"
@@ -50,6 +51,8 @@ func (proc *requestProcessor) Serve(l net.Listener) error {
 			} else {
 				topic := proc.tm.Find(r.Sub.Destination())
 				topic.Subscribe(r.Sub)
+				//TODO: if subscribed to oktopus/v1/agent send online message to ...status topic
+				log.Println(r.Sub.Destination())
 			}
 
 		case client.UnsubscribeOp:
