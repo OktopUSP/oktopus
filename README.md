@@ -194,8 +194,8 @@ Currently, telecommunications giants and startups, publishing new software daily
         <h4>Developer:</h4>
 Run app using Docker:
 <pre>
-leandro@leandro-laptop:~$ cd oktopus/devops
-leandro@leandro-laptop:~/oktopus/devops$ docker compose up
+user@user-laptop:~$ cd oktopus/devops
+user@user-laptop:~/oktopus/devops$ docker compose up
 </pre>
     </li>
     <li>
@@ -206,22 +206,27 @@ Basic manual compilation and run:
         </li>
         <li>
         Mqtt broker:
-            <pre>leandro@leandro-laptop:~$ cd oktopus/backend/services/mochi/ && go run cmd/main.go -redis "127.0.0.1:6379"</pre>
+            <pre>user@user-laptop:~$ cd oktopus/backend/services/mochi/ && go run cmd/main.go -redis "127.0.0.1:6379"</pre>
         </li>
         <li>
         TR-369 controller:
             <pre>
-leandro@leandro-laptop:~$ cd oktopus/backend/services/controller/ && go run cmd/oktopus/main.go -u root -P root -mongo "mongodb://127.0.0.1:27017"</pre>
+user@user-laptop:~$ cd oktopus/backend/services/controller/ && go run cmd/oktopus/main.go -u root -P root -mongo "mongodb://127.0.0.1:27017"</pre>
         </li>
         <li>
         Socketio server:
             <pre>
-leandro@leandro-laptop:~$ cd oktopus/backend/services/socketio && npm i && npm start</pre>
+user@user-laptop:~$ cd oktopus/backend/services/socketio && npm i && npm start</pre>
+        </li>
+        <li>
+        Websockets server:
+            <pre>
+user@user-laptop:~$ cd oktopus/backend/services/ws && go run cmd/main.go</pre>
         </li>
         <li>
         Frontend:
             <pre>
-leandro@leandro-laptop:~$ cd oktopus/frontend && npm i && npm run dev</pre>
+user@user-laptop:~$ cd oktopus/frontend && npm i && npm run dev</pre>
         </li>       
     </ul>
 
