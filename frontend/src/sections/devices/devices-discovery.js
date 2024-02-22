@@ -98,6 +98,9 @@ const addDeviceObj = async(obj, setShowLoading, router, updateDeviceParameters) 
     setShowLoading(true)
     let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/device/${router.query.id[0]}/add`, requestOptions))
     if (result.status != 200) {
+        if (result.status === 401){
+            router.push("/auth/login")
+        }
         setShowLoading(false)
         throw new Error('Please check your email and password');
     }else{
@@ -130,6 +133,9 @@ const deleteDeviceObj = async(obj, setShowLoading, router, updateDeviceParameter
     setShowLoading(true)
     let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/device/${router.query.id[0]}/del`, requestOptions))
     if (result.status != 200) {
+        if (result.status === 401){
+            router.push("/auth/login")
+        }
         setShowLoading(false)
         throw new Error('Please check your email and password');
     }else{
@@ -774,6 +780,9 @@ const getDeviceParameterInstances = async (raw) =>{
 
     let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/device/${router.query.id[0]}/get`, requestOptions))
     if (result.status != 200) {
+        if (result.status === 401){
+            router.push("/auth/login")
+        }
         throw new Error('Please check your email and password');
     }else if (result.status === 401){
     router.push("/auth/login")
@@ -1021,6 +1030,9 @@ const getDeviceParameterInstances = async (raw) =>{
     setShowLoading(true)
     let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/device/${router.query.id[0]}/set`, requestOptions))
     if (result.status != 200) {
+        if (result.status === 401){
+            router.push("/auth/login")
+        }
         setShowLoading(false)
         throw new Error('Please check your email and password');
     }else{

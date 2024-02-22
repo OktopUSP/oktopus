@@ -87,6 +87,9 @@ const handleOpen = () => {
   fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/device/${router.query.id[0]}/${method}`, requestOptions)
     .then(response => response.text())
     .then(result => {
+      if (result.status === 401){
+        router.push("/auth/login")
+      }
       setOpen(false)
       setAnswer(true)
       let teste =  JSON.stringify(JSON.parse(result), null, 2)
