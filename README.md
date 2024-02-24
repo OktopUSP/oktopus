@@ -194,8 +194,8 @@ Currently, telecommunications giants and startups, publishing new software daily
         <h4>Developer:</h4>
 Run app using Docker:
 <pre>
-user@user-laptop:~$ cd oktopus/devops
-user@user-laptop:~/oktopus/devops$ docker compose up
+user@user-laptop:~$ cd oktopus/deploy/compose
+user@user-laptop:~/oktopus/deploy/compose$ docker compose up
 </pre>
     </li>
     <li>
