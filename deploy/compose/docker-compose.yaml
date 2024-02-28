@@ -1,22 +1,33 @@
 services:
 
-  oktopustr369:
-      image: 'golang:1.21.4'
-      container_name: oktopustr369
-      tty: true
-      stdin_open: true
-      volumes:
-      - ../:/app/oktopus
-      command: bash -c "cd /app/oktopus/backend/services/controller && go run cmd/oktopus/main.go -mongo mongodb://172.16.235.2:27017 -a 172.16.235.4 -p 1883 -ws_addr 172.16.235.8"
-      ports:
-      - 8000:8000
-      depends_on:
-      - mongodb
-      - mochi
-      - websockets
-      networks:
-        usp_network:
-          ipv4_address: 172.16.235.7
+  controller:
+    image: 'golang:1.21.4'
+    container_name: controlller
+    tty: true
+    stdin_open: true
+    volumes:
+    - ../:/app/oktopus
+    command: bash -c "cd /app/oktopus/backend/services/controller && go run cmd/oktopus/main.go -mongo mongodb://172.16.235.2:27017 -a 172.16.235.4 -p 1883 -ws_addr 172.16.235.8"
+    ports:
+    - 8000:8000
+    depends_on:
+    - mongodb
+    - mqtt
+    - websockets
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.7
+  
+  nats:
+    image: 'nats:latest'
+    container_name: nats
+    ports:
+      - 4222:4222
+      - 8222:8222
+    command: -n oktopus -m 8222 -js
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.9
 
   mongodb:
     image: mongo
@@ -32,14 +43,14 @@ services:
       usp_network:
         ipv4_address: 172.16.235.3
 
-  mochi:
+  mqtt:
     image: 'golang:1.21.4'
-    container_name: mochi
+    container_name: mqtt
     tty: true
     stdin_open: true
     volumes:
     - ../:/app/oktopus
-    command: bash -c "cd /app/oktopus/backend/services/mochi/cmd/ && go run main.go -redis 'redis:6379' -info :8081"
+    command: bash -c "cd /app/oktopus/backend/services/mqtt/cmd/ && go run main.go -redis 'redis:6379' -info :8081"
     ports:
     - 1883:1883
     depends_on:

@@ -206,7 +206,7 @@ Basic manual compilation and run:
         </li>
         <li>
         Mqtt broker:
-            <pre>user@user-laptop:~$ cd oktopus/backend/services/mochi/ && go run cmd/main.go -redis "127.0.0.1:6379"</pre>
+            <pre>user@user-laptop:~$ cd oktopus/backend/services/mqtt/ && go run cmd/main.go -redis "127.0.0.1:6379"</pre>
         </li>
         <li>
         TR-369 controller:
