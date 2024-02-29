@@ -4,3 +4,7 @@ cmd/mqtt
 auth.prod.json
 run.prod.sh
 mochi
+*.pem
+*.crt
+*.key
+*.local
