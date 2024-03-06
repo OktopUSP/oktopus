@@ -38,7 +38,6 @@ type Device struct {
 	Websockets   Status
 }
 
-// TODO: don't change device status of other MTP
 func (d *Database) CreateDevice(device Device) error {
 	var result bson.M
 	var deviceExistent Device

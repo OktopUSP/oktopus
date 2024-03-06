@@ -1,0 +1,10 @@
+cmd/mqtt
+.DS_Store
+*.db
+auth.prod.json
+run.prod.sh
+mochi
+*.pem
+*.crt
+*.key
+*.local
