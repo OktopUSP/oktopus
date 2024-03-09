@@ -10,7 +10,8 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func (h *Handler) HandleDeviceStatus(device, subject string, data []byte) {
+func (h *Handler) HandleDeviceStatus(device, subject string, data []byte, mtp string, ack func()) {
+	defer ack()
 	payload, err := strconv.Atoi(string(data))
 	if err != nil {
 		log.Printf("Status subject payload message error %q", err)
@@ -18,15 +19,15 @@ func (h *Handler) HandleDeviceStatus(device, subject string, data []byte) {
 
 	switch payload {
 	case ONLINE:
-		h.deviceOnline(device)
+		h.deviceOnline(device, mtp)
 	case OFFLINE:
-		h.deviceOffline(device)
+		h.deviceOffline(device, mtp)
 	default:
 		ignoreMsg(subject, "status", data)
 	}
 }
 
-func (h *Handler) deviceOnline(device string) {
+func (h *Handler) deviceOnline(device, mtp string) {
 
 	log.Printf("Device %s is online", device)
 
@@ -49,16 +50,18 @@ func (h *Handler) deviceOnline(device string) {
 		log.Fatalln("Failed to encode tr369 record:", err)
 	}
 
-	err = h.nc.Publish(NATS_SUBJ_PREFIX+device+".info", tr369Message)
+	err = h.nc.Publish(mtp+"-adapter.usp.v1."+device+".info", tr369Message)
 	if err != nil {
 		log.Printf("Failed to publish online device message: %v", err)
 	}
 }
 
-func (h *Handler) deviceOffline(device string) {
+func (h *Handler) deviceOffline(device, mtp string) {
 	log.Printf("Device %s is offline", device)
 
-	err := h.db.UpdateStatus(device, db.Offline, db.MQTT)
+	mtpLayer := getMtp(mtp)
+
+	err := h.db.UpdateStatus(device, db.Offline, mtpLayer)
 	if err != nil {
 		log.Fatal(err)
 	}

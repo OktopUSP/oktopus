@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	ONLINE = iota
-	OFFLINE
+	OFFLINE = iota
+	ONLINE
 )
 
 const NATS_MQTT_SUBJECT_PREFIX = "mqtt.usp.v1."

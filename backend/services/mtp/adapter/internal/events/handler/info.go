@@ -10,8 +10,9 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func (h *Handler) HandleDeviceInfo(device, subject string, data []byte, mtp string) {
-	log.Printf("Device %s info", device)
+func (h *Handler) HandleDeviceInfo(device, subject string, data []byte, mtp string, ack func()) {
+	defer ack()
+	log.Printf("Device %s info, mtp: %s", device, mtp)
 	deviceInfo := parseDeviceInfoMsg(device, subject, data, getMtp(mtp))
 	err := h.db.CreateDevice(deviceInfo)
 	if err != nil {
@@ -28,7 +29,7 @@ func getMtp(mtp string) db.MTP {
 	case nats.STOMP_STREAM_NAME:
 		return db.STOMP
 	default:
-		return db.MTP(0)
+		return db.UNDEFINED
 	}
 }
 

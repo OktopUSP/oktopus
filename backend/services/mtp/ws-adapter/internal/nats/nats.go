@@ -4,14 +4,13 @@ import (
 	"log"
 	"time"
 
+	"github.com/OktopUSP/oktopus/backend/services/mtp/ws-adapter/internal/config"
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
-
-	"github.com/OktopUSP/oktopus/backend/services/mqtt-adapter/internal/config"
 )
 
 const (
-	STREAM_NAME = "mqtt"
+	STREAM_NAME = "ws"
 )
 
 func StartNatsClient(c config.Nats) (
@@ -27,7 +26,7 @@ func StartNatsClient(c config.Nats) (
 
 	opts := defineOptions(c)
 
-    log.Printf("Connecting to NATS server %s", c.Url)
+	log.Printf("Connecting to NATS server %s", c.Url)
 
 	for {
 		nc, err = nats.Connect(c.Url, opts...)

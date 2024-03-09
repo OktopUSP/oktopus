@@ -48,13 +48,12 @@ func StartEventsListener(ctx context.Context, js jetstream.JetStream, h handler.
 
 				switch msgType {
 				case "status":
-					h.HandleDeviceStatus(device, msg.Subject(), data)
+					h.HandleDeviceStatus(device, msg.Subject(), data, event, func() { msg.Ack(); log.Println("Acked msg") })
 				case "info":
-					h.HandleDeviceInfo(device, msg.Subject(), data, event)
+					h.HandleDeviceInfo(device, msg.Subject(), data, event, func() { msg.Ack(); log.Println("Acked msg") })
 				default:
 					//ignoreMsg(msg.Subject(), "status", msg.Data())
 				}
-				msg.Ack()
 			}
 		}()
 	}

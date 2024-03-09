@@ -12,12 +12,11 @@ import (
 )
 
 const (
-	MQTT_ADAPTER_STREAM_NAME = "mqtt-adapter"
-	MQTT_STREAM_NAME         = "mqtt"
-	WS_STREAM_NAME           = "ws"
-	STOMP_STREAM_NAME        = "stomp"
-	LORA_STREAM_NAME         = "lora"
-	OPC_STREAM_NAME          = "opc"
+	MQTT_STREAM_NAME  = "mqtt"
+	WS_STREAM_NAME    = "ws"
+	STOMP_STREAM_NAME = "stomp"
+	LORA_STREAM_NAME  = "lora"
+	OPC_STREAM_NAME   = "opc"
 )
 
 func StartNatsClient(c config.Nats) (jetstream.JetStream, *nats.Conn) {
@@ -28,6 +27,8 @@ func StartNatsClient(c config.Nats) (jetstream.JetStream, *nats.Conn) {
 	)
 
 	opts := defineOptions(c)
+
+	log.Printf("Connecting to NATS server %s", c.Url)
 
 	for {
 		nc, err = nats.Connect(c.Url, opts...)

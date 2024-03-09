@@ -7,11 +7,9 @@ import (
 )
 
 const (
-	ONLINE = iota
-	OFFLINE
+	OFFLINE = iota
+	ONLINE
 )
-
-const NATS_SUBJ_PREFIX = "mqtt-adapter.usp.v1."
 
 type Handler struct {
 	nc  *nats.Conn
