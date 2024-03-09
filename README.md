@@ -9,6 +9,146 @@
 <p>
 This repository aims to promote the development of a multi-vendor management platform for CPEs and IoTs. Any device that follows the TR-369 protocol can be managed. The main objective is to facilitate and unify device management, which generates countless benefits for the end user and service providers, suppressing the demands that today's technologies require: device interconnection, data collection, speed, availability and more.
 </p>
+
+<ul><li><h4>Sponsors:</h4></li></ul>
+
+<ul><li><h4>Companies that use Oktopus:</h4></li></ul>
+
+<a href="https://www.inango.com/" target="_blank"><img src="https://github.com/OktopUSP/oktopus/assets/83298718/3b3e65d9-33fa-46c4-8b24-f9e2a84a04a6" width="125px"/></a>
+
+<p>If you'd like to know how to donate above <a href="https://github.com/sponsors/leandrofars">Github Sponsors</a> values, start a partnership or somehow to contribute to the project, email <a href="">leandro@oktopustr369.com</a>, every contribution is welcome, and the resources will help the project to move on. Also, if your company uses this project and you'd like your logo to appear up here, contact us.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<ul>
+    <li>
+        <h4>💼 Commercial Support:</h4>
+        <p>
+            Our solution has an open-source software license, meaning you can modify/study the code and use it for free. You can perform all the configurations, allocate servers, and set it up on your network with the classic "do it yourself" approach, or save time and money: contact us for a quote and get commercial support.
+        </p>
+        <ul>
+            <li> 
+            Software customization according to your needs and preferences
+            </li>
+            <li> 
+            Full support to your team
+            </li>
+            <li> 
+            Affordable prices for companies of all sizes
+            </li>
+            <li> 
+            Trust and assistance from experts
+            </li>
+            <li> 
+            Complete solution for production environments, from the server provisionning to devices connection
+            </li>
+        </ul>
+        <p>Contact <a href="">leandro@oktopustr369.com</a> via email and get a quote.</p>
+    </li> 
+</ul>
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<ul><li><h4>Infrastructure:</h4></li></ul>
+
+![image](https://github.com/OktopUSP/oktopus/assets/83298718/eba6c47b-c9a9-4ebe-bba2-06c16f8cdffc)
+
+<ul>
+    <li>
+        <h4>API:</h4>
+        <ul>
+            <li> 
+            <a href="https://documenter.getpostman.com/view/18932104/2s93eR3vQY#10c46751-ede9-4ea1-8ea4-264ebf539e5e">Documentation </a>
+            </li>
+            <li> 
+            <a href="https://www.postman.com/docking-module-astronomer-46169629/workspace/oktopus">Workspace of tests and development</a>
+            </li>
+        </ul>
+    </li>
+</ul>
+<ul>
+    <li>
+        <h4>Developer:</h4>
+Run app using Docker:
+<pre>
+user@user-laptop:~$ cd oktopus/deploy/compose
+user@user-laptop:~/oktopus/deploy/compose$ docker compose up
+</pre>
+    </li>
+    <li>
+Basic manual compilation and run:
+    <ul>
+        <li>
+        <b>Dependencies:</b> Node version: v14.20.0 | Go version: v1.18.1
+        </li>
+        <li>
+        Mqtt broker:
+            <pre>user@user-laptop:~$ cd oktopus/backend/services/mqtt/ && go run cmd/main.go -redis "127.0.0.1:6379"</pre>
+        </li>
+        <li>
+        TR-369 controller:
+            <pre>
+user@user-laptop:~$ cd oktopus/backend/services/controller/ && go run cmd/oktopus/main.go -u root -P root -mongo "mongodb://127.0.0.1:27017"</pre>
+        </li>
+        <li>
+        Socketio server:
+            <pre>
+user@user-laptop:~$ cd oktopus/backend/services/socketio && npm i && npm start</pre>
+        </li>
+        <li>
+        Websockets server:
+            <pre>
+user@user-laptop:~$ cd oktopus/backend/services/ws && go run cmd/main.go</pre>
+        </li>
+        <li>
+        Frontend:
+            <pre>
+user@user-laptop:~$ cd oktopus/frontend && npm i && npm run dev</pre>
+        </li>       
+    </ul>
+
+</li>
+    <li>
+      <h4>Device test agent (obuspa):</h4>
+        <p><b>
+        P.S: This guide in here is too simple, and at the same time hard, because you have to compile obuspa C code yourself, for an easier, more complete and real-world simulation of devices you might use <a href="https://github.com/OktopUSP/agent-sim">Oktopus TR-369 Agent Simulator</a>.
+        </b></p>
+        <p>Follow the instructions to build <a href="https://github.com/BroadbandForum/obuspa">obuspa</a> at their repo QUICK_START_GUIDE.md and remember to define 'INCLUDE_PROGRAMMATIC_FACTORY_RESET' at <a href="https://github.com/BroadbandForum/obuspa/blob/master/src/vendor/vendor_defs.h">'vendor_defs.h'</a> inside src/vendor folder, also advice you to build it with make tool.</p>
+        <p>You can customize <a href="https://github.com/OktopUSP/oktopus/tree/main/agent/oktopus-mqtt-obuspa.txt">'oktopus-mqtt-obuspa.txt'</a> accordingly to your needs, there you can change broker address, client password, and etc. '-i' option defines the interface your usp packets will go through, in this case it's localhost, also keep in mind that after you run obuspa if you made a change to 'oktopus-mqtt-obuspa.txt' and want it to take effect you must delete '/usr/local/var/obuspa/usp.db' file before running the agent again (docs provide you other methods to do it too).'-r' option defines the config file you want the agent to use. </p>
+        <p>Run MQTT agent:</p>
+        <pre>user@user-laptop:~/oktopus$ obuspa -p -v 4 -r agent/oktopus-mqtt-obuspa.txt -i lo</pre>
+        <p>Run Websockets agent:</p>
+        <pre>user@user-laptop:~/oktopus$ obuspa -p -v 4 -r agent/oktopus-websockets-obuspa.txt -i lo</pre>
+        <p>Obuspa has a lot of info and docs at their repo, which shows you many options to set your environment and customize agent to your embedded project. This basic agent has the purpose to test oktopus connection and shows an idea of how it's like with true devices, although with those, you're able to explore much more parameters and execute lots of configurations. Obuspa has default parameters and mocked info:</p>
+        <img src="https://github.com/OktopUSP/oktopus/assets/83298718/4599d566-eada-4313-8ae1-31dae82391de"/>
+        <img src="https://github.com/OktopUSP/oktopus/assets/83298718/501b4ccd-6147-4957-9096-695134e34b5e"/>
+    </li>
+</ul>
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<ul>
+    <li>
+        <h4>Roadmap:</h4>
+        <p>
+            The project goals are organized with milestones that have a due date, just like a sprint. Those issues grouped in milestones are done and have their status updated in a kanban board.
+        </p>
+        <ul>
+            <li> 
+            <a href="https://github.com/OktopUSP/oktopus/milestones">Milestones </a>
+            </li>
+            <li> 
+            <a href="https://github.com/orgs/OktopUSP/projects/1/views/2">Kanban Board </a>
+            </li>
+        </ul>
+    </li>
+</ul>
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<p>Are you going to use our project in your company? would like to talk about TR-369 and IoT management, we're online on <a href="https://join.slack.com/t/oktopustr-369/shared_invite/zt-1znmrbr52-3AXgOlSeQTPQW8_Qhn3C4g">Slack</a>.</p>
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
 <ul>
     <li>
         <h4>TR-069 ---> TR-369 :</h4>
@@ -169,147 +309,6 @@ Currently, telecommunications giants and startups, publishing new software daily
 <img src="https://github.com/leandrofars/oktopus/assets/83298718/64664b0e-81cd-4a29-bbc5-b4186a04dfa2" width="50%"/>
     </li>
 </ul>
-
---------------------------------------------------------------------------------------------------------------------------------------------------------
-
-<ul><li><h4>Infrastructure:</h4></li></ul>
-
-![image](https://github.com/OktopUSP/oktopus/assets/83298718/eba6c47b-c9a9-4ebe-bba2-06c16f8cdffc)
-
-<ul>
-    <li>
-        <h4>API:</h4>
-        <ul>
-            <li> 
-            <a href="https://documenter.getpostman.com/view/18932104/2s93eR3vQY#10c46751-ede9-4ea1-8ea4-264ebf539e5e">Documentation </a>
-            </li>
-            <li> 
-            <a href="https://www.postman.com/docking-module-astronomer-46169629/workspace/oktopus">Workspace of tests and development</a>
-            </li>
-        </ul>
-    </li>
-</ul>
-<ul>
-    <li>
-        <h4>Developer:</h4>
-Run app using Docker:
-<pre>
-user@user-laptop:~$ cd oktopus/deploy/compose
-user@user-laptop:~/oktopus/deploy/compose$ docker compose up
-</pre>
-    </li>
-    <li>
-Basic manual compilation and run:
-    <ul>
-        <li>
-        <b>Dependencies:</b> Node version: v14.20.0 | Go version: v1.18.1
-        </li>
-        <li>
-        Mqtt broker:
-            <pre>user@user-laptop:~$ cd oktopus/backend/services/mqtt/ && go run cmd/main.go -redis "127.0.0.1:6379"</pre>
-        </li>
-        <li>
-        TR-369 controller:
-            <pre>
-user@user-laptop:~$ cd oktopus/backend/services/controller/ && go run cmd/oktopus/main.go -u root -P root -mongo "mongodb://127.0.0.1:27017"</pre>
-        </li>
-        <li>
-        Socketio server:
-            <pre>
-user@user-laptop:~$ cd oktopus/backend/services/socketio && npm i && npm start</pre>
-        </li>
-        <li>
-        Websockets server:
-            <pre>
-user@user-laptop:~$ cd oktopus/backend/services/ws && go run cmd/main.go</pre>
-        </li>
-        <li>
-        Frontend:
-            <pre>
-user@user-laptop:~$ cd oktopus/frontend && npm i && npm run dev</pre>
-        </li>       
-    </ul>
-
-</li>
-    <li>
-      <h4>Device test agent (obuspa):</h4>
-        <p><b>
-        P.S: This guide in here is too simple, and at the same time hard, because you have to compile obuspa C code yourself, for an easier, more complete and real-world simulation of devices you might use <a href="https://github.com/OktopUSP/agent-sim">Oktopus TR-369 Agent Simulator</a>.
-        </b></p>
-        <p>Follow the instructions to build <a href="https://github.com/BroadbandForum/obuspa">obuspa</a> at their repo QUICK_START_GUIDE.md and remember to define 'INCLUDE_PROGRAMMATIC_FACTORY_RESET' at <a href="https://github.com/BroadbandForum/obuspa/blob/master/src/vendor/vendor_defs.h">'vendor_defs.h'</a> inside src/vendor folder, also advice you to build it with make tool.</p>
-        <p>You can customize <a href="https://github.com/OktopUSP/oktopus/tree/main/agent/oktopus-mqtt-obuspa.txt">'oktopus-mqtt-obuspa.txt'</a> accordingly to your needs, there you can change broker address, client password, and etc. '-i' option defines the interface your usp packets will go through, in this case it's localhost, also keep in mind that after you run obuspa if you made a change to 'oktopus-mqtt-obuspa.txt' and want it to take effect you must delete '/usr/local/var/obuspa/usp.db' file before running the agent again (docs provide you other methods to do it too).'-r' option defines the config file you want the agent to use. </p>
-        <p>Run MQTT agent:</p>
-        <pre>user@user-laptop:~/oktopus$ obuspa -p -v 4 -r agent/oktopus-mqtt-obuspa.txt -i lo</pre>
-        <p>Run Websockets agent:</p>
-        <pre>user@user-laptop:~/oktopus$ obuspa -p -v 4 -r agent/oktopus-websockets-obuspa.txt -i lo</pre>
-        <p>Obuspa has a lot of info and docs at their repo, which shows you many options to set your environment and customize agent to your embedded project. This basic agent has the purpose to test oktopus connection and shows an idea of how it's like with true devices, although with those, you're able to explore much more parameters and execute lots of configurations. Obuspa has default parameters and mocked info:</p>
-        <img src="https://github.com/OktopUSP/oktopus/assets/83298718/4599d566-eada-4313-8ae1-31dae82391de"/>
-        <img src="https://github.com/OktopUSP/oktopus/assets/83298718/501b4ccd-6147-4957-9096-695134e34b5e"/>
-    </li>
-</ul>
-
---------------------------------------------------------------------------------------------------------------------------------------------------------
-
-<ul><li><h4>Sponsors:</h4></li></ul>
-
-<ul><li><h4>Companies that use Oktopus:</h4></li></ul>
-
-<a href="https://www.inango.com/" target="_blank"><img src="https://github.com/OktopUSP/oktopus/assets/83298718/3b3e65d9-33fa-46c4-8b24-f9e2a84a04a6" width="125px"/></a>
-
-<p>If you'd like to know how to donate above <a href="https://github.com/sponsors/leandrofars">Github Sponsors</a> values, start a partnership or somehow to contribute to the project, email <a href="">leandro@oktopustr369.com</a>, every contribution is welcome, and the resources will help the project to move on. Also, if your company uses this project and you'd like your logo to appear up here, contact us.
-
---------------------------------------------------------------------------------------------------------------------------------------------------------
-
-<ul>
-    <li>
-        <h4>💼 Commercial Support:</h4>
-        <p>
-            Our solution has an open-source software license, meaning you can modify/study the code and use it for free. You can perform all the configurations, allocate servers, and set it up on your network with the classic "do it yourself" approach, or save time and money: contact us for a quote and get commercial support.
-        </p>
-        <ul>
-            <li> 
-            Software customization according to your needs and preferences
-            </li>
-            <li> 
-            Full support to your team
-            </li>
-            <li> 
-            Affordable prices for companies of all sizes
-            </li>
-            <li> 
-            Trust and assistance from experts
-            </li>
-            <li> 
-            Complete solution for production environments, from the server provisionning to devices connection
-            </li>
-        </ul>
-        <p>Contact <a href="">leandro@oktopustr369.com</a> via email and get a quote.</p>
-    </li> 
-</ul>
-
---------------------------------------------------------------------------------------------------------------------------------------------------------
-
-<ul>
-    <li>
-        <h4>Roadmap:</h4>
-        <p>
-            The project goals are organized with milestones that have a due date, just like a sprint. Those issues grouped in milestones are done and have their status updated in a kanban board.
-        </p>
-        <ul>
-            <li> 
-            <a href="https://github.com/OktopUSP/oktopus/milestones">Milestones </a>
-            </li>
-            <li> 
-            <a href="https://github.com/orgs/OktopUSP/projects/1/views/2">Kanban Board </a>
-            </li>
-        </ul>
-    </li>
-</ul>
-
---------------------------------------------------------------------------------------------------------------------------------------------------------
-
-<p>Are you going to use our project in your company? would like to talk about TR-369 and IoT management, we're online on <a href="https://join.slack.com/t/oktopustr-369/shared_invite/zt-1znmrbr52-3AXgOlSeQTPQW8_Qhn3C4g">Slack</a>.</p>
-<p>If you are interested in internal information about the team and our intentions, visit our <a href="https://github.com/leandrofars/oktopus/wiki">Wiki</a>. [DEPRECATED]</p>
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
