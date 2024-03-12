@@ -1,4 +1,3 @@
-cmd/mqtt
 .DS_Store
 *.db
 auth.prod.json
@@ -8,3 +7,4 @@ mochi
 *.crt
 *.key
 *.local
+./mqtt
