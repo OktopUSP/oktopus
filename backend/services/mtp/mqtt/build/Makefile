@@ -55,7 +55,7 @@ logs:
 bash:
 	@docker exec -it ${DOCKER_USER}-${DOCKER_APP} ${CONTAINER_SHELL}
 
-release: 
-	@docker pull ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG}
+release: build
+	@docker push ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG}
 	@docker tag ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG} ${DOCKER_USER}/${DOCKER_APP}:latest
 	@docker push ${DOCKER_USER}/${DOCKER_APP}:latest
