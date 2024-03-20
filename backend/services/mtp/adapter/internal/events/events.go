@@ -12,6 +12,8 @@ import (
 
 func StartEventsListener(ctx context.Context, js jetstream.JetStream, h handler.Handler) {
 
+	log.Println("Listening for nats events")
+
 	events := []string{
 		nats.MQTT_STREAM_NAME,
 		nats.WS_STREAM_NAME,
@@ -48,11 +50,11 @@ func StartEventsListener(ctx context.Context, js jetstream.JetStream, h handler.
 
 				switch msgType {
 				case "status":
-					h.HandleDeviceStatus(device, msg.Subject(), data, event, func() { msg.Ack(); log.Println("Acked msg") })
+					h.HandleDeviceStatus(device, msg.Subject(), data, event, func() { msg.Ack() })
 				case "info":
-					h.HandleDeviceInfo(device, msg.Subject(), data, event, func() { msg.Ack(); log.Println("Acked msg") })
+					h.HandleDeviceInfo(device, msg.Subject(), data, event, func() { msg.Ack() })
 				default:
-					//ignoreMsg(msg.Subject(), "status", msg.Data())
+					log.Printf("Unknown message type received, subject: %s", msg.Subject())
 				}
 			}
 		}()

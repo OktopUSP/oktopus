@@ -11,6 +11,7 @@ import (
 	"github.com/OktopUSP/oktopus/backend/services/mtp/adapter/internal/events"
 	"github.com/OktopUSP/oktopus/backend/services/mtp/adapter/internal/events/handler"
 	"github.com/OktopUSP/oktopus/backend/services/mtp/adapter/internal/nats"
+	"github.com/OktopUSP/oktopus/backend/services/mtp/adapter/internal/reqs"
 )
 
 func main() {
@@ -26,6 +27,8 @@ func main() {
 	handler := handler.NewHandler(nc, js, db, c.ControllerId)
 
 	events.StartEventsListener(c.Nats.Ctx, js, handler)
+
+	reqs.StartRequestsListener(c.Nats.Ctx, nc, db)
 
 	<-done
 

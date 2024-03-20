@@ -116,7 +116,6 @@ func (d *Database) RetrieveDevices(filter bson.A) ([]Device, error) {
 
 func (d *Database) RetrieveDevice(sn string) (Device, error) {
 	var result Device
-	//TODO: filter devices by user ownership
 	err := d.devices.FindOne(d.ctx, bson.D{{"sn", sn}}, nil).Decode(&result)
 	if err != nil {
 		log.Println(err)
@@ -131,6 +130,17 @@ func (d *Database) RetrieveDevicesCount(filter bson.M) (int64, error) {
 
 func (d *Database) DeleteDevice() {
 
+}
+
+func (d *Database) DeviceExists(sn string) (bool, error) {
+	_, err := d.RetrieveDevice(sn)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }
 
 func (m MTP) String() string {

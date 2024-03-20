@@ -79,6 +79,7 @@ func loadEnvVariables() {
 	if _, err := os.Stat(LOCAL_ENV); err == nil {
 		_ = godotenv.Overload(LOCAL_ENV)
 		log.Printf("Loaded variables from '%s'", LOCAL_ENV)
+		return
 	}
 
 	if err != nil {

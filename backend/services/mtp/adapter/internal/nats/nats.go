@@ -17,6 +17,8 @@ const (
 	STOMP_STREAM_NAME = "stomp"
 	LORA_STREAM_NAME  = "lora"
 	OPC_STREAM_NAME   = "opc"
+	ADAPTER_SUBJECT   = "adapter" + USP_SUBJECT
+	USP_SUBJECT       = ".usp.v1."
 )
 
 func StartNatsClient(c config.Nats) (jetstream.JetStream, *nats.Conn) {
