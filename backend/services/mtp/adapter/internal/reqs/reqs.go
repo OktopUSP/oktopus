@@ -28,8 +28,7 @@ func StartRequestsListener(ctx context.Context, nc *nats.Conn, db db.Database) {
 
 		deviceInfo, err := db.RetrieveDevice(device)
 		if deviceInfo.SN != "" {
-			body, _ := json.Marshal(deviceInfo)
-			respondMsg(msg.Respond, 200, body)
+			respondMsg(msg.Respond, 200, deviceInfo)
 		} else {
 			if err != nil {
 				if err == mongo.ErrNoDocuments {

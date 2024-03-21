@@ -101,6 +101,21 @@ func (b *Bridge) natsMessageHandler(cm *autopaho.ConnectionManager) {
 				ResponseTopic: "oktopus/usp/v1/controller/" + getDeviceFromSubject(m.Subject),
 			},
 		})
+
+	})
+
+	b.Sub(NATS_MQTT_ADAPTER_SUBJECT_PREFIX+"api", func(m *nats.Msg) {
+
+		log.Printf("Received message on api subject")
+		cm.Publish(b.Ctx, &paho.Publish{
+			QoS:     byte(b.Mqtt.Qos),
+			Topic:   MQTT_TOPIC_PREFIX + "v1/agent/" + getDeviceFromSubject(m.Subject),
+			Payload: m.Data,
+			Properties: &paho.PublishProperties{
+				ResponseTopic: "oktopus/usp/v1/api/" + getDeviceFromSubject(m.Subject),
+			},
+		})
+
 	})
 }
 

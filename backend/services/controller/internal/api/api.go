@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/leandrofars/oktopus/internal/api/cors"
+	"github.com/leandrofars/oktopus/internal/api/middleware"
 	"github.com/leandrofars/oktopus/internal/bridge"
 	"github.com/leandrofars/oktopus/internal/config"
 	"github.com/leandrofars/oktopus/internal/db"
@@ -44,19 +45,19 @@ func NewApi(c config.RestApi, js jetstream.JetStream, nc *nats.Conn, bridge brid
 
 func (a *Api) StartApi() {
 	r := mux.NewRouter()
-	// authentication := r.PathPrefix("/api/auth").Subrouter()
-	// authentication.HandleFunc("/login", a.generateToken).Methods("PUT")
-	// authentication.HandleFunc("/register", a.registerUser).Methods("POST")
-	// authentication.HandleFunc("/admin/register", a.registerAdminUser).Methods("POST")
-	// authentication.HandleFunc("/admin/exists", a.adminUserExists).Methods("GET")
-	// iot := r.PathPrefix("/api/device").Subrouter()
+	authentication := r.PathPrefix("/api/auth").Subrouter()
+	authentication.HandleFunc("/login", a.generateToken).Methods("PUT")
+	authentication.HandleFunc("/register", a.registerUser).Methods("POST")
+	authentication.HandleFunc("/admin/register", a.registerAdminUser).Methods("POST")
+	authentication.HandleFunc("/admin/exists", a.adminUserExists).Methods("GET")
+	iot := r.PathPrefix("/api/device").Subrouter()
 	// iot.HandleFunc("", a.retrieveDevices).Methods("GET")
 	// iot.HandleFunc("/{id}", a.retrieveDevices).Methods("GET")
 	// iot.HandleFunc("/{sn}/get", a.deviceGetMsg).Methods("PUT")
 	// iot.HandleFunc("/{sn}/add", a.deviceCreateMsg).Methods("PUT")
 	// iot.HandleFunc("/{sn}/del", a.deviceDeleteMsg).Methods("PUT")
 	// iot.HandleFunc("/{sn}/set", a.deviceUpdateMsg).Methods("PUT")
-	// iot.HandleFunc("/{sn}/parameters", a.deviceGetSupportedParametersMsg).Methods("PUT")
+	iot.HandleFunc("/{sn}/parameters", a.deviceGetSupportedParametersMsg).Methods("PUT")
 	// iot.HandleFunc("/{sn}/instances", a.deviceGetParameterInstances).Methods("PUT")
 	// iot.HandleFunc("/{sn}/operate", a.deviceOperateMsg).Methods("PUT")
 	// iot.HandleFunc("/{sn}/fw_update", a.deviceFwUpdate).Methods("PUT")
@@ -72,9 +73,9 @@ func (a *Api) StartApi() {
 	users.HandleFunc("", a.retrieveUsers).Methods("GET")
 
 	/* ----- Middleware for requests which requires user to be authenticated ---- */
-	// iot.Use(func(handler http.Handler) http.Handler {
-	// 	return middleware.Middleware(handler)
-	// })
+	iot.Use(func(handler http.Handler) http.Handler {
+		return middleware.Middleware(handler)
+	})
 
 	// mtp.Use(func(handler http.Handler) http.Handler {
 	// 	return middleware.Middleware(handler)

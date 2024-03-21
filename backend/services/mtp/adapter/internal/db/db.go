@@ -37,12 +37,29 @@ func NewDatabase(ctx context.Context, mongoUri string) Database {
 
 	devices := client.Database("adapter").Collection("devices")
 	createIndexes(ctx, devices)
+	resetDeviceStatus(ctx, devices)
 
 	db.devices = devices
 	db.ctx = ctx
 	db.m = &sync.Mutex{}
 
 	return db
+}
+
+func resetDeviceStatus(ctx context.Context, devices *mongo.Collection) {
+	_, err := devices.UpdateMany(ctx, bson.D{{}}, bson.D{
+		{
+			"$set", bson.D{
+				{"mqtt", 0},
+				{"stomp", 0},
+				{"websockets", 0},
+				{"status", 0},
+			},
+		},
+	})
+	if err != nil {
+		log.Fatalln("ERROR to reset device status in database:", err)
+	}
 }
 
 func createIndexes(ctx context.Context, devices *mongo.Collection) {
