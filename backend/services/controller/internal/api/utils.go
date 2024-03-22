@@ -10,6 +10,7 @@ import (
 	local "github.com/leandrofars/oktopus/internal/nats"
 	"github.com/leandrofars/oktopus/internal/utils"
 	"github.com/nats-io/nats.go"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var errInvalidMtp = errors.New("Invalid MTP, valid options are: mqtt, ws, stomp")
@@ -88,5 +89,31 @@ func getDeviceInfo(w http.ResponseWriter, sn string, nc *nats.Conn) (device *ent
 		w,
 		nc,
 	)
-	return &msg.Msg, err
+	if msg != nil {
+		return &msg.Msg, err
+	}
+	return nil, err
+}
+
+func getDeviceCount(w http.ResponseWriter, nc *nats.Conn) (int64, error) {
+	msg, err := bridge.NatsReq[int64](
+		local.NATS_ADAPTER_SUBJECT+"devices.count",
+		[]byte(""),
+		w,
+		nc,
+	)
+	return msg.Msg, err
+}
+
+func getDevices(w http.ResponseWriter, filter primitive.A, nc *nats.Conn) (*[]entity.Device, error) {
+	msg, err := bridge.NatsReq[[]entity.Device](
+		local.NATS_ADAPTER_SUBJECT+"devices.retrieve",
+		utils.Marshall(filter),
+		w,
+		nc,
+	)
+	if msg != nil {
+		return &msg.Msg, err
+	}
+	return nil, err
 }

@@ -95,9 +95,17 @@ func (d *Database) CreateDevice(device Device) error {
 	return err
 }
 func (d *Database) RetrieveDevices(filter bson.A) ([]Device, error) {
-	cursor, err := d.devices.Aggregate(d.ctx, filter)
 
 	var results []Device
+
+	cursor, err := d.devices.Aggregate(d.ctx, filter)
+	if err != nil {
+		return results, err
+	}
+
+	if cursor.Err() != nil {
+		return results, cursor.Err()
+	}
 
 	for cursor.Next(d.ctx) {
 		var device Device

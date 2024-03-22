@@ -12,6 +12,7 @@ import (
 	"github.com/OktopUSP/oktopus/backend/services/mtp/adapter/internal/db"
 	local "github.com/OktopUSP/oktopus/backend/services/mtp/adapter/internal/nats"
 	"github.com/nats-io/nats.go"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -22,6 +23,7 @@ type msgAnswer struct {
 
 func StartRequestsListener(ctx context.Context, nc *nats.Conn, db db.Database) {
 	log.Println("Listening for nats requests")
+
 	nc.Subscribe(local.ADAPTER_SUBJECT+"*.device", func(msg *nats.Msg) {
 		subject := strings.Split(msg.Subject, ".")
 		device := subject[len(subject)-2]
@@ -38,6 +40,30 @@ func StartRequestsListener(ctx context.Context, nc *nats.Conn, db db.Database) {
 				}
 			}
 		}
+	})
+
+	nc.Subscribe(local.ADAPTER_SUBJECT+"devices.count", func(msg *nats.Msg) {
+		count, err := db.RetrieveDevicesCount(bson.M{})
+		if err != nil {
+			respondMsg(msg.Respond, 500, err.Error())
+		}
+		respondMsg(msg.Respond, 200, count)
+	})
+
+	nc.Subscribe(local.ADAPTER_SUBJECT+"devices.retrieve", func(msg *nats.Msg) {
+
+		var filter bson.A
+
+		err := json.Unmarshal(msg.Data, &filter)
+		if err != nil {
+			respondMsg(msg.Respond, 500, err.Error())
+		}
+
+		devicesList, err := db.RetrieveDevices(filter)
+		if err != nil {
+			respondMsg(msg.Respond, 500, err.Error())
+		}
+		respondMsg(msg.Respond, 200, devicesList)
 	})
 }
 
