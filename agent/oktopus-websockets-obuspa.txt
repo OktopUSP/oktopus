@@ -23,7 +23,7 @@ Device.LocalAgent.EndpointID "oktopus-0-ws"
 
 # Controller's websocket server (for agent initiated sessions)
 Device.LocalAgent.Controller.1.EndpointID "oktopusController"
-Device.LocalAgent.Controller.1.MTP.1.WebSocket.Host "host.docker.internal"
+Device.LocalAgent.Controller.1.MTP.1.WebSocket.Host "127.0.0.1"
 Device.LocalAgent.Controller.1.MTP.1.WebSocket.Port "8080"
 Device.LocalAgent.Controller.1.MTP.1.WebSocket.Path "ws/agent"
 Device.LocalAgent.Controller.1.MTP.1.WebSocket.EnableEncryption "false"

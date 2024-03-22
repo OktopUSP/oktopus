@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/OktopUSP/oktopus/backend/services/mtp/ws-adapter/internal/config"
+	"github.com/OktopUSP/oktopus/backend/services/mtp/ws-adapter/internal/usp/usp_msg"
 	"github.com/OktopUSP/oktopus/backend/services/mtp/ws-adapter/internal/usp/usp_record"
 	"github.com/gorilla/websocket"
 	"github.com/nats-io/nats.go"
@@ -22,7 +23,7 @@ import (
 const (
 	NATS_WS_SUBJECT_PREFIX         = "ws.usp.v1."
 	NATS_WS_ADAPTER_SUBJECT_PREFIX = "ws-adapter.usp.v1.*."
-	WS_TOPIC_PREFIX                = "oktopus/usp/"
+	DEVICE_SUBJECT_PREFIX          = "device.usp.v1."
 	WS_CONNECTION_RETRY            = 10 * time.Second
 )
 
@@ -47,7 +48,8 @@ type Bridge struct {
 	Ws             config.Ws
 	NewDeviceQueue map[string]string
 	NewDevQMutex   *sync.Mutex
-	Ctx            context.Context
+
+	Ctx context.Context
 }
 
 func NewBridge(p Publisher, s Subscriber, ctx context.Context, w config.Ws) *Bridge {
@@ -105,22 +107,16 @@ func (b *Bridge) StartBridge() {
 							b.newDeviceMsgHandler(wc, device, wsMsg)
 							continue
 						}
+						log.Println("Handle api request")
+						var msg usp_msg.Msg
+						err = proto.Unmarshal(record.GetNoSessionContext().Payload, &msg)
+						if err != nil {
+							log.Println(err)
+							continue
+						}
+						b.Pub(DEVICE_SUBJECT_PREFIX+device+".api", wsMsg)
+						continue
 					}
-
-					// log.Println("Handle api request")
-					// var msg usp_msg.Msg
-					// err = proto.Unmarshal(record.GetNoSessionContext().Payload, &msg)
-					// if err != nil {
-					// 	log.Println(err)
-					// 	continue
-					// }
-					// if _, ok := w.MsgQueue[msg.Header.MsgId]; ok {
-					// 	//m.QMutex.Lock()
-					// 	w.MsgQueue[msg.Header.MsgId] <- msg
-					// 	//m.QMutex.Unlock()
-					// } else {
-					// 	log.Printf("Message answer to request %s arrived too late", msg.Header.MsgId)
-					// }
 
 				}
 			}(wc)
@@ -144,6 +140,17 @@ func (b *Bridge) subscribe(wc *websocket.Conn) {
 		b.NewDevQMutex.Lock()
 		b.NewDeviceQueue[device] = ""
 		b.NewDevQMutex.Unlock()
+
+		err := wc.WriteMessage(websocket.BinaryMessage, msg.Data)
+		if err != nil {
+			log.Printf("send websocket msg error: %q", err)
+			return
+		}
+	})
+
+	b.Sub(NATS_WS_ADAPTER_SUBJECT_PREFIX+"api", func(msg *nats.Msg) {
+
+		log.Printf("Received message on api subject")
 
 		err := wc.WriteMessage(websocket.BinaryMessage, msg.Data)
 		if err != nil {

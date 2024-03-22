@@ -55,6 +55,7 @@ func StartEventsListener(ctx context.Context, js jetstream.JetStream, h handler.
 					h.HandleDeviceInfo(device, msg.Subject(), data, event, func() { msg.Ack() })
 				default:
 					log.Printf("Unknown message type received, subject: %s", msg.Subject())
+					msg.Ack()
 				}
 			}
 		}()

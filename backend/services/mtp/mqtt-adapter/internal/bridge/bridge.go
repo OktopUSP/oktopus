@@ -21,6 +21,7 @@ const (
 
 const NATS_MQTT_SUBJECT_PREFIX = "mqtt.usp.v1."
 const NATS_MQTT_ADAPTER_SUBJECT_PREFIX = "mqtt-adapter.usp.v1.*."
+const DEVICE_SUBJECT_PREFIX = "device.usp.v1."
 const MQTT_TOPIC_PREFIX = "oktopus/usp/"
 
 type (
@@ -133,7 +134,7 @@ func (b *Bridge) mqttMessageHandler(status, controller, apiMsg chan *paho.Publis
 		case c := <-controller:
 			b.Pub(NATS_MQTT_SUBJECT_PREFIX+getDeviceFromTopic(c.Topic)+".info", c.Payload)
 		case a := <-apiMsg:
-			b.Pub(NATS_MQTT_SUBJECT_PREFIX+getDeviceFromTopic(a.Topic)+".api", a.Payload)
+			b.Pub(DEVICE_SUBJECT_PREFIX+getDeviceFromTopic(a.Topic)+".api", a.Payload)
 		}
 	}
 }
