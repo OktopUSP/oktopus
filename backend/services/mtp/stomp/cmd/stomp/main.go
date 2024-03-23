@@ -17,23 +17,24 @@ type Credentials struct {
 func (c *Credentials) Authenticate(login, passwd string) bool {
 
 	if c.Login == "" && c.Passwd == "" {
-		log.Println("NEW CLIENT AUTH: Server is running with no auth")
 		return true
 	}
 
 	if login != c.Login || passwd != c.Passwd {
-		log.Println("NEW CLIENT AUTH: Invalid Credentials")
+		log.Println("CLIENT AUTH: Invalid Credentials")
 		return false
 	}
-	log.Println("NEW CLIENT AUTH: OK")
 	return true
 }
 
 func main() {
 
 	err := godotenv.Load()
+	if err != nil {
+		log.Println("Error loading godotenv file")
+	}
 	localEnv := ".env.local"
-	if _, err := os.Stat(localEnv); err == nil {
+	if _, err = os.Stat(localEnv); err == nil {
 		_ = godotenv.Overload(localEnv)
 		log.Println("Loaded variables from '.env.local'")
 	} else {

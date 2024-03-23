@@ -51,8 +51,18 @@ func (proc *requestProcessor) Serve(l net.Listener) error {
 			} else {
 				topic := proc.tm.Find(r.Sub.Destination())
 				topic.Subscribe(r.Sub)
-				//TODO: if subscribed to oktopus/v1/agent send online message to ...status topic
-				log.Println(r.Sub.Destination())
+				destination := r.Sub.Destination()
+				if strings.Contains(destination, "agent") {
+					log.Println("Device connected: ", destination)
+					topic := proc.tm.Find("oktopus/usp/v1/status")
+					topic.Enqueue(frame.New(
+						frame.MESSAGE,
+						frame.Destination,
+						"oktopus/usp/v1/status",
+						frame.Message,
+						destination+"|1",
+					))
+				}
 			}
 
 		case client.UnsubscribeOp:
@@ -60,9 +70,23 @@ func (proc *requestProcessor) Serve(l net.Listener) error {
 				queue := proc.qm.Find(r.Sub.Destination())
 				// todo error handling
 				queue.Unsubscribe(r.Sub)
+
 			} else {
-				topic := proc.tm.Find(r.Sub.Destination())
+				destination := r.Sub.Destination()
+				topic := proc.tm.Find(destination)
 				topic.Unsubscribe(r.Sub)
+
+				if strings.Contains(destination, "agent") {
+					log.Println("Device disconnected: ", destination)
+					topic := proc.tm.Find("oktopus/usp/v1/status")
+					topic.Enqueue(frame.New(
+						frame.MESSAGE,
+						frame.Destination,
+						"oktopus/usp/v1/status",
+						frame.Message,
+						destination+"|0",
+					))
+				}
 			}
 
 		case client.EnqueueOp:

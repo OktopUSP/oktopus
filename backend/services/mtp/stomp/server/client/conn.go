@@ -529,9 +529,9 @@ func (c *Conn) handleConnect(f *frame.Frame) error {
 
 	response := frame.New(frame.CONNECTED,
 		frame.Version, string(c.version),
-		frame.Server, "stompd/x.y.z", // TODO: get version
+		frame.Server, "stompd/1.2",
 		frame.HeartBeat, fmt.Sprintf("%d,%d", cy, cx),
-		frame.SubscribeDest, "oktopus/v1/agent/"+endpointId,
+		frame.SubscribeDest, "oktopus/usp/v1/agent/"+endpointId,
 	)
 
 	c.sendImmediately(response)

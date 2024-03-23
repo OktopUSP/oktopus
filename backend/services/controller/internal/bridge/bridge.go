@@ -38,6 +38,10 @@ func NatsUspInteraction(
 
 	var answer []byte
 
+	log.Println("Sending usp message")
+	log.Println("subSubj: ", subSubj)
+	log.Println("pubSubj: ", pubSubj)
+
 	ch := make(chan *nats.Msg, 64)
 	done := make(chan error)
 	_, err := nc.ChanSubscribe(subSubj, ch)
