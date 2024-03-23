@@ -65,6 +65,30 @@ func StartRequestsListener(ctx context.Context, nc *nats.Conn, db db.Database) {
 		}
 		respondMsg(msg.Respond, 200, devicesList)
 	})
+
+	nc.Subscribe(local.ADAPTER_SUBJECT+"devices.class", func(msg *nats.Msg) {
+		productClassCount, err := db.RetrieveProductsClassInfo()
+		if err != nil {
+			respondMsg(msg.Respond, 500, err.Error())
+		}
+		respondMsg(msg.Respond, 200, productClassCount)
+	})
+
+	nc.Subscribe(local.ADAPTER_SUBJECT+"devices.vendors", func(msg *nats.Msg) {
+		productClassCount, err := db.RetrieveVendorsInfo()
+		if err != nil {
+			respondMsg(msg.Respond, 500, err.Error())
+		}
+		respondMsg(msg.Respond, 200, productClassCount)
+	})
+
+	nc.Subscribe(local.ADAPTER_SUBJECT+"devices.status", func(msg *nats.Msg) {
+		productClassCount, err := db.RetrieveStatusInfo()
+		if err != nil {
+			respondMsg(msg.Respond, 500, err.Error())
+		}
+		respondMsg(msg.Respond, 200, productClassCount)
+	})
 }
 
 func respondMsg(respond func(data []byte) error, code int, msgData any) {

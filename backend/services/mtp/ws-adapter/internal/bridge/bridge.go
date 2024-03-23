@@ -5,11 +5,11 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"log"
+	"net"
 	"reflect"
 	"strings"
 	"sync"
 
-	// "reflect"
 	"time"
 
 	"github.com/OktopUSP/oktopus/backend/services/mtp/ws-adapter/internal/config"
@@ -17,12 +17,13 @@ import (
 	"github.com/OktopUSP/oktopus/backend/services/mtp/ws-adapter/internal/usp/usp_record"
 	"github.com/gorilla/websocket"
 	"github.com/nats-io/nats.go"
+	"golang.org/x/sys/unix"
 	"google.golang.org/protobuf/proto"
 )
 
 const (
 	NATS_WS_SUBJECT_PREFIX         = "ws.usp.v1."
-	NATS_WS_ADAPTER_SUBJECT_PREFIX = "ws-adapter.usp.v1.*."
+	NATS_WS_ADAPTER_SUBJECT_PREFIX = "ws-adapter.usp.v1."
 	DEVICE_SUBJECT_PREFIX          = "device.usp.v1."
 	WS_CONNECTION_RETRY            = 10 * time.Second
 )
@@ -31,6 +32,11 @@ const (
 	OFFLINE = iota
 	ONLINE
 )
+
+type msgAnswer struct {
+	Code int
+	Msg  any
+}
 
 type deviceStatus struct {
 	Eid    string
@@ -130,7 +136,7 @@ func (b *Bridge) subscribe(wc *websocket.Conn) {
 	b.NewDeviceQueue = make(map[string]string)
 	b.NewDevQMutex = &sync.Mutex{}
 
-	b.Sub(NATS_WS_ADAPTER_SUBJECT_PREFIX+"info", func(msg *nats.Msg) {
+	b.Sub(NATS_WS_ADAPTER_SUBJECT_PREFIX+"*.info", func(msg *nats.Msg) {
 
 		log.Printf("Received message on info subject")
 
@@ -148,7 +154,7 @@ func (b *Bridge) subscribe(wc *websocket.Conn) {
 		}
 	})
 
-	b.Sub(NATS_WS_ADAPTER_SUBJECT_PREFIX+"api", func(msg *nats.Msg) {
+	b.Sub(NATS_WS_ADAPTER_SUBJECT_PREFIX+"*.api", func(msg *nats.Msg) {
 
 		log.Printf("Received message on api subject")
 
@@ -158,6 +164,43 @@ func (b *Bridge) subscribe(wc *websocket.Conn) {
 			return
 		}
 	})
+
+	b.Sub(NATS_WS_ADAPTER_SUBJECT_PREFIX+"rtt", func(msg *nats.Msg) {
+
+		log.Printf("Received message on rtt subject")
+
+		conn, err := net.Dial("tcp", b.Ws.Addr+b.Ws.Port)
+		if err != nil {
+			respondMsg(msg.Respond, 500, err.Error())
+			return
+		}
+		defer conn.Close()
+
+		info, err := tcpInfo(conn.(*net.TCPConn))
+		if err != nil {
+			respondMsg(msg.Respond, 500, err.Error())
+			return
+		}
+		rtt := time.Duration(info.Rtt) * time.Microsecond
+
+		respondMsg(msg.Respond, 200, rtt/1000)
+
+	})
+}
+
+func respondMsg(respond func(data []byte) error, code int, msgData any) {
+
+	msg, err := json.Marshal(msgAnswer{
+		Code: code,
+		Msg:  msgData,
+	})
+	if err != nil {
+		log.Printf("Failed to marshal message: %q", err)
+		respond([]byte(err.Error()))
+		return
+	}
+
+	respond([]byte(msg))
 }
 
 func (b *Bridge) newDeviceMsgHandler(wc *websocket.Conn, device string, msg []byte) {
@@ -200,4 +243,23 @@ func (b *Bridge) newDialer() websocket.Dialer {
 			InsecureSkipVerify: b.Ws.SkipTlsVerify,
 		},
 	}
+}
+
+func tcpInfo(conn *net.TCPConn) (*unix.TCPInfo, error) {
+	raw, err := conn.SyscallConn()
+	if err != nil {
+		return nil, err
+	}
+
+	var info *unix.TCPInfo
+	ctrlErr := raw.Control(func(fd uintptr) {
+		info, err = unix.GetsockoptTCPInfo(int(fd), unix.IPPROTO_TCP, unix.TCP_INFO)
+	})
+	switch {
+	case ctrlErr != nil:
+		return nil, ctrlErr
+	case err != nil:
+		return nil, err
+	}
+	return info, nil
 }

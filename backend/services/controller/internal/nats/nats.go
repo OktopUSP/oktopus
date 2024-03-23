@@ -16,7 +16,7 @@ const (
 	NATS_MQTT_ADAPTER_SUBJECT_PREFIX = "mqtt-adapter.usp.v1."
 	NATS_ADAPTER_SUBJECT             = "adapter.usp.v1."
 	NATS_WS_SUBJECT_PREFIX           = "ws.usp.v1."
-	NATS_WS_ADAPTER_SUBJECT_PREFIX   = "ws-adapter.usp.v1.*."
+	NATS_WS_ADAPTER_SUBJECT_PREFIX   = "ws-adapter.usp.v1."
 	DEVICE_SUBJECT_PREFIX            = "device.usp.v1."
 )
 

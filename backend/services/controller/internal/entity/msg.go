@@ -1,7 +1,9 @@
 package entity
 
+import "time"
+
 type DataType interface {
-	[]map[string]interface{} | *string | Device | int64 | []Device
+	[]map[string]interface{} | *string | Device | int64 | []Device | []VendorsCount | []ProductClassCount | []StatusCount | time.Duration
 }
 
 type MsgAnswer[T DataType] struct {

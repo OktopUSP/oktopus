@@ -2,7 +2,9 @@ package bridge
 
 import (
 	"context"
+	"encoding/json"
 	"log"
+	"net"
 	"net/url"
 	"strings"
 	"time"
@@ -12,6 +14,7 @@ import (
 	"github.com/eclipse/paho.golang/paho"
 	"github.com/google/uuid"
 	"github.com/nats-io/nats.go"
+	"golang.org/x/sys/unix"
 )
 
 const (
@@ -19,8 +22,13 @@ const (
 	ONLINE
 )
 
+type msgAnswer struct {
+	Code int
+	Msg  any
+}
+
 const NATS_MQTT_SUBJECT_PREFIX = "mqtt.usp.v1."
-const NATS_MQTT_ADAPTER_SUBJECT_PREFIX = "mqtt-adapter.usp.v1.*."
+const NATS_MQTT_ADAPTER_SUBJECT_PREFIX = "mqtt-adapter.usp.v1."
 const DEVICE_SUBJECT_PREFIX = "device.usp.v1."
 const MQTT_TOPIC_PREFIX = "oktopus/usp/"
 
@@ -91,7 +99,7 @@ func (b *Bridge) StartBridge() {
 }
 
 func (b *Bridge) natsMessageHandler(cm *autopaho.ConnectionManager) {
-	b.Sub(NATS_MQTT_ADAPTER_SUBJECT_PREFIX+"info", func(m *nats.Msg) {
+	b.Sub(NATS_MQTT_ADAPTER_SUBJECT_PREFIX+"*.info", func(m *nats.Msg) {
 
 		log.Printf("Received message on info subject")
 		cm.Publish(b.Ctx, &paho.Publish{
@@ -105,7 +113,7 @@ func (b *Bridge) natsMessageHandler(cm *autopaho.ConnectionManager) {
 
 	})
 
-	b.Sub(NATS_MQTT_ADAPTER_SUBJECT_PREFIX+"api", func(m *nats.Msg) {
+	b.Sub(NATS_MQTT_ADAPTER_SUBJECT_PREFIX+"*.api", func(m *nats.Msg) {
 
 		log.Printf("Received message on api subject")
 		cm.Publish(b.Ctx, &paho.Publish{
@@ -117,6 +125,27 @@ func (b *Bridge) natsMessageHandler(cm *autopaho.ConnectionManager) {
 			},
 		})
 
+	})
+
+	b.Sub(NATS_MQTT_ADAPTER_SUBJECT_PREFIX+"rtt", func(msg *nats.Msg) {
+
+		log.Printf("Received message on rtt subject")
+		url := strings.Split(b.Mqtt.Url, "://")[1]
+		conn, err := net.Dial("tcp", url)
+		if err != nil {
+			respondMsg(msg.Respond, 500, err.Error())
+			return
+		}
+		defer conn.Close()
+
+		info, err := tcpInfo(conn.(*net.TCPConn))
+		if err != nil {
+			respondMsg(msg.Respond, 500, err.Error())
+			return
+		}
+		rtt := time.Duration(info.Rtt) * time.Microsecond
+
+		respondMsg(msg.Respond, 200, rtt/1000)
 	})
 }
 
@@ -209,4 +238,38 @@ func buildClientConfig(status, controller, apiMsg chan *paho.Publish, id string)
 	}
 
 	return &clientConfig
+}
+
+func respondMsg(respond func(data []byte) error, code int, msgData any) {
+
+	msg, err := json.Marshal(msgAnswer{
+		Code: code,
+		Msg:  msgData,
+	})
+	if err != nil {
+		log.Printf("Failed to marshal message: %q", err)
+		respond([]byte(err.Error()))
+		return
+	}
+
+	respond([]byte(msg))
+}
+
+func tcpInfo(conn *net.TCPConn) (*unix.TCPInfo, error) {
+	raw, err := conn.SyscallConn()
+	if err != nil {
+		return nil, err
+	}
+
+	var info *unix.TCPInfo
+	ctrlErr := raw.Control(func(fd uintptr) {
+		info, err = unix.GetsockoptTCPInfo(int(fd), unix.IPPROTO_TCP, unix.TCP_INFO)
+	})
+	switch {
+	case ctrlErr != nil:
+		return nil, ctrlErr
+	case err != nil:
+		return nil, err
+	}
+	return info, nil
 }
