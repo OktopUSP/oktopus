@@ -43,7 +43,7 @@ This repository aims to promote the development of a multi-vendor management pla
             Complete solution for production environments, from the server provisionning to devices connection
             </li>
         </ul>
-        <p>Contact <a href="">leandro@oktopustr369.com</a> via email and get a quote.</p>
+        <p>Contact <a href="">leandro@oktopus.app.br</a> via email and get a quote.</p>
     </li> 
 </ul>
 
