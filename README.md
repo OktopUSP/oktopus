@@ -12,11 +12,13 @@ This repository aims to promote the development of a multi-vendor management pla
 
 <ul><li><h4>Sponsors:</h4></li></ul>
 
+<a href="https://www.made4it.com.br/" target="_blank"><img src="https://github.com/OktopUSP/oktopus/assets/83298718/10da316f-e3fd-4e8d-93d3-5868cc2724e3" width="200px"/></a>
+
 <ul><li><h4>Companies that use Oktopus:</h4></li></ul>
 
-<a href="https://www.inango.com/" target="_blank"><img src="https://github.com/OktopUSP/oktopus/assets/83298718/3b3e65d9-33fa-46c4-8b24-f9e2a84a04a6" width="125px"/></a>
+<a href="https://www.inango.com/" target="_blank"><img src="https://github.com/OktopUSP/oktopus/assets/83298718/3b3e65d9-33fa-46c4-8b24-f9e2a84a04a6" width="100px"/></a>
 
-<p>If you'd like to know how to donate above <a href="https://github.com/sponsors/leandrofars">Github Sponsors</a> values, start a partnership or somehow to contribute to the project, email <a href="">leandro@oktopustr369.com</a>, every contribution is welcome, and the resources will help the project to move on. Also, if your company uses this project and you'd like your logo to appear up here, contact us.
+<p>If you'd like to know how to donate above <a href="https://github.com/sponsors/leandrofars">Github Sponsors</a> values, start a partnership or somehow to contribute to the project, email <a href="">leandro@oktopus.app.br</a>, every contribution is welcome, and the resources will help the project to move on. Also, if your company uses this project and you'd like your logo to appear up here, contact us.
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
