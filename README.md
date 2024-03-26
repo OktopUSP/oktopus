@@ -68,45 +68,12 @@ This repository aims to promote the development of a multi-vendor management pla
 </ul>
 <ul>
     <li>
-        <h4>Developer:</h4>
+        <h4>Quick start:</h4>
 Run app using Docker:
 <pre>
 user@user-laptop:~$ cd oktopus/deploy/compose
 user@user-laptop:~/oktopus/deploy/compose$ docker compose up
 </pre>
-    </li>
-    <li>
-Basic manual compilation and run:
-    <ul>
-        <li>
-        <b>Dependencies:</b> Node version: v14.20.0 | Go version: v1.18.1
-        </li>
-        <li>
-        Mqtt broker:
-            <pre>user@user-laptop:~$ cd oktopus/backend/services/mqtt/ && go run cmd/main.go -redis "127.0.0.1:6379"</pre>
-        </li>
-        <li>
-        TR-369 controller:
-            <pre>
-user@user-laptop:~$ cd oktopus/backend/services/controller/ && go run cmd/oktopus/main.go -u root -P root -mongo "mongodb://127.0.0.1:27017"</pre>
-        </li>
-        <li>
-        Socketio server:
-            <pre>
-user@user-laptop:~$ cd oktopus/backend/services/socketio && npm i && npm start</pre>
-        </li>
-        <li>
-        Websockets server:
-            <pre>
-user@user-laptop:~$ cd oktopus/backend/services/ws && go run cmd/main.go</pre>
-        </li>
-        <li>
-        Frontend:
-            <pre>
-user@user-laptop:~$ cd oktopus/frontend && npm i && npm run dev</pre>
-        </li>       
-    </ul>
-
 </li>
     <li>
       <h4>Device test agent (obuspa):</h4>
