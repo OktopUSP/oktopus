@@ -1,23 +1,6 @@
 services:
 
-  controller:
-    image: 'golang:1.21.4'
-    container_name: controlller
-    tty: true
-    stdin_open: true
-    volumes:
-    - ../:/app/oktopus
-    command: bash -c "cd /app/oktopus/backend/services/controller && go run cmd/oktopus/main.go -mongo mongodb://172.16.235.2:27017 -a 172.16.235.4 -p 1883 -ws_addr 172.16.235.8"
-    ports:
-    - 8000:8000
-    depends_on:
-    - mongodb
-    - mqtt
-    - websockets
-    networks:
-      usp_network:
-        ipv4_address: 172.16.235.7
-  
+#/* ----------------------------- Message Broker ----------------------------- */
   nats:
     image: 'nats:latest'
     container_name: nats
@@ -27,66 +10,136 @@ services:
     command: -n oktopus -m 8222 -js
     networks:
       usp_network:
-        ipv4_address: 172.16.235.9
-
-  mongodb:
-    image: mongo
-    container_name: mongodb_usp
-    networks:
-      usp_network:
         ipv4_address: 172.16.235.2
+    profiles: [nats]
+#/* -------------------------------------------------------------------------- */
 
-  redis:
-    image: redis
-    container_name: redis_usp
+#/* ------------------------ API REST / USP Controller ----------------------- */
+  controller:
+    image: 'oktopusp/controller'
+    container_name: controlller
+    ports:
+    - 8000:8000
+    depends_on:
+    - mongo_usp
     networks:
       usp_network:
         ipv4_address: 172.16.235.3
+    profiles: [controller]
+#/* -------------------------------------------------------------------------- */
 
-  mqtt:
-    image: 'golang:1.21.4'
-    container_name: mqtt
-    tty: true
-    stdin_open: true
-    volumes:
-    - ../:/app/oktopus
-    command: bash -c "cd /app/oktopus/backend/services/mqtt/cmd/ && go run main.go -redis 'redis:6379' -info :8081"
+#/* ---------------------------- Databases / Cache --------------------------- */
+  mongo_usp:
+    image: mongo
+    container_name: mongo_usp
     ports:
-    - 1883:1883
-    depends_on:
-      - redis
+      - 27017:27017
     networks:
       usp_network:
         ipv4_address: 172.16.235.4
 
-  websockets:
-    image: 'golang:1.21.6'
+  redis:
+    image: redis
+    container_name: redis_usp
+    ports:
+      - 6379:6379
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.5
+    profiles: [mqtt]
+#/* -------------------------------------------------------------------------- */
+
+#/* ----------------------- Message Transfer Protocols ----------------------- */
+  mqtt:
+    image: 'oktopusp/mqtt'
+    container_name: mqtt
+    ports:
+    - 1883:1883
+    - 8883:8883
+    depends_on:
+      - redis
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.6
+    profiles: [mqtt]
+
+  ws:
+    image: 'oktopusp/ws'
     container_name: websockets
-    tty: true
-    stdin_open: true
-    volumes:
-    - ../:/app/oktopus
-    command: bash -c "cd /app/oktopus/backend/services/ws/ && go run cmd/main.go"
     ports:
     - 8080:8080
     networks:
       usp_network:
+        ipv4_address: 172.16.235.7
+    profiles: [ws]
+  
+  stomp:
+    image: 'oktopusp/stomp'
+    container_name: stomp
+    ports:
+    - 61613:61613
+    networks:
+      usp_network:
         ipv4_address: 172.16.235.8
+    profiles: [stomp]
+#/* -------------------------------------------------------------------------- */
 
+#/* --------------- Message transfer Protocols Adapters to NATS -------------- */
+  mqtt-adapter:
+    image: 'oktopusp/mqtt-adapter'
+    container_name: mqtt-adapter
+    depends_on:
+      - mqtt
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.9
+    profiles: [mqtt]
+    
+
+  ws-adapter:
+    image: 'oktopusp/ws-adapter'
+    container_name: ws-adapter
+    depends_on:
+      - ws
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.10
+    profiles: [ws]
+  
+  stomp-adapter:
+    image: 'oktopusp/stomp-adapter'
+    container_name: stomp-adapter
+    depends_on:
+      - stomp
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.11
+    profiles: [stomp]
+
+  adapter:
+    image: 'oktopusp/adapter'
+    container_name: adapter
+    depends_on:
+      - mongo_usp
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.12
+    profiles: [adapter]
+#/* -------------------------------------------------------------------------- */
+
+#/* ------------- SocketIO Real Time Communication With Frontend ------------- */
   socketio:
-    image: 'node:16.20.2'
+    image: 'oktopusp/adapter'
     container_name: socketio
-    tty: true
-    stdin_open: true
-    volumes:
-    - ../:/app/oktopus
-    command: bash -c "cd /app/oktopus/backend/services/socketio/ && npm i && node server.js"
     ports:
     - 5000:5000
     networks:
       usp_network:
-        ipv4_address: 172.16.235.5
+        ipv4_address: 172.16.235.12
+    profiles: [frontend]
+#/* -------------------------------------------------------------------------- */
 
+#/* -------------------------------- Frontend -------------------------------- */
   frontend:
     image: 'node:16.20.2'
     container_name: frontend
@@ -99,7 +152,21 @@ services:
       - 3000:3000
     networks:
       usp_network:
-        ipv4_address: 172.16.235.6
+        ipv4_address: 172.16.235.13
+    profiles: [frontend]
+#/* -------------------------------------------------------------------------- */
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    ports:
+      - 9443:9443
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.14
+    profiles: [portainer]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
 networks:
    usp_network:

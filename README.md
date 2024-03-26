@@ -72,7 +72,7 @@ This repository aims to promote the development of a multi-vendor management pla
 Run app using Docker:
 <pre>
 user@user-laptop:~$ cd oktopus/deploy/compose
-user@user-laptop:~/oktopus/deploy/compose$ docker compose up
+user@user-laptop:~/oktopus/deploy/compose$ COMPOSE_PROFILES=nats,controller,mqtt,stomp,ws,adapter,frontend,portainer docker compose up -d
 </pre>
 </li>
     <li>

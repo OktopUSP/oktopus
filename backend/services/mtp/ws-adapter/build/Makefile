@@ -1,7 +1,7 @@
 .PHONY: help build push start stop release remove delete run logs bash
 
 DOCKER_USER ?= oktopusp
-DOCKER_APP ?= mqtt
+DOCKER_APP ?= ws-adapter
 DOCKER_TAG ?= $(shell git log --format="%h" -n 1)
 CONTAINER_SHELL ?= /bin/sh
 
@@ -32,7 +32,7 @@ build:
 	@docker build -t ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG} -f Dockerfile ../
 
 run:
-	@docker run -d --name ${DOCKER_USER}-${DOCKER_APP} -p 1883:1883 -p 8883:8883 ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG}
+	@docker run -d --name ${DOCKER_USER}-${DOCKER_APP} ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG}
 
 stop:
 	@docker stop ${DOCKER_USER}-${DOCKER_APP}
