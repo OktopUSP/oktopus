@@ -1,0 +1,193 @@
+services:
+
+#/* ----------------------------- Message Broker ----------------------------- */
+  msg_broker:
+    image: 'nats:latest'
+    container_name: nats
+    ports:
+      - 4222:4222
+      - 8222:8222
+    command: -n oktopus -m 8222 -js
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.2
+    profiles: [nats]
+#/* -------------------------------------------------------------------------- */
+
+#/* ------------------------ API REST / USP Controller ----------------------- */
+  controller:
+    image: 'oktopusp/controller'
+    container_name: controlller
+    ports:
+    - 8000:8000
+    depends_on:
+    - mongo_usp
+    env_file:
+      - .env.controller
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.3
+    profiles: [controller]
+#/* -------------------------------------------------------------------------- */
+
+#/* ---------------------------- Databases / Cache --------------------------- */
+  mongo_usp:
+    image: mongo
+    container_name: mongo_usp
+    ports:
+      - 27017:27017
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.4
+    profiles: [controller,adapter]
+
+  redis:
+    image: redis
+    container_name: redis_usp
+    ports:
+      - 6379:6379
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.5
+    profiles: [mqtt]
+#/* -------------------------------------------------------------------------- */
+
+#/* ----------------------- Message Transfer Protocols ----------------------- */
+  mqtt:
+    image: 'oktopusp/mqtt'
+    container_name: mqtt
+    ports:
+    - 1883:1883
+    - 8883:8883
+    depends_on:
+      - redis
+    env_file:
+      - .env.mqtt
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.6
+    profiles: [mqtt]
+
+  ws:
+    image: 'oktopusp/ws'
+    container_name: websockets
+    ports:
+    - 8080:8080
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.7
+    profiles: [ws]
+  
+  stomp:
+    image: 'oktopusp/stomp'
+    container_name: stomp
+    ports:
+    - 61613:61613
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.8
+    profiles: [stomp]
+#/* -------------------------------------------------------------------------- */
+
+#/* --------------- Message transfer Protocols Adapters to NATS -------------- */
+  mqtt-adapter:
+    image: 'oktopusp/mqtt-adapter'
+    container_name: mqtt-adapter
+    depends_on:
+      - mqtt
+    env_file:
+      - .env.mqtt-adapter
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.9
+    profiles: [mqtt]
+    
+
+  ws-adapter:
+    image: 'oktopusp/ws-adapter'
+    container_name: ws-adapter
+    depends_on:
+      - ws
+    env_file:
+      - .env.ws-adapter
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.10
+    profiles: [ws]
+  
+  stomp-adapter:
+    image: 'oktopusp/stomp-adapter'
+    container_name: stomp-adapter
+    depends_on:
+      - stomp
+    env_file:
+      - .env.stomp-adapter
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.11
+    profiles: [stomp]
+
+  adapter:
+    image: 'oktopusp/adapter'
+    container_name: adapter
+    depends_on:
+      - mongo_usp
+    env_file:
+      - .env.adapter
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.12
+    profiles: [adapter]
+#/* -------------------------------------------------------------------------- */
+
+#/* ------------- SocketIO Real Time Communication With Frontend ------------- */
+  socketio:
+    image: 'oktopusp/socketio'
+    container_name: socketio
+    ports:
+    - 5000:5000
+    env_file:
+      - .env.socketio
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.13
+    profiles: [frontend]
+#/* -------------------------------------------------------------------------- */
+
+#/* -------------------------------- Frontend -------------------------------- */
+  frontend:
+    image: 'node:16.20.2'
+    container_name: frontend
+    tty: true
+    stdin_open: true
+    volumes:
+      - ../../frontend:/app/
+    command: bash -c "cd /app/ && npm i && npm run dev"
+    ports:
+      - 3000:3000
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.14
+    profiles: [frontend]
+#/* -------------------------------------------------------------------------- */
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    ports:
+      - 9443:9443
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.15
+    profiles: [portainer]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+networks:
+   usp_network:
+    driver: bridge
+    ipam: 
+      driver: default
+      config:
+        - subnet: 172.16.235.0/24
+          gateway: 172.16.235.1

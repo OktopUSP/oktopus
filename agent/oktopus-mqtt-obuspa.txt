@@ -31,7 +31,7 @@ Device.LocalAgent.Subscription.1.NotifType Event
 Device.LocalAgent.Subscription.1.ReferenceList Device.Boot!
 Device.LocalAgent.Subscription.1.Persistent true
 
-Device.LocalAgent.MTP.1.MQTT.ResponseTopicConfigured "oktopus/v1/controller"
+Device.LocalAgent.MTP.1.MQTT.ResponseTopicConfigured "oktopus/usp/v1/controller"
 Device.LocalAgent.MTP.1.MQTT.Reference "Device.MQTT.Client.1"
 Device.MQTT.Client.1.BrokerAddress "localhost"
 Device.MQTT.Client.1.ProtocolVersion "5.0"
@@ -59,7 +59,7 @@ Device.LocalAgent.Controller.1.MTP.1.Enable true
 Device.LocalAgent.Controller.1.MTP.1.Protocol "MQTT"
 Device.LocalAgent.Controller.1.EndpointID "oktopusController"
 Device.LocalAgent.Controller.1.MTP.1.MQTT.Reference "Device.MQTT.Client.1"
-Device.LocalAgent.Controller.1.MTP.1.MQTT.Topic "oktopus/v1/controller"
+Device.LocalAgent.Controller.1.MTP.1.MQTT.Topic "oktopus/usp/v1/controller"
 
 
 

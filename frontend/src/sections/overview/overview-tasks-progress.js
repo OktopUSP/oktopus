@@ -13,7 +13,11 @@ import {
 } from '@mui/material';
 
 export const OverviewTasksProgress = (props) => {
-  const { value, sx } = props;
+  var { value, sx } = props;
+  var valueRaw;
+  if( value !== undefined) {
+    valueRaw = value.substring(1);
+  }
 
   return (
     <Card sx={sx}>
@@ -33,7 +37,7 @@ export const OverviewTasksProgress = (props) => {
               Conexão MQTT
             </Typography>
             <Typography variant="h4">
-              {value}ms
+              {valueRaw}
             </Typography>
           </Stack>
           <Avatar
@@ -50,7 +54,7 @@ export const OverviewTasksProgress = (props) => {
         </Stack>
         <Box sx={{ mt: 3 }}>
           <LinearProgress
-            value={value}
+            value={80}
             variant="determinate"
           />
         </Box>
@@ -60,6 +64,6 @@ export const OverviewTasksProgress = (props) => {
 };
 
 OverviewTasksProgress.propTypes = {
-  value: PropTypes.number.isRequired,
+  value: PropTypes.string.isRequired,
   sx: PropTypes.object
 };

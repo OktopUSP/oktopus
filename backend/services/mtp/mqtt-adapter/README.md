@@ -1,0 +1,1 @@
+- acts as a bridge between mqtt server and controller

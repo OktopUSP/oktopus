@@ -3,21 +3,15 @@ package db
 import (
 	"context"
 	"log"
-	"sync"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-//TODO: create another package fo structs and interfaces
-
 type Database struct {
-	client  *mongo.Client
-	devices *mongo.Collection
-	users   *mongo.Collection
-	ctx     context.Context
-	m       *sync.Mutex
+	client *mongo.Client
+	users  *mongo.Collection
+	ctx    context.Context
 }
 
 func NewDatabase(ctx context.Context, mongoUri string) Database {
@@ -38,25 +32,8 @@ func NewDatabase(ctx context.Context, mongoUri string) Database {
 
 	log.Println("Connected to MongoDB-->", mongoUri)
 
-	devices := client.Database("oktopus").Collection("devices")
-	createIndexes(ctx, devices)
-
-	users := client.Database("oktopus").Collection("users")
-	db.devices = devices
-	db.users = users
+	db.users = client.Database("account-mngr").Collection("users")
 	db.ctx = ctx
-	db.m = &sync.Mutex{}
 
 	return db
-}
-
-func createIndexes(ctx context.Context, devices *mongo.Collection) {
-	indexField := bson.M{"sn": 1}
-	_, err := devices.Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys:    indexField,
-		Options: options.Index().SetUnique(true),
-	})
-	if err != nil {
-		log.Println("ERROR to create index in database:", err)
-	}
 }

@@ -3,11 +3,13 @@ package api
 import (
 	"encoding/json"
 	"log"
-	"net"
 	"net/http"
 	"time"
 
-	"github.com/leandrofars/oktopus/internal/db"
+	"github.com/leandrofars/oktopus/internal/bridge"
+	"github.com/leandrofars/oktopus/internal/entity"
+	local "github.com/leandrofars/oktopus/internal/nats"
+	"github.com/leandrofars/oktopus/internal/utils"
 )
 
 type StatusCount struct {
@@ -16,10 +18,11 @@ type StatusCount struct {
 }
 
 type GeneralInfo struct {
-	MqttRtt           time.Duration
-	ProductClassCount []db.ProductClassCount
+	MqttRtt           string
+	WebsocketsRtt     string
+	ProductClassCount []entity.ProductClassCount
 	StatusCount       StatusCount
-	VendorsCount      []db.VendorsCount
+	VendorsCount      []entity.VendorsCount
 }
 
 // TODO: fix when mqtt broker is not set don't break api
@@ -27,56 +30,71 @@ func (a *Api) generalInfo(w http.ResponseWriter, r *http.Request) {
 
 	var result GeneralInfo
 
-	productclasscount, err := a.Db.RetrieveProductsClassInfo()
+	productclasscount, err := bridge.NatsReq[[]entity.ProductClassCount](
+		local.NATS_ADAPTER_SUBJECT+"devices.class",
+		[]byte(""),
+		w,
+		a.nc,
+	)
 	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	vendorcount, err := a.Db.RetrieveVendorsInfo()
+	vendorcount, err := bridge.NatsReq[[]entity.VendorsCount](
+		local.NATS_ADAPTER_SUBJECT+"devices.vendors",
+		[]byte(""),
+		w,
+		a.nc,
+	)
 	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	statuscount, err := a.Db.RetrieveStatusInfo()
+	statusCount, err := bridge.NatsReq[[]entity.StatusCount](
+		local.NATS_ADAPTER_SUBJECT+"devices.status",
+		[]byte(""),
+		w,
+		a.nc,
+	)
 	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	for _, v := range statuscount {
-		switch db.Status(v.Status) {
-		case db.Online:
+	for _, v := range statusCount.Msg {
+		switch entity.Status(v.Status) {
+		case entity.Online:
 			result.StatusCount.Online = v.Count
-		case db.Offline:
+		case entity.Offline:
 			result.StatusCount.Offline = v.Count
 		}
 	}
 
-	result.VendorsCount = vendorcount
-	result.ProductClassCount = productclasscount
+	result.VendorsCount = vendorcount.Msg
+	result.ProductClassCount = productclasscount.Msg
 
-	conn, err := net.Dial("tcp", a.Mqtt.Addr+":"+a.Mqtt.Port)
+	now := time.Now()
+	_, err = bridge.NatsReq[time.Duration](
+		local.NATS_WS_ADAPTER_SUBJECT_PREFIX+"rtt",
+		[]byte(""),
+		w,
+		a.nc,
+	)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode("Error to connect to broker: " + err.Error())
 		return
 	}
-	defer conn.Close()
+	result.WebsocketsRtt = time.Until(now).String()
 
-	info, err := tcpInfo(conn.(*net.TCPConn))
+	now = time.Now()
+	_, err = bridge.NatsReq[time.Duration](
+		local.NATS_MQTT_ADAPTER_SUBJECT_PREFIX+"rtt",
+		[]byte(""),
+		w,
+		a.nc,
+	)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode("Error to get TCP socket info")
 		return
 	}
-	rtt := time.Duration(info.Rtt) * time.Microsecond
-
-	result.MqttRtt = rtt / 1000
+	result.MqttRtt = time.Until(now).String()
 
 	err = json.NewEncoder(w).Encode(result)
 	if err != nil {
@@ -85,51 +103,51 @@ func (a *Api) generalInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Api) vendorsInfo(w http.ResponseWriter, r *http.Request) {
-	vendors, err := a.Db.RetrieveVendorsInfo()
+	vendors, err := bridge.NatsReq[[]entity.VendorsCount](
+		local.NATS_ADAPTER_SUBJECT+"devices.vendors",
+		[]byte(""),
+		w,
+		a.nc,
+	)
 	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	err = json.NewEncoder(w).Encode(vendors)
-	if err != nil {
-		log.Println(err)
-	}
+	utils.MarshallEncoder(vendors.Msg, w)
 }
 
 func (a *Api) productClassInfo(w http.ResponseWriter, r *http.Request) {
-	vendors, err := a.Db.RetrieveProductsClassInfo()
+	vendors, err := bridge.NatsReq[[]entity.ProductClassCount](
+		local.NATS_ADAPTER_SUBJECT+"devices.class",
+		[]byte(""),
+		w,
+		a.nc,
+	)
 	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	err = json.NewEncoder(w).Encode(vendors)
-	if err != nil {
-		log.Println(err)
-	}
+	utils.MarshallEncoder(vendors.Msg, w)
 }
 
 func (a *Api) statusInfo(w http.ResponseWriter, r *http.Request) {
-	vendors, err := a.Db.RetrieveStatusInfo()
+	vendors, err := bridge.NatsReq[[]entity.StatusCount](
+		local.NATS_ADAPTER_SUBJECT+"devices.status",
+		[]byte(""),
+		w,
+		a.nc,
+	)
 	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	var status StatusCount
-	for _, v := range vendors {
-		switch db.Status(v.Status) {
-		case db.Online:
+	for _, v := range vendors.Msg {
+		switch entity.Status(v.Status) {
+		case entity.Online:
 			status.Online = v.Count
-		case db.Offline:
+		case entity.Offline:
 			status.Offline = v.Count
 		}
 	}
 
-	err = json.NewEncoder(w).Encode(status)
-	if err != nil {
-		log.Println(err)
-	}
+	utils.MarshallEncoder(status, w)
 }

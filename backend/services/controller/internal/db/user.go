@@ -1,10 +1,11 @@
 package db
 
 import (
+	"log"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
-	"log"
 )
 
 type User struct {

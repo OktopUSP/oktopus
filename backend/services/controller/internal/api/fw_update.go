@@ -4,83 +4,86 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"time"
 
-	"github.com/gorilla/mux"
-	"github.com/leandrofars/oktopus/internal/db"
-	usp_msg "github.com/leandrofars/oktopus/internal/usp_message"
+	"github.com/leandrofars/oktopus/internal/bridge"
+	local "github.com/leandrofars/oktopus/internal/nats"
+	"github.com/leandrofars/oktopus/internal/usp/usp_msg"
+	"github.com/leandrofars/oktopus/internal/usp/usp_record"
+	"github.com/leandrofars/oktopus/internal/usp/usp_utils"
 	"github.com/leandrofars/oktopus/internal/utils"
 	"google.golang.org/protobuf/proto"
 )
 
-type FwUpdate struct {
+type fwUpdate struct {
 	Url string
 }
 
 func (a *Api) deviceFwUpdate(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	sn := vars["sn"]
-	device := a.deviceExists(sn, w)
-
-	var payload FwUpdate
-
-	err := json.NewDecoder(r.Body).Decode(&payload)
+	sn := getSerialNumberFromRequest(r)
+	mtp, err := getMtpFromRequest(r, w)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("Bad body, err: " + err.Error())
 		return
 	}
 
-	msg := utils.NewGetMsg(usp_msg.Get{
+	if mtp == "" {
+		var ok bool
+		mtp, ok = deviceStateOK(w, a.nc, sn)
+		if !ok {
+			return
+		}
+	}
+
+	var payload fwUpdate
+
+	utils.MarshallDecoder(&payload, r.Body)
+
+	msg := usp_utils.NewGetMsg(usp_msg.Get{
 		ParamPaths: []string{"Device.DeviceInfo.FirmwareImage.*.Status"},
 		MaxDepth:   1,
 	})
-	encodedMsg, err := proto.Marshal(&msg)
+
+	protoMsg, err := proto.Marshal(&msg)
 	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(utils.Marshall(err.Error()))
 		return
 	}
 
-	record := utils.NewUspRecord(encodedMsg, sn)
-	tr369Message, err := proto.Marshal(&record)
+	record := usp_utils.NewUspRecord(protoMsg, sn)
+	protoRecord, err := proto.Marshal(&record)
 	if err != nil {
-		log.Fatalln("Failed to encode tr369 record:", err)
-	}
-
-	a.QMutex.Lock()
-	a.MsgQueue[msg.Header.MsgId] = make(chan usp_msg.Msg)
-	a.QMutex.Unlock()
-	log.Println("Sending Msg:", msg.Header.MsgId)
-
-	if device.Mqtt == db.Online {
-		a.Mqtt.Publish(tr369Message, "oktopus/v1/agent/"+sn, "oktopus/v1/api/"+sn, false)
-	} else if device.Websockets == db.Online {
-		a.Websockets.Publish(tr369Message, "", "", false)
-	} else if device.Stomp == db.Online {
-		//TODO: send stomp message
-	}
-
-	var getMsgAnswer *usp_msg.GetResp
-
-	select {
-	case msg := <-a.MsgQueue[msg.Header.MsgId]:
-		log.Printf("Received Msg: %s", msg.Header.MsgId)
-		a.QMutex.Lock()
-		delete(a.MsgQueue, msg.Header.MsgId)
-		a.QMutex.Unlock()
-		log.Println("requests queue:", a.MsgQueue)
-		getMsgAnswer = msg.Body.GetResponse().GetGetResp()
-	case <-time.After(REQUEST_TIMEOUT):
-		log.Printf("Request %s Timed Out", msg.Header.MsgId)
-		w.WriteHeader(http.StatusGatewayTimeout)
-		a.QMutex.Lock()
-		delete(a.MsgQueue, msg.Header.MsgId)
-		a.QMutex.Unlock()
-		log.Println("requests queue:", a.MsgQueue)
-		json.NewEncoder(w).Encode("Request Timed Out")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(utils.Marshall(err.Error()))
 		return
 	}
+
+	data, err := bridge.NatsUspInteraction(
+		local.DEVICE_SUBJECT_PREFIX+sn+".api",
+		mtp+"-adapter.usp.v1."+sn+".api",
+		protoRecord,
+		w,
+		a.nc,
+	)
+	if err != nil {
+		return
+	}
+
+	var receivedRecord usp_record.Record
+	err = proto.Unmarshal(data, &receivedRecord)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(utils.Marshall(err.Error()))
+		return
+	}
+	var receivedMsg usp_msg.Msg
+	err = proto.Unmarshal(receivedRecord.GetNoSessionContext().Payload, &receivedMsg)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(utils.Marshall(err.Error()))
+		return
+	}
+
+	getMsgAnswer := receivedMsg.Body.GetResponse().GetGetResp()
 
 	partition := checkAvaiableFwPartition(getMsgAnswer.ReqPathResults)
 	if partition == "" {
@@ -108,8 +111,8 @@ func (a *Api) deviceFwUpdate(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	msg = utils.NewOperateMsg(receiver)
-	a.uspCall(msg, sn, w, device)
+	msg = usp_utils.NewOperateMsg(receiver)
+	err = sendUspMsg(msg, sn, w, a.nc, mtp)
 }
 
 // Check which fw image is activated

@@ -10,7 +10,7 @@ import (
 )
 
 func (a *Api) retrieveUsers(w http.ResponseWriter, r *http.Request) {
-	users, err := a.Db.FindAllUsers()
+	users, err := a.db.FindAllUsers()
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -42,7 +42,7 @@ func (a *Api) registerUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Check if user which is requesting creation has the necessary privileges
-	rUser, err := a.Db.FindUser(email)
+	rUser, err := a.db.FindUser(email)
 	if rUser.Level != AdminUser {
 		w.WriteHeader(http.StatusForbidden)
 		return
@@ -62,7 +62,7 @@ func (a *Api) registerUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := a.Db.RegisterUser(user); err != nil {
+	if err := a.db.RegisterUser(user); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -77,7 +77,7 @@ func (a *Api) registerAdminUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users, err := a.Db.FindAllUsers()
+	users, err := a.db.FindAllUsers()
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -98,7 +98,7 @@ func (a *Api) registerAdminUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := a.Db.RegisterUser(user); err != nil {
+	if err := a.db.RegisterUser(user); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -116,7 +116,7 @@ func adminUserExists(users []map[string]interface{}) bool {
 
 func (a *Api) adminUserExists(w http.ResponseWriter, r *http.Request) {
 
-	users, err := a.Db.FindAllUsers()
+	users, err := a.db.FindAllUsers()
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -141,7 +141,7 @@ func (a *Api) generateToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := a.Db.FindUser(tokenReq.Email)
+	user, err := a.db.FindUser(tokenReq.Email)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("Invalid Credentials")
