@@ -1,7 +1,7 @@
 services:
 
 #/* ----------------------------- Message Broker ----------------------------- */
-  nats:
+  msg_broker:
     image: 'nats:latest'
     container_name: nats
     ports:
@@ -22,6 +22,8 @@ services:
     - 8000:8000
     depends_on:
     - mongo_usp
+    env_file:
+      - .env.controller
     networks:
       usp_network:
         ipv4_address: 172.16.235.3
@@ -37,6 +39,7 @@ services:
     networks:
       usp_network:
         ipv4_address: 172.16.235.4
+    profiles: [controller,adapter]
 
   redis:
     image: redis
@@ -58,6 +61,8 @@ services:
     - 8883:8883
     depends_on:
       - redis
+    env_file:
+      - .env.mqtt
     networks:
       usp_network:
         ipv4_address: 172.16.235.6
@@ -90,6 +95,8 @@ services:
     container_name: mqtt-adapter
     depends_on:
       - mqtt
+    env_file:
+      - .env.mqtt-adapter
     networks:
       usp_network:
         ipv4_address: 172.16.235.9
@@ -101,6 +108,8 @@ services:
     container_name: ws-adapter
     depends_on:
       - ws
+    env_file:
+      - .env.ws-adapter
     networks:
       usp_network:
         ipv4_address: 172.16.235.10
@@ -111,6 +120,8 @@ services:
     container_name: stomp-adapter
     depends_on:
       - stomp
+    env_file:
+      - .env.stomp-adapter
     networks:
       usp_network:
         ipv4_address: 172.16.235.11
@@ -121,6 +132,8 @@ services:
     container_name: adapter
     depends_on:
       - mongo_usp
+    env_file:
+      - .env.adapter
     networks:
       usp_network:
         ipv4_address: 172.16.235.12
@@ -129,13 +142,15 @@ services:
 
 #/* ------------- SocketIO Real Time Communication With Frontend ------------- */
   socketio:
-    image: 'oktopusp/adapter'
+    image: 'oktopusp/socketio'
     container_name: socketio
     ports:
     - 5000:5000
+    env_file:
+      - .env.socketio
     networks:
       usp_network:
-        ipv4_address: 172.16.235.12
+        ipv4_address: 172.16.235.13
     profiles: [frontend]
 #/* -------------------------------------------------------------------------- */
 
@@ -146,13 +161,13 @@ services:
     tty: true
     stdin_open: true
     volumes:
-      - ../:/app/oktopus
-    command: bash -c "cd /app/oktopus/frontend && npm i && npm run dev"
+      - ../../frontend:/app/
+    command: bash -c "cd /app/ && npm i && npm run dev"
     ports:
       - 3000:3000
     networks:
       usp_network:
-        ipv4_address: 172.16.235.13
+        ipv4_address: 172.16.235.14
     profiles: [frontend]
 #/* -------------------------------------------------------------------------- */
 
@@ -163,7 +178,7 @@ services:
       - 9443:9443
     networks:
       usp_network:
-        ipv4_address: 172.16.235.14
+        ipv4_address: 172.16.235.15
     profiles: [portainer]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

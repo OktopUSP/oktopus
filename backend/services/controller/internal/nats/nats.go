@@ -11,7 +11,7 @@ import (
 
 const (
 	NATS_ACCOUNT_SUBJ_PREFIX         = "account-manager.v1."
-	NATS_REQUEST_TIMEOUT             = 5 * time.Second
+	NATS_REQUEST_TIMEOUT             = 10 * time.Second
 	NATS_MQTT_SUBJECT_PREFIX         = "mqtt.usp.v1."
 	NATS_MQTT_ADAPTER_SUBJECT_PREFIX = "mqtt-adapter.usp.v1."
 	NATS_ADAPTER_SUBJECT             = "adapter.usp.v1."
