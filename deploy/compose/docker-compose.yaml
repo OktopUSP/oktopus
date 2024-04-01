@@ -156,13 +156,10 @@ services:
 
 #/* -------------------------------- Frontend -------------------------------- */
   frontend:
-    image: 'node:16.20.2'
+    image: 'oktopusp/frontend'
     container_name: frontend
-    tty: true
-    stdin_open: true
-    volumes:
-      - ../../frontend:/app/
-    command: bash -c "cd /app/ && npm i && npm run dev"
+    env_file:
+      - .env.frontend
     ports:
       - 3000:3000
     networks:
