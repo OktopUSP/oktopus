@@ -1,1 +1,0 @@
-obuspa -p -v 4 -r ./oktopus-mqtt-obuspa.txt -i lo
