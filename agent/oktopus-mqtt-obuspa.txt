@@ -17,8 +17,7 @@
 # Adding MQTT parameters to test the datamodel interface
 #
 
-Device.LocalAgent.EndpointID "oktopus-agent-test"
-
+Device.LocalAgent.EndpointID "oktopus-0-mqtt"
 
 ## Adding boot params
 Device.LocalAgent.Controller.1.BootParameter.1.Enable true
