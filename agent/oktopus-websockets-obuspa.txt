@@ -22,17 +22,19 @@
 Device.LocalAgent.EndpointID "oktopus-0-ws"
 
 # Controller's websocket server (for agent initiated sessions)
-Device.LocalAgent.Controller.1.EndpointID "oktopusController"
 Device.LocalAgent.Controller.1.MTP.1.WebSocket.Host "127.0.0.1"
 Device.LocalAgent.Controller.1.MTP.1.WebSocket.Port "8080"
-Device.LocalAgent.Controller.1.MTP.1.WebSocket.Path "ws/agent"
+Device.LocalAgent.Controller.1.MTP.1.WebSocket.Path "/ws/agent"
 Device.LocalAgent.Controller.1.MTP.1.WebSocket.EnableEncryption "false"
+Device.LocalAgent.Controller.1.MTP.1.WebSocket.KeepAliveInterval "30"
+Device.LocalAgent.Controller.1.MTP.1.WebSocket.SessionRetryMinimumWaitInterval "5"
+Device.LocalAgent.Controller.1.MTP.1.WebSocket.SessionRetryMinimumWaitInterval "2000"
 
 # Agent's websocket server (for controller initiated sessions)
-Device.LocalAgent.MTP.1.WebSocket.Port "8080"
-Device.LocalAgent.MTP.1.WebSocket.Path "/usp"
-Device.LocalAgent.MTP.1.WebSocket.EnableEncryption "false"
-
+Device.LocalAgent.MTP.1.WebSocket.Port "5683"
+Device.LocalAgent.MTP.1.WebSocket.Path ""
+Device.LocalAgent.MTP.1.WebSocket.EnableEncryption "true"
+Device.LocalAgent.MTP.1.WebSocket.KeepAliveInterval "30"
 
 #
 # The following parameters may be modified
@@ -40,7 +42,6 @@ Device.LocalAgent.MTP.1.WebSocket.EnableEncryption "false"
 Device.LocalAgent.MTP.1.Alias "cpe-1"
 Device.LocalAgent.MTP.1.Enable "true"
 Device.LocalAgent.MTP.1.Protocol "WebSocket"
-Device.LocalAgent.MTP.1.WebSocket.KeepAliveInterval "30"
 Device.LocalAgent.Controller.1.Alias "cpe-1"
 Device.LocalAgent.Controller.1.Enable "true"
 Device.LocalAgent.Controller.1.AssignedRole "Device.LocalAgent.ControllerTrust.Role.1"
@@ -49,11 +50,9 @@ Device.LocalAgent.Controller.1.PeriodicNotifTime "0001-01-01T00:00:00Z"
 Device.LocalAgent.Controller.1.USPNotifRetryMinimumWaitInterval "5"
 Device.LocalAgent.Controller.1.USPNotifRetryIntervalMultiplier "2000"
 Device.LocalAgent.Controller.1.ControllerCode ""
-Device.LocalAgent.Controller.1.MTP.1.Alias "oktopus0"
+Device.LocalAgent.Controller.1.EndpointID "oktopusController"
+Device.LocalAgent.Controller.1.MTP.1.Alias "cpe-1"
 Device.LocalAgent.Controller.1.MTP.1.Enable "true"
 Device.LocalAgent.Controller.1.MTP.1.Protocol "WebSocket"
-Device.LocalAgent.Controller.1.MTP.1.WebSocket.KeepAliveInterval "30"
-Device.LocalAgent.Controller.1.MTP.1.WebSocket.SessionRetryMinimumWaitInterval "5"
-Device.LocalAgent.Controller.1.MTP.1.WebSocket.SessionRetryIntervalMultiplier "2000"
 Internal.Reboot.Cause "LocalFactoryReset"
 		
