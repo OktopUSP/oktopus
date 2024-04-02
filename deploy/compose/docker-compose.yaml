@@ -179,6 +179,7 @@ services:
     profiles: [portainer]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./portainer_data:/data
 
 networks:
    usp_network:
