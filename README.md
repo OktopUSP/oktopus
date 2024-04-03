@@ -82,7 +82,7 @@ user@user-laptop:~/oktopus/deploy/compose$ COMPOSE_PROFILES=nats,controller,mqtt
         <p>Run MQTT agent:</p>
         <pre>user@user-laptop:~/oktopus$ docker run -d -v $(pwd)/agent/oktopus-mqtt-obuspa.txt:/obuspa/oktopus-mqtt-obuspa.txt --network host --name obuspa-mqtt oktopusp/obuspa:latest obuspa -r /obuspa/oktopus-mqtt-obuspa.txt -p -v4 -i lo</pre>
         <p>Run Websockets agent:</p>
-        <pre>user@user-laptop:~/oktopus$ docker run -d -v $(pwd)/agent/oktopus-websockets-obuspa.txt:/obuspa/oktopus-websockets-obuspa.txt --network host --name obuspa-websockets oktopusp/obuspa:latest obuspa -r /obuspa/oktopus-websockets-obuspa.txt -p -v4 -i lo && docker logs -f obuspa-websockets</pre>
+        <pre>user@user-laptop:~/oktopus$ docker run -d -v $(pwd)/agent/oktopus-websockets-obuspa.txt:/obuspa/oktopus-websockets-obuspa.txt --network host --name obuspa-websockets oktopusp/obuspa:latest obuspa -r /obuspa/oktopus-websockets-obuspa.txt -p -v4 -i lo</pre>
         <img src="https://github.com/OktopUSP/oktopus/assets/83298718/4599d566-eada-4313-8ae1-31dae82391de"/>
         <img src="https://github.com/OktopUSP/oktopus/assets/83298718/501b4ccd-6147-4957-9096-695134e34b5e"/>
     </li>
