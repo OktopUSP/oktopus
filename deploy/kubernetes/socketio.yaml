@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: socketio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: socketio
+  template:
+    metadata:
+      labels:
+        app: socketio
+    spec:
+      containers:
+        - name: socketio
+          image: oktopusp/socketio:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NATS_URL
+              value: "nats:4222"
