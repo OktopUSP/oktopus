@@ -39,6 +39,8 @@ services:
     networks:
       usp_network:
         ipv4_address: 172.16.235.4
+    volumes:
+      - ./mongo_data:/data/db
     profiles: [controller,adapter]
 
   redis:

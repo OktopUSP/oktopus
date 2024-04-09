@@ -1,2 +1,4 @@
 portainer_data/* 
 !portainer_data/.gitkeep
+mongo_data/* 
+!mongo_data/.gitkeep
