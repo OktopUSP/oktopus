@@ -62,9 +62,6 @@ This repository aims to promote the development of a multi-vendor management pla
             <li> 
             <a href="https://documenter.getpostman.com/view/18932104/2s93eR3vQY#10c46751-ede9-4ea1-8ea4-264ebf539e5e">Documentation </a>
             </li>
-            <li> 
-            <a href="https://www.postman.com/docking-module-astronomer-46169629/workspace/oktopus">Workspace of tests and development</a>
-            </li>
         </ul>
     </li>
 </ul>
