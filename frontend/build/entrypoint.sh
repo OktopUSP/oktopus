@@ -10,7 +10,7 @@ function apply_path {
     test -n "$NEXT_PUBLIC_WS_ENPOINT"
 
     find /app/.next \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i "s#REST_API_URL#$NEXT_PUBLIC_REST_ENPOINT#g"
-    find /app/.next \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i "s#WS_URL#$ENVIROMENT_VAR#g"
+    find /app/.next \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i "s#WS_URL#$NEXT_PUBLIC_WS_ENPOINT#g"
 }
 
 apply_path
