@@ -1,4 +1,4 @@
-FROM node:16.20.2-alpine
+FROM node:16.20.2-alpine as builder
 
 WORKDIR /app
 
@@ -6,6 +6,24 @@ COPY ../ .
 
 RUN npm install 
 
-RUN npm run build
+RUN NEXT_PUBLIC_REST_ENPOINT=REST_API_URL NEXT_PUBLIC_WS_ENPOINT=WS_URL npm run build
 
-ENTRYPOINT [ "npm", "run", "start" ]
+RUN ls -la && echo "Listing directory contents done"
+
+FROM node:16.20.2-alpine as runner
+
+WORKDIR /app
+
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/build/entrypoint.sh ./entrypoint.sh
+COPY --from=builder /app/public ./public
+
+
+RUN npm install
+
+RUN chmod 755 entrypoint.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+CMD [ "npm", "run", "start" ]
