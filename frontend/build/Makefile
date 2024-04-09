@@ -27,6 +27,7 @@ help:
 	@echo "logs - show logs of docker container"
 	@echo "bash - access container shell"
 	@echo "release - tag image as latest and push to registry"
+	@echo "tag - tag image as latest"
 
 build:
 	@docker build -t ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG} -f Dockerfile ../
@@ -59,3 +60,6 @@ release: build
 	@docker push ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG}
 	@docker tag ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG} ${DOCKER_USER}/${DOCKER_APP}:latest
 	@docker push ${DOCKER_USER}/${DOCKER_APP}:latest
+
+tag:
+	docker tag ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG} ${DOCKER_USER}/${DOCKER_APP}:latest
