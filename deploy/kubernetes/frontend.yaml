@@ -16,10 +16,16 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: oktopusp/frontend:latest
+          image: rogersacchelli/frontend:latest
           ports: 
             - containerPort: 3000
           imagePullPolicy: IfNotPresent
+          env:
+            - name: NEXT_PUBLIC_REST_ENPOINT
+              value: "tcp://10.10.10.10:1234"
+            - name: NEXT_PUBLIC_WS_ENPOINT
+              value: "tcp://10.11.12.13:2343"
+
 ---
 apiVersion: v1
 kind: Service

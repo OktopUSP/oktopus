@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ws-adapter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ws-adapter
+  template:
+    metadata:
+      labels:
+        app: ws-adapter
+    spec:
+      containers:
+        - name: ws-adapter
+          image: oktopusp/ws-adapter:latest
+          resources:
+            #requests:
+            #  memory: 64Mi
+            #  cpu: 0.1
+            #limits:
+            # memory: 256Mi
+            # cpu: 0.2
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NATS_URL
+              value: "nats://nats:4222"
+            - name: NATS_NAME
+              value: "ws-adapter"
+            - name: NATS_VERIFY_CERTIFICATES
+              value: "0"  # 0 - DEBUG
+            - name: WS_TOKEN
+              value: ""
+            - name: WS_AUTH_ENABLE
+              value: "false"
+            - name: WS_ADDR
+              value: "ws-svc"
+            - name: WS_PORT
+              value: ":8080"
+            - name: WS_ROUTE
+              value: "/ws/controller"
+            - name: WS_TLS_ENABLE
+              value: "false"
+            - name: WS_SKIP_TLS_VERIFY
+              value: "false"
