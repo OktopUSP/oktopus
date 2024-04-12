@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: rogersacchelli/frontend:latest
+          image: oktopusp/frontend:latest
           ports: 
             - containerPort: 3000
           imagePullPolicy: IfNotPresent

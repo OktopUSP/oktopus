@@ -1,4 +1,4 @@
-name: Oktopus MQTT Brocker
+name: Oktopus MQTT Broker
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -36,8 +36,8 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: ../
-          file: ./backend/services/mtp/mqtt/build/Dockerfile
+          context: ./backend/services/mtp/mqtt/
+          file: ./build/Dockerfile
           platforms: linux/amd64
           push: true
           tags: rogersacchelli/mqtt:latest
