@@ -22,9 +22,9 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: NEXT_PUBLIC_REST_ENPOINT
-              value: "tcp://10.10.10.10:1234"
+              value: "192.168.1.130:30003"
             - name: NEXT_PUBLIC_WS_ENPOINT
-              value: "tcp://10.11.12.13:2343"
+              value: "192.168.1.130:30002"
 
 ---
 apiVersion: v1
