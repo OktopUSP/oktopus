@@ -4,25 +4,17 @@ import (
 	"log"
 	"time"
 
-	"github.com/leandrofars/oktopus/internal/config"
+	"github.com/OktopUSP/oktopus/ws/internal/config"
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
 )
 
 const (
-	NATS_ACCOUNT_SUBJ_PREFIX         = "account-manager.v1."
-	NATS_REQUEST_TIMEOUT             = 10 * time.Second
-	NATS_MQTT_SUBJECT_PREFIX         = "mqtt.usp.v1."
-	NATS_MQTT_ADAPTER_SUBJECT_PREFIX = "mqtt-adapter.usp.v1."
-	NATS_ADAPTER_SUBJECT             = "adapter.usp.v1."
-	NATS_WS_SUBJECT_PREFIX           = "ws.usp.v1."
-	NATS_WS_ADAPTER_SUBJECT_PREFIX   = "ws-adapter.usp.v1."
-	DEVICE_SUBJECT_PREFIX            = "device.usp.v1."
-	BUCKET_NAME                      = "devices-auth"
-	BUCKET_DESCRIPTION               = "Devices authentication"
+	BUCKET_NAME        = "devices-auth"
+	BUCKET_DESCRIPTION = "Devices authentication"
 )
 
-func StartNatsClient(c config.Nats) (jetstream.JetStream, *nats.Conn, jetstream.KeyValue) {
+func StartNatsClient(c config.Nats) (*nats.Conn, jetstream.KeyValue) {
 
 	var (
 		nc  *nats.Conn
@@ -56,7 +48,7 @@ func StartNatsClient(c config.Nats) (jetstream.JetStream, *nats.Conn, jetstream.
 		log.Fatalf("Failed to create KeyValue store: %v", err)
 	}
 
-	return js, nc, kv
+	return nc, kv
 }
 
 func defineOptions(c config.Nats) []nats.Option {

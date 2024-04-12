@@ -22,6 +22,7 @@ type Api struct {
 	nc     *nats.Conn
 	bridge bridge.Bridge
 	db     db.Database
+	kv     jetstream.KeyValue
 	ctx    context.Context
 }
 
@@ -32,7 +33,7 @@ const (
 	AdminUser
 )
 
-func NewApi(c config.RestApi, js jetstream.JetStream, nc *nats.Conn, bridge bridge.Bridge, d db.Database) Api {
+func NewApi(c config.RestApi, js jetstream.JetStream, nc *nats.Conn, bridge bridge.Bridge, d db.Database, kv jetstream.KeyValue) Api {
 	return Api{
 		port:   c.Port,
 		js:     js,
@@ -40,6 +41,7 @@ func NewApi(c config.RestApi, js jetstream.JetStream, nc *nats.Conn, bridge brid
 		ctx:    c.Ctx,
 		bridge: bridge,
 		db:     d,
+		kv:     kv,
 	}
 }
 
@@ -51,6 +53,7 @@ func (a *Api) StartApi() {
 	authentication.HandleFunc("/admin/register", a.registerAdminUser).Methods("POST")
 	authentication.HandleFunc("/admin/exists", a.adminUserExists).Methods("GET")
 	iot := r.PathPrefix("/api/device").Subrouter()
+	iot.HandleFunc("/auth", a.deviceAuth).Methods("GET", "PUT", "DELETE")
 	iot.HandleFunc("", a.retrieveDevices).Methods("GET")
 	iot.HandleFunc("/{id}", a.retrieveDevices).Methods("GET")
 	iot.HandleFunc("/{sn}/{mtp}/get", a.deviceGetMsg).Methods("PUT")
@@ -76,10 +79,6 @@ func (a *Api) StartApi() {
 	iot.Use(func(handler http.Handler) http.Handler {
 		return middleware.Middleware(handler)
 	})
-
-	// mtp.Use(func(handler http.Handler) http.Handler {
-	// 	return middleware.Middleware(handler)
-	// })
 
 	dash.Use(func(handler http.Handler) http.Handler {
 		return middleware.Middleware(handler)

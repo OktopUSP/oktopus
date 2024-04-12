@@ -2,6 +2,7 @@
 package config
 
 import (
+	"context"
 	"flag"
 	"log"
 	"os"
@@ -13,9 +14,16 @@ import (
 type Config struct {
 	Port          string // server port: e.g. ":8080"
 	Auth          bool   // server auth enable/disable
-	Token         string // controller auth token
 	ControllerEID string // controller endpoint id
 	Tls           bool   // enable/diable websockets server tls
+	Nats          Nats
+}
+
+type Nats struct {
+	Url                string
+	Name               string
+	VerifyCertificates bool
+	Ctx                context.Context
 }
 
 func NewConfig() Config {
@@ -33,8 +41,10 @@ func NewConfig() Config {
 	*/
 
 	/* ------------------------------ define flags ------------------------------ */
+	natsUrl := flag.String("nats_url", lookupEnvOrString("NATS_URL", "nats://localhost:4222"), "url for nats server")
+	natsName := flag.String("nats_name", lookupEnvOrString("NATS_NAME", "ws-adapter"), "name for nats client")
+	natsVerifyCertificates := flag.Bool("nats_verify_certificates", lookupEnvOrBool("NATS_VERIFY_CERTIFICATES", false), "verify validity of certificates from nats server")
 	flPort := flag.String("port", lookupEnvOrString("SERVER_PORT", ":8080"), "Server port")
-	flToken := flag.String("token", lookupEnvOrString("SERVER_AUTH_TOKEN", ""), "Controller auth token")
 	flAuth := flag.Bool("auth", lookupEnvOrBool("SERVER_AUTH_ENABLE", false), "Server auth enable/disable")
 	flControllerEid := flag.String("controller-eid", lookupEnvOrString("CONTROLLER_EID", "oktopusController"), "Controller eid")
 	flTls := flag.Bool("tls", lookupEnvOrBool("SERVER_TLS_ENABLE", false), "Enable/diable websockets server tls")
@@ -47,12 +57,19 @@ func NewConfig() Config {
 		os.Exit(0)
 	}
 
+	ctx := context.TODO()
+
 	return Config{
 		Port:          *flPort,
-		Token:         *flToken,
 		Auth:          *flAuth,
 		ControllerEID: *flControllerEid,
 		Tls:           *flTls,
+		Nats: Nats{
+			Url:                *natsUrl,
+			Name:               *natsName,
+			VerifyCertificates: *natsVerifyCertificates,
+			Ctx:                ctx,
+		},
 	}
 }
 

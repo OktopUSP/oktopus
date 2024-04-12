@@ -24,10 +24,15 @@ type Mongo struct {
 	Ctx context.Context
 }
 
+type Controller struct {
+	ControllerId     string
+	ControllerPasswd string
+}
+
 type Config struct {
-	Nats         Nats
-	Mongo        Mongo
-	ControllerId string
+	Nats       Nats
+	Mongo      Mongo
+	Controller Controller
 }
 
 func NewConfig() *Config {
@@ -40,6 +45,7 @@ func NewConfig() *Config {
 	natsVerifyCertificates := flag.Bool("nats_verify_certificates", lookupEnvOrBool("NATS_VERIFY_CERTIFICATES", false), "verify validity of certificates from nats server")
 	mongoUri := flag.String("mongo_uri", lookupEnvOrString("MONGO_URI", "mongodb://localhost:27017"), "uri for mongodb server")
 	controllerId := flag.String("controller_id", lookupEnvOrString("CONTROLLER_ID", "oktopusController"), "usp controller endpoint id")
+	controllerPassword := flag.String("controller_passwd", lookupEnvOrString("CONTROLLER_PASSWORD", ""), "usp controller endpoint password to connect to")
 	flHelp := flag.Bool("help", false, "Help")
 
 	/*
@@ -69,7 +75,10 @@ func NewConfig() *Config {
 			Uri: *mongoUri,
 			Ctx: ctx,
 		},
-		ControllerId: *controllerId,
+		Controller: Controller{
+			ControllerId:     *controllerId,
+			ControllerPasswd: *controllerPassword,
+		},
 	}
 }
 

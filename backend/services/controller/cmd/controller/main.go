@@ -20,13 +20,13 @@ func main() {
 
 	c := config.NewConfig()
 
-	js, nc := nats.StartNatsClient(c.Nats)
+	js, nc, kv := nats.StartNatsClient(c.Nats)
 
 	bridge := bridge.NewBridge(js, nc)
 
 	db := db.NewDatabase(c.Mongo.Ctx, c.Mongo.Uri)
 
-	api := api.NewApi(c.RestApi, js, nc, bridge, db)
+	api := api.NewApi(c.RestApi, js, nc, bridge, db, kv)
 	api.StartApi()
 
 	<-done

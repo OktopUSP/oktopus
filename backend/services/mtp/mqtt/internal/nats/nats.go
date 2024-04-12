@@ -1,10 +1,10 @@
 package nats
 
 import (
+	"broker/internal/config"
 	"log"
 	"time"
 
-	"github.com/leandrofars/oktopus/internal/config"
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
 )

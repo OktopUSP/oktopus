@@ -12,16 +12,18 @@ import (
 )
 
 const (
-	MQTT_STREAM_NAME  = "mqtt"
-	WS_STREAM_NAME    = "ws"
-	STOMP_STREAM_NAME = "stomp"
-	LORA_STREAM_NAME  = "lora"
-	OPC_STREAM_NAME   = "opc"
-	ADAPTER_SUBJECT   = "adapter" + USP_SUBJECT
-	USP_SUBJECT       = ".usp.v1."
+	MQTT_STREAM_NAME   = "mqtt"
+	WS_STREAM_NAME     = "ws"
+	STOMP_STREAM_NAME  = "stomp"
+	LORA_STREAM_NAME   = "lora"
+	OPC_STREAM_NAME    = "opc"
+	ADAPTER_SUBJECT    = "adapter" + USP_SUBJECT
+	USP_SUBJECT        = ".usp.v1."
+	BUCKET_NAME        = "devices-auth"
+	BUCKET_DESCRIPTION = "Devices authentication"
 )
 
-func StartNatsClient(c config.Nats) (jetstream.JetStream, *nats.Conn) {
+func StartNatsClient(c config.Nats, controller config.Controller) (jetstream.JetStream, *nats.Conn) {
 
 	var (
 		nc  *nats.Conn
@@ -59,7 +61,24 @@ func StartNatsClient(c config.Nats) (jetstream.JetStream, *nats.Conn) {
 		log.Fatalf("Failed to create Consumer: %v", err)
 	}
 
+	createKeyValueStores(c.Ctx, js, controller)
+
 	return js, nc
+}
+
+func createKeyValueStores(ctx context.Context, js jetstream.JetStream, control config.Controller) {
+	kv, err := js.CreateOrUpdateKeyValue(ctx, jetstream.KeyValueConfig{
+		Bucket:      BUCKET_NAME,
+		Description: BUCKET_DESCRIPTION,
+	})
+	if err != nil {
+		log.Fatalf("Failed to create KeyValue store: %v", err)
+	}
+
+	_, err = kv.PutString(ctx, control.ControllerId, control.ControllerPasswd)
+	if err != nil {
+		log.Printf("Failed to create KeyValue store: %v", err)
+	}
 }
 
 func createStreams(ctx context.Context, js jetstream.JetStream, streams []string) error {

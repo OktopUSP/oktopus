@@ -7,7 +7,9 @@ import (
 	"time"
 
 	"github.com/OktopUSP/oktopus/ws/internal/usp_record"
+	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
+	"github.com/nats-io/nats.go/jetstream"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -148,10 +150,26 @@ func (c *Client) writePump() {
 }
 
 // Handle USP Controller events
-func ServeController(w http.ResponseWriter, r *http.Request, token, cEID string, authEnable bool) {
+func ServeController(
+	w http.ResponseWriter,
+	r *http.Request,
+	cEID string,
+	authEnable bool,
+	kv jetstream.KeyValue,
+) {
 	if authEnable {
+		entry, err := kv.Get(r.Context(), cEID)
+		if err != nil {
+			if err == jetstream.ErrKeyNotFound {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			log.Println("Nats kv error:", err)
+			w.Write([]byte("Nats kv error:" + err.Error()))
+			return
+		}
 		recv_token := r.URL.Query().Get("token")
-		if recv_token != token {
+		if recv_token != string(entry.Value()) {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write([]byte("Unauthorized"))
 			return
@@ -172,7 +190,13 @@ func ServeController(w http.ResponseWriter, r *http.Request, token, cEID string,
 }
 
 // Handle USP Agent events, cEID = controller endpoint id
-func ServeAgent(w http.ResponseWriter, r *http.Request, cEID string) {
+func ServeAgent(
+	w http.ResponseWriter,
+	r *http.Request,
+	cEID string,
+	kv jetstream.KeyValue,
+	authEnable bool,
+) {
 
 	header := http.Header{
 		"Sec-Websocket-Protocol": {uspVersion},
@@ -185,6 +209,24 @@ func ServeAgent(w http.ResponseWriter, r *http.Request, cEID string) {
 		log.Println("Device id not found")
 		w.Write([]byte("Device id not found"))
 		return
+	}
+
+	if authEnable {
+		entry, err := kv.Get(r.Context(), deviceid)
+		if err != nil {
+			if err == jetstream.ErrKeyNotFound {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			log.Println("Nats kv error:", err)
+			w.Write([]byte("Nats kv error:" + err.Error()))
+			return
+		}
+
+		if mux.Vars(r)["passwd"] != string(entry.Value()) {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 	}
 
 	conn, err := upgrader.Upgrade(w, r, header)

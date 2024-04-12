@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/leandrofars/oktopus/internal/utils"
+	"github.com/nats-io/nats.go/jetstream"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -100,5 +102,107 @@ func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		log.Println(err)
+	}
+}
+
+type DeviceAuth struct {
+	User     string `json:"id"`
+	Password string `json:"password"`
+}
+
+func (a *Api) deviceAuth(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+
+		id := r.URL.Query().Get("id")
+		if id != "" {
+			entry, err := a.kv.Get(r.Context(), id)
+			if err != nil {
+				if err == jetstream.ErrKeyNotFound {
+					w.WriteHeader(http.StatusNotFound)
+					return
+				}
+				w.WriteHeader(http.StatusInternalServerError)
+				utils.MarshallEncoder(err, w)
+				return
+			}
+			utils.MarshallEncoder(map[string]string{
+				id: string(entry.Value()),
+			}, w)
+			return
+		}
+
+		entries, err := a.kv.ListKeys(r.Context(), jetstream.IgnoreDeletes())
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			utils.MarshallEncoder(err, w)
+			return
+		}
+
+		listOfKeys := make(map[string]string)
+
+		keys := entries.Keys()
+		for key := range keys {
+			entry, err := a.kv.Get(r.Context(), key)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				utils.MarshallEncoder(err, w)
+				return
+			}
+
+			/*listOfKeys = append(listOfKeys, map[string]string{
+				key: string(entry.Value()),
+			})*/
+			listOfKeys[key] = string(entry.Value())
+		}
+
+		utils.MarshallEncoder(listOfKeys, w)
+
+	} else if r.Method == http.MethodDelete {
+
+		id := r.URL.Query().Get("id")
+		if id != "" {
+			err := a.kv.Purge(r.Context(), id)
+			if err != nil {
+				if err == jetstream.ErrKeyNotFound {
+					w.WriteHeader(http.StatusNotFound)
+					return
+				}
+				w.WriteHeader(http.StatusInternalServerError)
+				utils.MarshallEncoder(err, w)
+				return
+			}
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		utils.MarshallEncoder("No id provided", w)
+
+	} else if r.Method == http.MethodPut {
+
+		var deviceAuth DeviceAuth
+
+		err := utils.MarshallDecoder(&deviceAuth, r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			utils.MarshallEncoder(err, w)
+			return
+		}
+
+		if deviceAuth.User != "" {
+			_, err := a.kv.PutString(r.Context(), deviceAuth.User, deviceAuth.Password)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				utils.MarshallEncoder(err, w)
+				return
+			}
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		utils.MarshallEncoder("device must have a user", w)
+
+	} else {
+		log.Println("Unknown method used in device auth api")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
 	}
 }

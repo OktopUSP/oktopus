@@ -7,6 +7,7 @@ import (
 	"syscall"
 
 	"github.com/OktopUSP/oktopus/ws/internal/config"
+	"github.com/OktopUSP/oktopus/ws/internal/nats"
 	"github.com/OktopUSP/oktopus/ws/internal/ws"
 )
 
@@ -19,7 +20,9 @@ func main() {
 	// Locks app running until it receives a stop command as Ctrl+C.
 	signal.Notify(done, syscall.SIGINT)
 
-	ws.StartNewServer(conf)
+	_, kv := nats.StartNatsClient(conf.Nats)
+	
+	ws.StartNewServer(conf, kv)
 
 	<-done
 
