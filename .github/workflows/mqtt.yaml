@@ -32,7 +32,7 @@ jobs:
 
       - 
         name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/mqtt:latest -f backend/services/mtp/mqtt/build/Dockerfile .
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/mqtt:latest -f backend/services/mtp/mqtt/build/Dockerfile backend/services/mtp/mqtt
       - 
         name: Push Docker image to Docker Hub
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/mqtt:latest
