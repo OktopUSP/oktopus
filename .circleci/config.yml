@@ -13,10 +13,10 @@ jobs:
           name: Build and Push application Docker image
           command: |
             cd build && make release
-# workflows:
-#   build_and_deploy:
-#     jobs:
-#       - release:
-#           filters:
-#             branches:
-#               only: main
+workflows:
+  build_and_deploy:
+    jobs:
+      - release:
+          filters:
+            branches:
+              only: dev
