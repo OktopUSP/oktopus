@@ -20,4 +20,4 @@ workflows:
       - release:
           filters:
             branches:
-              only: dev
+              only: main
