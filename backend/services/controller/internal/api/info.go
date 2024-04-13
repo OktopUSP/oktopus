@@ -73,28 +73,24 @@ func (a *Api) generalInfo(w http.ResponseWriter, r *http.Request) {
 	result.ProductClassCount = productclasscount.Msg
 
 	now := time.Now()
-	_, err = bridge.NatsReq[time.Duration](
+	_, err = bridge.NatsReqWithoutHttpSet[time.Duration](
 		local.NATS_WS_ADAPTER_SUBJECT_PREFIX+"rtt",
 		[]byte(""),
-		w,
 		a.nc,
 	)
-	if err != nil {
-		return
+	if err == nil {
+		result.WebsocketsRtt = time.Until(now).String()
 	}
-	result.WebsocketsRtt = time.Until(now).String()
 
 	now = time.Now()
-	_, err = bridge.NatsReq[time.Duration](
+	_, err = bridge.NatsReqWithoutHttpSet[time.Duration](
 		local.NATS_MQTT_ADAPTER_SUBJECT_PREFIX+"rtt",
 		[]byte(""),
-		w,
 		a.nc,
 	)
-	if err != nil {
-		return
+	if err == nil {
+		result.MqttRtt = time.Until(now).String()
 	}
-	result.MqttRtt = time.Until(now).String()
 
 	err = json.NewEncoder(w).Encode(result)
 	if err != nil {

@@ -172,3 +172,35 @@ func NatsReq[T entity.DataType](
 
 	return answer, nil
 }
+
+func NatsReqWithoutHttpSet[T entity.DataType](
+	subj string,
+	body []byte,
+	nc *nats.Conn,
+) (*entity.MsgAnswer[T], error) {
+
+	var answer *entity.MsgAnswer[T]
+
+	msg, err := nc.Request(subj, body, local.NATS_REQUEST_TIMEOUT)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	err = json.Unmarshal(msg.Data, &answer)
+	if err != nil {
+
+		var errMsg *entity.MsgAnswer[*string]
+		err = json.Unmarshal(msg.Data, &errMsg)
+
+		if err != nil {
+			log.Println("Bad answer message formatting: ", err.Error())
+			return nil, err
+		}
+
+		log.Printf("Error message received, msg: %s, code: %d", *errMsg.Msg, errMsg.Code)
+		return nil, errNatsMsgReceivedWithErrorData
+	}
+
+	return answer, nil
+}
