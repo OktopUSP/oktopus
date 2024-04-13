@@ -1,59 +1,22 @@
 version: 2.1
-executors:
-  nodejs:
-    docker:
-      - image: cimg/node:18.17.1
-  golang:
-    docker:
-      - image: cimg/go:1.20.7
-
 jobs:
-
-  build_and_deploy_controller:
-    executor: golang
+  release:
+    docker:
+      - image: cimg/base:2022.09
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
     steps:
       - checkout
+      - setup_remote_docker
       - run:
-          name: Build and Deploy Controller
+          name: Build and Push application Docker image
           command: |
-            cd backend/services/controller && go build -o controller cmd/oktopus/main.go
-            scp -o StrictHostKeyChecking=no controller $SSH_USER@$SSH_HOST:/home/$SSH_USER
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "sudo mv controller /usr/bin/ && sudo systemctl restart controller"
-  
-  build_and_deploy_mochi:
-    executor: golang
-    steps:
-      - checkout
-      - run:
-          name: Build and Deploy Mochi
-          command: |
-            cd backend/services/mochi/ && go build -o mochi cmd/main.go
-            scp -o StrictHostKeyChecking=no mochi $SSH_USER@$SSH_HOST:/home/$SSH_USER
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "sudo mv mochi /usr/bin/ && sudo systemctl restart mochi"
-
-  build_and_deploy_frontend:
-    executor: nodejs
-    steps:
-      - checkout
-      - run:
-          name: Build and Deploy Frontend
-          command: |
-            cd frontend && npm i && npm run build
-            scp -o StrictHostKeyChecking=no -r .next/ $SSH_USER@$SSH_HOST:/home/$SSH_USER/oktopus/frontend
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "pm2 restart oktopus"
-
-workflows:
-  build_and_deploy:
-    jobs:
-      - build_and_deploy_controller:
-          filters:
-            branches:
-              only: main
-      - build_and_deploy_mochi:
-          filters:
-            branches:
-              only: main
-      - build_and_deploy_frontend:
-          filters:
-            branches:
-              only: main
+            cd build && make release
+# workflows:
+#   build_and_deploy:
+#     jobs:
+#       - release:
+#           filters:
+#             branches:
+#               only: main
