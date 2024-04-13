@@ -12,9 +12,10 @@ jobs:
       - run:
           name: Build and Push application Docker image
           command: |
+            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
             cd build && make release
 workflows:
-  build_and_deploy:
+  release:
     jobs:
       - release:
           filters:
