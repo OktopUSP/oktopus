@@ -1,10 +1,10 @@
 package mqtt
 
 import (
+	"broker/internal/config"
 	"crypto/tls"
 	"io/ioutil"
 	"log"
-	"os"
 
 	rv8 "github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
@@ -20,13 +20,14 @@ var (
 )
 
 type Mqtt struct {
-	Port      string
-	Tls       bool
-	Fullchain string
-	Privkey   string
-	AuthFile  string
-	Redis     Redis
-	LogLevel  int
+	Port       string
+	Tls        bool
+	Fullchain  string
+	Privkey    string
+	Redis      Redis
+	LogLevel   int
+	Nats       config.Nats
+	AuthEnable bool
 }
 
 type Redis struct {
@@ -38,7 +39,7 @@ type Redis struct {
 func (m *Mqtt) Start(mqttServer *mqtt.Server) {
 
 	defineSeverLog(mqttServer, m.LogLevel)
-	defineServerAuth(mqttServer, m.AuthFile)
+	defineServerAuth(mqttServer, m.Nats, m.AuthEnable)
 
 	server = mqttServer
 
@@ -112,15 +113,9 @@ func defineServerTls(fullchain, privkey string) *listeners.Config {
 	return nil
 }
 
-func defineServerAuth(server *mqtt.Server, authFile string) {
-	if authFile != "" {
-		data, err := os.ReadFile(authFile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		err = server.AddHook(new(auth.Hook), &auth.Options{
-			Data: data,
-		})
+func defineServerAuth(server *mqtt.Server, natsConfig config.Nats, authEnable bool) {
+	if authEnable {
+		err := server.AddHook(new(NatsAuthHook), natsConfig)
 		if err != nil {
 			log.Fatal(err)
 		}

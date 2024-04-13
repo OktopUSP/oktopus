@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"flag"
 	"log"
 	"os"
@@ -16,7 +17,7 @@ type Config struct {
 	Tls           bool
 	Fullchain     string
 	Privkey       string
-	AuthFile      string
+	AuthEnable    bool
 	RedisEnable   bool
 	RedisAddr     string
 	RedisPassword string
@@ -25,9 +26,15 @@ type Config struct {
 	HttpEnable    bool
 	HttpPort      string
 	LogLevel      int
+	Nats          Nats
 }
 
-//TODO: debug websocket and http listeners
+type Nats struct {
+	Url                string
+	Name               string
+	VerifyCertificates bool
+	Ctx                context.Context
+}
 
 func NewConfig() Config {
 
@@ -44,15 +51,18 @@ func NewConfig() Config {
 	tls := flag.Bool("mqtt_tls", lookupEnvOrBool("MQTT_TLS", false), "enable/disable TLS")
 	fullchain := flag.String("full_chain_path", lookupEnvOrString("FULL_CHAIN_PATH", ""), "path to fullchain.pem certificate")
 	privkey := flag.String("private_key_path", lookupEnvOrString("PRIVATE_KEY_PATH", ""), "path to privkey.pem certificate")
-	authFile := flag.String("auth_file_path", lookupEnvOrString("AUTH_FILE_PATH", ""), "path to MQTT RBAC auth file")
+	authEnable := flag.Bool("auth_enable", lookupEnvOrBool("AUTH_ENABLE", false), "enable authentication")
 	redisEnable := flag.Bool("redis_enable", lookupEnvOrBool("REDIS_ENABLE", true), "enable/disable Redis db")
-	redisAddr := flag.String("redis_addr", lookupEnvOrString("REDIS_ADDR", "localhost:6379"), "address of redis db")
+	redisAddr := flag.String("redis_addr", lookupEnvOrString("REDIS_ADDR", ""), "address of redis db")
 	redisPassword := flag.String("redis_passwd", lookupEnvOrString("REDIS_PASSWD", ""), "redis db password")
 	wsEnable := flag.Bool("ws_enable", lookupEnvOrBool("WS_ENABLE", false), "enable/disable Websocket listener")
 	wsPort := flag.String("ws_port", lookupEnvOrString("WS_PORT", ":80"), "port for Websocket listener")
 	httpEnable := flag.Bool("http_enable", lookupEnvOrBool("HTTP_ENABLE", false), "enable/disable HTTP listener of mqtt metrics")
 	httpPort := flag.String("http_port", lookupEnvOrString("HTTP_PORT", ":8080"), "port for HTTP listener of mqtt metrics")
 	logLevel := flag.Int("log_level", lookupEnvOrInt("LOG_LEVEL", 1), "0=DEBUG, 1=INFO, 2=WARNING, 3=ERROR")
+	natsUrl := flag.String("nats_url", lookupEnvOrString("NATS_URL", "nats://localhost:4222"), "url for nats server")
+	natsName := flag.String("nats_name", lookupEnvOrString("NATS_NAME", "adapter"), "name for nats client")
+	natsVerifyCertificates := flag.Bool("nats_verify_certificates", lookupEnvOrBool("NATS_VERIFY_CERTIFICATES", false), "verify validity of certificates from nats server")
 
 	flag.Parse()
 	flHelp := flag.Bool("help", false, "Help")
@@ -62,12 +72,14 @@ func NewConfig() Config {
 		os.Exit(0)
 	}
 
+	ctx := context.TODO()
+
 	conf := Config{
 		MqttPort:      *mqttPort,
 		Tls:           *tls,
 		Fullchain:     *fullchain,
 		Privkey:       *privkey,
-		AuthFile:      *authFile,
+		AuthEnable:    *authEnable,
 		RedisEnable:   *redisEnable,
 		RedisAddr:     *redisAddr,
 		RedisPassword: *redisPassword,
@@ -76,6 +88,12 @@ func NewConfig() Config {
 		HttpEnable:    *httpEnable,
 		HttpPort:      *httpPort,
 		LogLevel:      *logLevel,
+		Nats: Nats{
+			Url:                *natsUrl,
+			Name:               *natsName,
+			VerifyCertificates: *natsVerifyCertificates,
+			Ctx:                ctx,
+		},
 	}
 
 	conf.validate()

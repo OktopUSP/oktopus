@@ -1,7 +1,7 @@
 .PHONY: help build
 
 .DEFAULT_GOAL := help
-DOCKER_USER ?= oktopus
+DOCKER_USER ?= oktopusp
 
 help:
 	@echo "Makefile arguments:"

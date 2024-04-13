@@ -20,11 +20,11 @@ func main() {
 
 	c := config.NewConfig()
 
-	js, nc := nats.StartNatsClient(c.Nats)
+	js, nc := nats.StartNatsClient(c.Nats, c.Controller)
 
 	db := db.NewDatabase(c.Mongo.Ctx, c.Mongo.Uri)
 
-	handler := handler.NewHandler(nc, js, db, c.ControllerId)
+	handler := handler.NewHandler(nc, js, db, c.Controller.ControllerId)
 
 	events.StartEventsListener(c.Nats.Ctx, js, handler)
 

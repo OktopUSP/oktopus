@@ -9,19 +9,23 @@ import (
 	"github.com/OktopUSP/oktopus/ws/internal/config"
 	"github.com/OktopUSP/oktopus/ws/internal/ws/handler"
 	"github.com/gorilla/mux"
+	"github.com/nats-io/nats.go/jetstream"
 )
 
 // Starts New Websockets Server
-func StartNewServer(c config.Config) {
+func StartNewServer(c config.Config, kv jetstream.KeyValue) {
 	// Initialize handlers of websockets events
 	go handler.InitHandlers(c.ControllerEID)
 
 	r := mux.NewRouter()
+	r.HandleFunc("/ws/agent/{passwd}", func(w http.ResponseWriter, r *http.Request) {
+		handler.ServeAgent(w, r, c.ControllerEID, kv, c.Auth)
+	})
 	r.HandleFunc("/ws/agent", func(w http.ResponseWriter, r *http.Request) {
-		handler.ServeAgent(w, r, c.ControllerEID)
+		handler.ServeAgent(w, r, c.ControllerEID, kv, c.Auth)
 	})
 	r.HandleFunc("/ws/controller", func(w http.ResponseWriter, r *http.Request) {
-		handler.ServeController(w, r, c.Token, c.ControllerEID, c.Auth)
+		handler.ServeController(w, r, c.ControllerEID, c.Auth, kv)
 	})
 
 	go func() {

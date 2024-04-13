@@ -22,9 +22,11 @@ func MarshallEncoder(data any, w io.Writer) {
 	}
 }
 
-func MarshallDecoder(data any, r io.Reader) {
+func MarshallDecoder(data any, r io.Reader) error {
 	err := json.NewDecoder(r).Decode(data)
 	if err != nil {
 		log.Printf("Error to decode message into json: %q", err)
 	}
+
+	return err
 }
