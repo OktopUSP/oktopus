@@ -74,8 +74,7 @@ user@user-laptop:~$ cd oktopus/deploy/compose
 user@user-laptop:~/oktopus/deploy/compose$ COMPOSE_PROFILES=nats,controller,mqtt,stomp,ws,adapter,frontend,portainer docker compose up -d
 </pre>
         UI will open at port 3000:
-        <img src="https://github.com/OktopUSP/oktopus/assets/83298718/c05bcaea-db87-4705-acb9-94d0711cffcf"/>
-        
+        <img src="https://github.com/OktopUSP/oktopus/assets/83298718/65f7c5b9-c08d-479a-8a13-fdfc634b5ca2"/>
 </li>
     <li>
       <h4>Device test agent (obuspa):</h4>

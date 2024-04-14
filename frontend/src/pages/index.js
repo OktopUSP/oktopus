@@ -162,7 +162,7 @@ const Page = () => {
           >
             <OverviewTasksProgress
               sx={{ height: '100%' }}
-              mtp={"Conexão STOMP"}
+              mtp={"STOMP Connection"}
               type={"stomp"}
               value={generalInfo.StompRtt}
             />
@@ -174,7 +174,7 @@ const Page = () => {
           >
             <OverviewTasksProgress
               sx={{ height: '100%' }}
-              mtp={"Conexão MQTT"}
+              mtp={"MQTT Connection"}
               type={"mqtt"}
               value={generalInfo.MqttRtt}
             />
@@ -186,7 +186,7 @@ const Page = () => {
           >
           <OverviewTasksProgress
               sx={{ height: '100%' }}
-              mtp={"Conexão Websockets"}
+              mtp={"Websockets Connection"}
               type={"websocket"}
               value={generalInfo.WebsocketsRtt}
             />
