@@ -148,12 +148,6 @@ const Page = () => {
             sm={6}
             lg={3}
           >
-          </Grid>
-          <Grid
-            xs={12}
-            sm={6}
-            lg={3}
-          >
             <OverviewTotalCustomers
               //difference={16}
               positive={false}
@@ -168,6 +162,20 @@ const Page = () => {
           >
             <OverviewTasksProgress
               sx={{ height: '100%' }}
+              mtp={"Conexão STOMP"}
+              type={"stomp"}
+              value={generalInfo.StompRtt}
+            />
+          </Grid>
+          <Grid
+            xs={12}
+            sm={6}
+            lg={3}
+          >
+            <OverviewTasksProgress
+              sx={{ height: '100%' }}
+              mtp={"Conexão MQTT"}
+              type={"mqtt"}
               value={generalInfo.MqttRtt}
             />
           </Grid>
@@ -176,6 +184,12 @@ const Page = () => {
             sm={6}
             lg={3}
           >
+          <OverviewTasksProgress
+              sx={{ height: '100%' }}
+              mtp={"Conexão Websockets"}
+              type={"websocket"}
+              value={generalInfo.WebsocketsRtt}
+            />
           </Grid>
           <Grid
             xs={12}
