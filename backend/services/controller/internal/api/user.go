@@ -5,8 +5,10 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/leandrofars/oktopus/internal/api/auth"
 	"github.com/leandrofars/oktopus/internal/db"
+	"github.com/leandrofars/oktopus/internal/utils"
 )
 
 func (a *Api) retrieveUsers(w http.ResponseWriter, r *http.Request) {
@@ -66,6 +68,81 @@ func (a *Api) registerUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+}
+
+func (a *Api) deleteUser(w http.ResponseWriter, r *http.Request) {
+	tokenString := r.Header.Get("Authorization")
+	if tokenString == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	email, err := auth.ValidateToken(tokenString)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	//Check if user which is requesting deletion has the necessary privileges
+	rUser, err := a.db.FindUser(email)
+	if rUser.Level != AdminUser {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	userEmail := mux.Vars(r)["user"]
+	if userEmail == email {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := a.db.DeleteUser(userEmail); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+}
+
+func (a *Api) changePassword(w http.ResponseWriter, r *http.Request) {
+	tokenString := r.Header.Get("Authorization")
+	if tokenString == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	email, err := auth.ValidateToken(tokenString)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	userToChangePasswd := mux.Vars(r)["user"]
+	if userToChangePasswd != "" && userToChangePasswd != email {
+		rUser, _ := a.db.FindUser(email)
+		if rUser.Level != AdminUser {
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
+		email = userToChangePasswd
+	}
+
+	var user db.User
+	err = json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		utils.MarshallEncoder(err, w)
+		return
+	}
+	user.Email = email
+
+	if err := user.HashPassword(user.Password); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if err := a.db.UpdatePassword(user); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 }
 
 func (a *Api) registerAdminUser(w http.ResponseWriter, r *http.Request) {
