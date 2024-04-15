@@ -137,7 +137,7 @@ const Page = () => {
     if (response.status === 401)
       router.push("/auth/login")
     let json = await response.json()
-    if (json.MTP != undefined){
+    if (json.SN != undefined){
       setDevices([json])
       setDeviceFound(true)
       setLoading(false)
