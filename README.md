@@ -53,7 +53,7 @@ This repository aims to promote the development of a multi-vendor management pla
 
 <ul><li><h4>Infrastructure:</h4></li></ul>
 
-![image](https://github.com/OktopUSP/oktopus/assets/83298718/ef9e496d-c075-4e52-aea6-e19e29cbd532)
+![image](https://github.com/OktopUSP/oktopus/assets/83298718/67873f6c-d3db-4045-8569-7e1135fc5fa7)
 
 <ul>
     <li>
