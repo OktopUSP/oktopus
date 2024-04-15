@@ -43,15 +43,6 @@ services:
       - ./mongo_data:/data/db
     profiles: [controller,adapter]
 
-  redis:
-    image: redis
-    container_name: redis_usp
-    ports:
-      - 6379:6379
-    networks:
-      usp_network:
-        ipv4_address: 172.16.235.5
-    profiles: [mqtt]
 #/* -------------------------------------------------------------------------- */
 
 #/* ----------------------- Message Transfer Protocols ----------------------- */
@@ -61,8 +52,6 @@ services:
     ports:
     - 1883:1883
     - 8883:8883
-    depends_on:
-      - redis
     env_file:
       - .env.mqtt
     networks:

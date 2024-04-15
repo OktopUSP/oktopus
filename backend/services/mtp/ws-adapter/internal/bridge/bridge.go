@@ -17,6 +17,7 @@ import (
 	"github.com/OktopUSP/oktopus/backend/services/mtp/ws-adapter/internal/usp/usp_record"
 	"github.com/gorilla/websocket"
 	"github.com/nats-io/nats.go"
+	"github.com/nats-io/nats.go/jetstream"
 	"golang.org/x/sys/unix"
 	"google.golang.org/protobuf/proto"
 )
@@ -54,25 +55,26 @@ type Bridge struct {
 	Ws             config.Ws
 	NewDeviceQueue map[string]string
 	NewDevQMutex   *sync.Mutex
-
-	Ctx context.Context
+	kv             jetstream.KeyValue
+	Ctx            context.Context
 }
 
-func NewBridge(p Publisher, s Subscriber, ctx context.Context, w config.Ws) *Bridge {
+func NewBridge(p Publisher, s Subscriber, ctx context.Context, w config.Ws, kv jetstream.KeyValue) *Bridge {
 	return &Bridge{
 		Pub: p,
 		Sub: s,
 		Ws:  w,
 		Ctx: ctx,
+		kv:  kv,
 	}
 }
 
 func (b *Bridge) StartBridge() {
 
-	url := b.urlBuild()
-	dialer := b.newDialer()
-	go func(dialer websocket.Dialer) {
+	go func() {
 		for {
+			url := b.urlBuild()
+			dialer := b.newDialer()
 			wc, _, err := dialer.Dial(url, nil)
 			if err != nil {
 				log.Printf("Error to connect to %s, err: %s", url, err)
@@ -128,7 +130,7 @@ func (b *Bridge) StartBridge() {
 			}(wc)
 			break
 		}
-	}(dialer)
+	}()
 }
 
 func (b *Bridge) subscribe(wc *websocket.Conn) {
@@ -230,8 +232,10 @@ func (b *Bridge) urlBuild() string {
 
 	wsUrl := prefix + b.Ws.Addr + b.Ws.Port + b.Ws.Route
 
+	token, _ := b.kv.Get(b.Ctx, "oktopusController")
+
 	if b.Ws.AuthEnable {
-		wsUrl = wsUrl + "?token=" + b.Ws.Token
+		wsUrl = wsUrl + "?token=" + string(token.Value())
 	}
 
 	return wsUrl

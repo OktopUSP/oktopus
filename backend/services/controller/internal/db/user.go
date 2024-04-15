@@ -27,6 +27,11 @@ func (d *Database) RegisterUser(user User) error {
 	return err
 }
 
+func (d *Database) UpdatePassword(user User) error {
+	_, err := d.users.UpdateOne(d.ctx, bson.D{{"email", user.Email}}, bson.D{{"$set", bson.D{{"password", user.Password}}}})
+	return err
+}
+
 func (d *Database) FindAllUsers() ([]map[string]interface{}, error) {
 	var result []map[string]interface{}
 	cursor, err := d.users.Find(d.ctx, bson.D{{}})
@@ -43,6 +48,11 @@ func (d *Database) FindUser(email string) (User, error) {
 	var result User
 	err := d.users.FindOne(d.ctx, bson.D{{"email", email}}).Decode(&result)
 	return result, err
+}
+
+func (d *Database) DeleteUser(email string) error {
+	_, err := d.users.DeleteOne(d.ctx, bson.D{{"email", email}})
+	return err
 }
 
 func (user *User) HashPassword(password string) error {

@@ -20,7 +20,6 @@ type Nats struct {
 }
 
 type Ws struct {
-	Token         string
 	AuthEnable    bool
 	Addr          string
 	Port          string
@@ -42,7 +41,6 @@ func NewConfig() *Config {
 	natsUrl := flag.String("nats_url", lookupEnvOrString("NATS_URL", "nats://localhost:4222"), "url for nats server")
 	natsName := flag.String("nats_name", lookupEnvOrString("NATS_NAME", "ws-adapter"), "name for nats client")
 	natsVerifyCertificates := flag.Bool("nats_verify_certificates", lookupEnvOrBool("NATS_VERIFY_CERTIFICATES", false), "verify validity of certificates from nats server")
-	wsToken := flag.String("ws_token", lookupEnvOrString("WS_TOKEN", ""), "websocket server auth token (if authentication is enabled)")
 	wsAuthEnable := flag.Bool("ws_auth_enable", lookupEnvOrBool("WS_AUTH_ENABLE", false), "enable authentication for websocket server")
 	wsAddr := flag.String("ws_addr", lookupEnvOrString("WS_ADDR", "localhost"), "websocket server address (domain or ip)")
 	wsPort := flag.String("ws_port", lookupEnvOrString("WS_PORT", ":8080"), "websocket server port")
@@ -68,7 +66,6 @@ func NewConfig() *Config {
 			Ctx:                ctx,
 		},
 		Ws: Ws{
-			Token:         *wsToken,
 			AuthEnable:    *wsAuthEnable,
 			Addr:          *wsAddr,
 			Port:          *wsPort,

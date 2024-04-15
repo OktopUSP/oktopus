@@ -44,7 +44,6 @@ func NewConfig() *Config {
 	mqttUrl := flag.String("mqtt_url", lookupEnvOrString("MQTT_URL", "tcp://localhost:1883"), "url for mqtt server")
 	mqttClientId := flag.String("mqtt_client_id", lookupEnvOrString("MQTT_CLIENT_ID", "mqtt-adapter"), "client id for mqtt")
 	mqttUsername := flag.String("mqtt_username", lookupEnvOrString("MQTT_USERNAME", "oktopusController"), "username for mqtt")
-	mqttPassword := flag.String("mqtt_password", lookupEnvOrString("MQTT_PASSWORD", ""), "password for mqtt")
 	mqttQos := flag.Int("mqtt_qos", lookupEnvOrInt("MQTT_QOS", 1), "quality of service for mqtt")
 	flHelp := flag.Bool("help", false, "Help")
 
@@ -75,7 +74,6 @@ func NewConfig() *Config {
 			Url:      *mqttUrl,
 			ClientId: *mqttClientId,
 			Username: *mqttUsername,
-			Password: *mqttPassword,
 			Ctx:      ctx,
 			Qos:      *mqttQos,
 		},

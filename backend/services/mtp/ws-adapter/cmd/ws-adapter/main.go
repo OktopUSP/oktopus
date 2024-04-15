@@ -18,9 +18,9 @@ func main() {
 
 	c := config.NewConfig()
 
-	_, publisher, subscriber := nats.StartNatsClient(c.Nats)
+	kv, publisher, subscriber := nats.StartNatsClient(c.Nats)
 
-	bridge := bridge.NewBridge(publisher, subscriber, c.Ws.Ctx, c.Ws)
+	bridge := bridge.NewBridge(publisher, subscriber, c.Ws.Ctx, c.Ws, kv)
 	bridge.StartBridge()
 
 	<-done

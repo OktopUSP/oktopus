@@ -111,6 +111,18 @@ type DeviceAuth struct {
 }
 
 func (a *Api) deviceAuth(w http.ResponseWriter, r *http.Request) {
+
+	user, err := a.db.FindUser(r.Context().Value("email").(string))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		utils.MarshallEncoder(err, w)
+		return
+	}
+	if user.Level != AdminUser {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
 	if r.Method == http.MethodGet {
 
 		id := r.URL.Query().Get("id")
