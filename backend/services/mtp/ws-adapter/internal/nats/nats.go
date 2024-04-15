@@ -10,11 +10,13 @@ import (
 )
 
 const (
-	STREAM_NAME = "ws"
+	STREAM_NAME        = "ws"
+	BUCKET_NAME        = "devices-auth"
+	BUCKET_DESCRIPTION = "Devices authentication"
 )
 
 func StartNatsClient(c config.Nats) (
-	*nats.Conn,
+	jetstream.KeyValue,
 	func(string, []byte) error,
 	func(string, func(*nats.Msg)) error,
 ) {
@@ -43,7 +45,15 @@ func StartNatsClient(c config.Nats) (
 		log.Fatalf("Failed to create JetStream client: %v", err)
 	}
 
-	return nc, publisher(js), subscriber(nc)
+	kv, err := js.CreateOrUpdateKeyValue(c.Ctx, jetstream.KeyValueConfig{
+		Bucket:      BUCKET_NAME,
+		Description: BUCKET_DESCRIPTION,
+	})
+	if err != nil {
+		log.Fatalf("Failed to create KeyValue store: %v", err)
+	}
+
+	return kv, publisher(js), subscriber(nc)
 }
 
 func subscriber(nc *nats.Conn) func(string, func(*nats.Msg)) error {

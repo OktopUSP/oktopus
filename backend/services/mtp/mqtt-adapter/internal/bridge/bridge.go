@@ -14,6 +14,7 @@ import (
 	"github.com/eclipse/paho.golang/paho"
 	"github.com/google/uuid"
 	"github.com/nats-io/nats.go"
+	"github.com/nats-io/nats.go/jetstream"
 	"golang.org/x/sys/unix"
 )
 
@@ -41,15 +42,17 @@ type Bridge struct {
 	Pub  Publisher
 	Sub  Subscriber
 	Mqtt config.Mqtt
+	kv   jetstream.KeyValue
 	Ctx  context.Context
 }
 
-func NewBridge(p Publisher, s Subscriber, ctx context.Context, m config.Mqtt) *Bridge {
+func NewBridge(p Publisher, s Subscriber, ctx context.Context, m config.Mqtt, kv jetstream.KeyValue) *Bridge {
 	return &Bridge{
 		Pub:  p,
 		Sub:  s,
 		Mqtt: m,
 		Ctx:  ctx,
+		kv:   kv,
 	}
 }
 
@@ -82,6 +85,7 @@ func (b *Bridge) StartBridge() {
 		ClientConfig: *pahoClientConfig,
 	}
 
+	b.setMqttPassword()
 	if b.Mqtt.Username != "" && b.Mqtt.Password != "" {
 		autopahoClientConfig.SetUsernamePassword(b.Mqtt.Username, []byte(b.Mqtt.Password))
 	}
@@ -272,4 +276,9 @@ func tcpInfo(conn *net.TCPConn) (*unix.TCPInfo, error) {
 		return nil, err
 	}
 	return info, nil
+}
+
+func (b *Bridge) setMqttPassword() {
+	entry, _ := b.kv.Get(b.Ctx, b.Mqtt.Username)
+	b.Mqtt.Password = string(entry.Value())
 }
