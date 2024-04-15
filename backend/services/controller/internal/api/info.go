@@ -26,7 +26,6 @@ type GeneralInfo struct {
 	VendorsCount      []entity.VendorsCount
 }
 
-// TODO: fix when mqtt broker is not set don't break api
 func (a *Api) generalInfo(w http.ResponseWriter, r *http.Request) {
 
 	var result GeneralInfo
