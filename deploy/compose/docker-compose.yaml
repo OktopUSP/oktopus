@@ -52,8 +52,6 @@ services:
     ports:
     - 1883:1883
     - 8883:8883
-    depends_on:
-      - redis
     env_file:
       - .env.mqtt
     networks:
