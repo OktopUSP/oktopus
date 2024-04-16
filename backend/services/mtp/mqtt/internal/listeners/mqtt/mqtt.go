@@ -21,7 +21,9 @@ var (
 
 type Mqtt struct {
 	Port       string
+	TlsPort    string
 	Tls        bool
+	NoTls      bool
 	Fullchain  string
 	Privkey    string
 	Redis      Redis
@@ -46,9 +48,13 @@ func (m *Mqtt) Start(mqttServer *mqtt.Server) {
 	var tlsConfig *listeners.Config
 	if m.Tls {
 		tlsConfig = defineServerTls(m.Fullchain, m.Privkey)
+		createListener(mqttServer, m.TlsPort, tlsConfig)
 	}
 
-	createListener(mqttServer, m.Port, tlsConfig)
+	if m.NoTls {
+		createListener(mqttServer, m.Port, nil)
+	}
+
 	addHooks(mqttServer, m.Redis)
 }
 

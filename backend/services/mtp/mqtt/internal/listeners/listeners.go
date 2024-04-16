@@ -53,6 +53,8 @@ func StartServers(c config.Config) {
 func newMqttServer(c config.Config) *broker.Mqtt {
 	return &broker.Mqtt{
 		Port:       c.MqttPort,
+		TlsPort:    c.MqttTlsPort,
+		NoTls:      c.NoTls,
 		Tls:        c.Tls,
 		Fullchain:  c.Fullchain,
 		Privkey:    c.Privkey,

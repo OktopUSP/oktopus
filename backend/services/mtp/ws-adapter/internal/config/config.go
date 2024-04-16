@@ -25,7 +25,9 @@ type Ws struct {
 	Port          string
 	Route         string
 	TlsEnable     bool
+	TlsPort       string
 	SkipTlsVerify bool
+	NoTls         bool
 	Ctx           context.Context
 }
 
@@ -44,6 +46,8 @@ func NewConfig() *Config {
 	wsAuthEnable := flag.Bool("ws_auth_enable", lookupEnvOrBool("WS_AUTH_ENABLE", false), "enable authentication for websocket server")
 	wsAddr := flag.String("ws_addr", lookupEnvOrString("WS_ADDR", "localhost"), "websocket server address (domain or ip)")
 	wsPort := flag.String("ws_port", lookupEnvOrString("WS_PORT", ":8080"), "websocket server port")
+	wsTlsPort := flag.String("ws_tls_port", lookupEnvOrString("WS_TLS_PORT", ":8081"), "websocket tls server port")
+	wsNoTls := flag.Bool("ws_no_tls", lookupEnvOrBool("WS_NO_TLS", false), "connects to websocket server without tls")
 	wsRoute := flag.String("ws_route", lookupEnvOrString("WS_ROUTE", "/ws/controller"), "websocket server route")
 	wsTlsEnable := flag.Bool("ws_tls_enable", lookupEnvOrBool("WS_TLS_ENABLE", false), "access websocket via tls protocol (wss)")
 	wsSkipTlsVerify := flag.Bool("ws_skip_tls_verify", lookupEnvOrBool("WS_SKIP_TLS_VERIFY", false), "skip tls verification for websocket server")
@@ -54,6 +58,10 @@ func NewConfig() *Config {
 	if *flHelp {
 		flag.Usage()
 		os.Exit(0)
+	}
+
+	if *wsNoTls && !*wsTlsEnable {
+		log.Fatalf("You must configure at least one connection to the websocket server")
 	}
 
 	ctx := context.TODO()
@@ -73,6 +81,8 @@ func NewConfig() *Config {
 			TlsEnable:     *wsTlsEnable,
 			SkipTlsVerify: *wsSkipTlsVerify,
 			Ctx:           ctx,
+			TlsPort:       *wsTlsPort,
+			NoTls:         *wsNoTls,
 		},
 	}
 }
