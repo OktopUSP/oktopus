@@ -16,14 +16,14 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: oktopusp/frontend:latest
+          image: rogersacchelli/frontend:1.0.3
           ports: 
             - containerPort: 3000
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
-            - name: NEXT_PUBLIC_REST_ENPOINT
+            - name: NEXT_PUBLIC_REST_ENDPOINT
               value: "192.168.1.130:30003"
-            - name: NEXT_PUBLIC_WS_ENPOINT
+            - name: NEXT_PUBLIC_WS_ENDPOINT
               value: "192.168.1.130:30002"
 
 ---
