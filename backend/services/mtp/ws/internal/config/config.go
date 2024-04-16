@@ -16,6 +16,10 @@ type Config struct {
 	Auth          bool   // server auth enable/disable
 	ControllerEID string // controller endpoint id
 	Tls           bool   // enable/diable websockets server tls
+	TlsPort       string
+	NoTls         bool
+	FullChain     string
+	PrivateKey    string
 	Nats          Nats
 }
 
@@ -47,7 +51,11 @@ func NewConfig() Config {
 	flPort := flag.String("port", lookupEnvOrString("SERVER_PORT", ":8080"), "Server port")
 	flAuth := flag.Bool("auth", lookupEnvOrBool("SERVER_AUTH_ENABLE", false), "Server auth enable/disable")
 	flControllerEid := flag.String("controller-eid", lookupEnvOrString("CONTROLLER_EID", "oktopusController"), "Controller eid")
-	flTls := flag.Bool("tls", lookupEnvOrBool("SERVER_TLS_ENABLE", false), "Enable/diable websockets server tls")
+	flTls := flag.Bool("tls", lookupEnvOrBool("SERVER_TLS_ENABLE", false), "Enable/disable websockets server tls")
+	flTlsPort := flag.String("tls_port", lookupEnvOrString("SERVER_TLS_PORT", ":8081"), "Server Port to use if TLS is enabled")
+	flNoTls := flag.Bool("no_tls", lookupEnvOrBool("SERVER_NO_TLS", false), "Disable/enable websockets serevr without tls")
+	flFullchain := flag.String("fullchain_path", lookupEnvOrString("FULL_CHAIN_PATH", "cert.pem"), "Fullchain file path")
+	flPrivKey := flag.String("privkey_path", lookupEnvOrString("PRIVATE_KEY_PATH", "key.pem"), "Private key file path")
 	flHelp := flag.Bool("help", false, "Help")
 	flag.Parse()
 	/* -------------------------------------------------------------------------- */
@@ -57,13 +65,21 @@ func NewConfig() Config {
 		os.Exit(0)
 	}
 
+	if *flNoTls && !*flTls {
+		log.Fatalf("You must at least choose one between tls and no_tls configs")
+	}
+
 	ctx := context.TODO()
 
 	return Config{
 		Port:          *flPort,
+		TlsPort:       *flTlsPort,
+		NoTls:         *flNoTls,
 		Auth:          *flAuth,
 		ControllerEID: *flControllerEid,
 		Tls:           *flTls,
+		FullChain:     *flFullchain,
+		PrivateKey:    *flPrivKey,
 		Nats: Nats{
 			Url:                *natsUrl,
 			Name:               *natsName,

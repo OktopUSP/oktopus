@@ -21,7 +21,14 @@ func main() {
 	kv, publisher, subscriber := nats.StartNatsClient(c.Nats)
 
 	bridge := bridge.NewBridge(publisher, subscriber, c.Ws.Ctx, c.Ws, kv)
-	bridge.StartBridge()
+
+	if !c.Ws.NoTls {
+		bridge.StartBridge(c.Ws.Port, false)
+	}
+
+	if c.Ws.TlsEnable {
+		bridge.StartBridge(c.Ws.TlsPort, true)
+	}
 
 	<-done
 

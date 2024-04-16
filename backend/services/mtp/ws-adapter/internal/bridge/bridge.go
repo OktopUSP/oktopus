@@ -69,11 +69,11 @@ func NewBridge(p Publisher, s Subscriber, ctx context.Context, w config.Ws, kv j
 	}
 }
 
-func (b *Bridge) StartBridge() {
+func (b *Bridge) StartBridge(port string, tls bool) {
 
-	go func() {
+	go func(port string, tls bool) {
 		for {
-			url := b.urlBuild()
+			url := b.urlBuild(tls, port)
 			dialer := b.newDialer()
 			wc, _, err := dialer.Dial(url, nil)
 			if err != nil {
@@ -89,7 +89,7 @@ func (b *Bridge) StartBridge() {
 					if err != nil {
 						if websocket.IsCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 							log.Printf("websocket error: %v", err)
-							b.StartBridge()
+							b.StartBridge(port, tls)
 							return
 						}
 						log.Println("websocket unexpected error:", err)
@@ -130,7 +130,7 @@ func (b *Bridge) StartBridge() {
 			}(wc)
 			break
 		}
-	}()
+	}(port, tls)
 }
 
 func (b *Bridge) subscribe(wc *websocket.Conn) {
@@ -224,13 +224,13 @@ func (b *Bridge) statusMsgHandler(wsMsg []byte) {
 	b.Pub(NATS_WS_SUBJECT_PREFIX+deviceStatus.Eid+".status", []byte(deviceStatus.Status))
 }
 
-func (b *Bridge) urlBuild() string {
+func (b *Bridge) urlBuild(tls bool, port string) string {
 	prefix := "ws://"
-	if b.Ws.TlsEnable {
+	if tls {
 		prefix = "wss://"
 	}
 
-	wsUrl := prefix + b.Ws.Addr + b.Ws.Port + b.Ws.Route
+	wsUrl := prefix + b.Ws.Addr + port + b.Ws.Route
 
 	token, _ := b.kv.Get(b.Ctx, "oktopusController")
 

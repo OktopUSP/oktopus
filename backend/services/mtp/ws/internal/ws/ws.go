@@ -30,12 +30,16 @@ func StartNewServer(c config.Config, kv jetstream.KeyValue) {
 
 	go func() {
 		if c.Tls {
-			log.Println("Websockets server running with TLS")
-			err := http.ListenAndServeTLS(c.Port, "cert.pem", "key.pem", r)
+			log.Println("Websockets server running with TLS at port", c.TlsPort)
+			err := http.ListenAndServeTLS(c.TlsPort, c.FullChain, c.PrivateKey, r)
 			if err != nil {
 				log.Fatal("ListenAndServeTLS: ", err)
 			}
-		} else {
+		}
+	}()
+
+	go func() {
+		if !c.NoTls {
 			log.Println("Websockets server running at port", c.Port)
 			err := http.ListenAndServe(c.Port, r)
 			if err != nil {
