@@ -120,7 +120,6 @@ golang.org/x/sync/errgroup
 # golang.org/x/sys v0.16.0
 ## explicit; go 1.18
 golang.org/x/sys/cpu
-golang.org/x/sys/unix
 # golang.org/x/text v0.14.0
 ## explicit; go 1.18
 golang.org/x/text/cases
@@ -131,13 +130,14 @@ golang.org/x/text/internal/tag
 golang.org/x/text/language
 golang.org/x/text/transform
 golang.org/x/text/unicode/norm
-# google.golang.org/protobuf v1.28.1
-## explicit; go 1.11
+# google.golang.org/protobuf v1.33.0
+## explicit; go 1.17
 google.golang.org/protobuf/encoding/prototext
 google.golang.org/protobuf/encoding/protowire
 google.golang.org/protobuf/internal/descfmt
 google.golang.org/protobuf/internal/descopts
 google.golang.org/protobuf/internal/detrand
+google.golang.org/protobuf/internal/editiondefaults
 google.golang.org/protobuf/internal/encoding/defval
 google.golang.org/protobuf/internal/encoding/messageset
 google.golang.org/protobuf/internal/encoding/tag
