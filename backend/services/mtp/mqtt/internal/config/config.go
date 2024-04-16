@@ -14,7 +14,9 @@ const LOCAL_ENV = ".env.local"
 
 type Config struct {
 	MqttPort      string
+	NoTls         bool
 	Tls           bool
+	MqttTlsPort   string
 	Fullchain     string
 	Privkey       string
 	AuthEnable    bool
@@ -48,7 +50,9 @@ func NewConfig() Config {
 	*/
 
 	mqttPort := flag.String("mqtt_port", lookupEnvOrString("MQTT_PORT", ":1883"), "port for MQTT listener")
+	mqttTlsPort := flag.String("mqtt_tls_port", lookupEnvOrString("MQTT_TLS_PORT", ":8883"), "port for MQTT TLS listener")
 	tls := flag.Bool("mqtt_tls", lookupEnvOrBool("MQTT_TLS", false), "enable/disable TLS")
+	noTls := flag.Bool("mqtt_no_tls", lookupEnvOrBool("MQTT_NO_TLS", true), "enable/disable mqtt without TLS")
 	fullchain := flag.String("full_chain_path", lookupEnvOrString("FULL_CHAIN_PATH", ""), "path to fullchain.pem certificate")
 	privkey := flag.String("private_key_path", lookupEnvOrString("PRIVATE_KEY_PATH", ""), "path to privkey.pem certificate")
 	authEnable := flag.Bool("auth_enable", lookupEnvOrBool("AUTH_ENABLE", false), "enable authentication")
@@ -72,10 +76,16 @@ func NewConfig() Config {
 		os.Exit(0)
 	}
 
+	if !*noTls && *tls {
+		log.Fatalln("You can't disable mqtt with and without TLS, choose at least one option.")
+	}
+
 	ctx := context.TODO()
 
 	conf := Config{
 		MqttPort:      *mqttPort,
+		MqttTlsPort:   *mqttTlsPort,
+		NoTls:         *noTls,
 		Tls:           *tls,
 		Fullchain:     *fullchain,
 		Privkey:       *privkey,

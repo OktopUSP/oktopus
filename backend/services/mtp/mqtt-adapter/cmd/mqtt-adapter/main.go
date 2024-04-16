@@ -21,7 +21,14 @@ func main() {
 	kv, publisher, subscriber := nats.StartNatsClient(c.Nats)
 
 	bridge := bridge.NewBridge(publisher, subscriber, c.Mqtt.Ctx, c.Mqtt, kv)
-	bridge.StartBridge()
+
+	if c.Mqtt.Url != "" {
+		bridge.StartBridge(c.Mqtt.Url, c.Mqtt.ClientId)
+	}
+
+	if c.Mqtt.UrlForTls != "" {
+		bridge.StartBridge(c.Mqtt.UrlForTls, c.Mqtt.ClientId+"-tls")
+	}
 
 	<-done
 

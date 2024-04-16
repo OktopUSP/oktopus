@@ -2,6 +2,7 @@ package bridge
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"log"
 	"net"
@@ -56,9 +57,9 @@ func NewBridge(p Publisher, s Subscriber, ctx context.Context, m config.Mqtt, kv
 	}
 }
 
-func (b *Bridge) StartBridge() {
+func (b *Bridge) StartBridge(serverUrl, clientId string) {
 
-	broker, _ := url.Parse(b.Mqtt.Url)
+	broker, _ := url.Parse(serverUrl)
 
 	status := make(chan *paho.Publish)
 	controller := make(chan *paho.Publish)
@@ -66,7 +67,7 @@ func (b *Bridge) StartBridge() {
 
 	go b.mqttMessageHandler(status, controller, apiMsg)
 
-	pahoClientConfig := buildClientConfig(status, controller, apiMsg, b.Mqtt.ClientId)
+	pahoClientConfig := buildClientConfig(status, controller, apiMsg, clientId)
 
 	autopahoClientConfig := autopaho.ClientConfig{
 		BrokerUrls: []*url.URL{
@@ -76,13 +77,16 @@ func (b *Bridge) StartBridge() {
 		ConnectRetryDelay: 5 * time.Second,
 		ConnectTimeout:    5 * time.Second,
 		OnConnectionUp: func(cm *autopaho.ConnectionManager, connAck *paho.Connack) {
-			log.Printf("Connected to MQTT broker--> %s", b.Mqtt.Url)
+			log.Printf("Connected to MQTT broker--> %s", serverUrl)
 			subscribe(b.Mqtt.Ctx, b.Mqtt.Qos, cm)
 		},
 		OnConnectError: func(err error) {
 			log.Printf("Error while attempting connection: %s\n", err)
 		},
 		ClientConfig: *pahoClientConfig,
+		TlsCfg: &tls.Config{
+			InsecureSkipVerify: b.Mqtt.SkipVerify,
+		},
 	}
 
 	b.setMqttPassword()

@@ -20,12 +20,14 @@ type Nats struct {
 }
 
 type Mqtt struct {
-	Url      string
-	ClientId string
-	Username string
-	Password string
-	Qos      int
-	Ctx      context.Context
+	Url        string
+	UrlForTls  string
+	SkipVerify bool
+	ClientId   string
+	Username   string
+	Password   string
+	Qos        int
+	Ctx        context.Context
 }
 
 type Config struct {
@@ -42,6 +44,8 @@ func NewConfig() *Config {
 	natsName := flag.String("nats_name", lookupEnvOrString("NATS_NAME", "mqtt-adapter"), "name for nats client")
 	natsVerifyCertificates := flag.Bool("nats_verify_certificates", lookupEnvOrBool("NATS_VERIFY_CERTIFICATES", false), "verify validity of certificates from nats server")
 	mqttUrl := flag.String("mqtt_url", lookupEnvOrString("MQTT_URL", "tcp://localhost:1883"), "url for mqtt server")
+	mqttsUrl := flag.String("mqtts_url", lookupEnvOrString("MQTTS_URL", ""), "url for mqtts server")
+	mqttsSkipVerify := flag.Bool("mqtts_skip_verify", lookupEnvOrBool("MQTTS_SKIP_VERIFY", false), "skip verification of server certificate for mqtts")
 	mqttClientId := flag.String("mqtt_client_id", lookupEnvOrString("MQTT_CLIENT_ID", "mqtt-adapter"), "client id for mqtt")
 	mqttUsername := flag.String("mqtt_username", lookupEnvOrString("MQTT_USERNAME", "oktopusController"), "username for mqtt")
 	mqttQos := flag.Int("mqtt_qos", lookupEnvOrInt("MQTT_QOS", 1), "quality of service for mqtt")
@@ -71,11 +75,13 @@ func NewConfig() *Config {
 			Ctx:                ctx,
 		},
 		Mqtt: Mqtt{
-			Url:      *mqttUrl,
-			ClientId: *mqttClientId,
-			Username: *mqttUsername,
-			Ctx:      ctx,
-			Qos:      *mqttQos,
+			Url:        *mqttUrl,
+			UrlForTls:  *mqttsUrl,
+			SkipVerify: *mqttsSkipVerify,
+			ClientId:   *mqttClientId,
+			Username:   *mqttUsername,
+			Ctx:        ctx,
+			Qos:        *mqttQos,
 		},
 	}
 }
