@@ -1,0 +1,8 @@
+controller:
+  service:
+    tcpPorts:
+      - name: mqtt
+        port: 1883
+        targetPort: 1883
+  extraArgs:
+    - --configmap-tcp-services=default/haproxy-tcp

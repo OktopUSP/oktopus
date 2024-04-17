@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-adapter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-adapter
+  template:
+    metadata:
+      labels:
+        app: mqtt-adapter
+    spec:
+      containers:
+        - name: mqtt-adapter
+          image: oktopusp/mqtt-adapter:latest
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 0.1
+            limits:
+              memory: 128Mi
+              cpu: 0.2
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NATS_URL
+              value: "nats:4222"
+            - name: NATS_NAME
+              value: "mqtt-adapter"
+            - name: NATS_VERIFY_CERTIFICATES
+              value: "false"
+            - name: MQTT_URL
+              value: "tcp://mqtt:1883"
+            - name: MQTT_CLIENT_ID
+              value: "mqtt-adapter"
+            - name: MQTT_USERNAME
+              value: ""
+            - name: MQTT_PASSWORD
+              value: ""
+            - name: MQTT_QOS
+              value: "1"
+            - name: MQTT_SERVICE_HOST
+              value: "mqtt"

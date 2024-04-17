@@ -1,0 +1,39 @@
+name: Oktopus MQTT Broker
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build-mqtt:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - 
+        name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/mqtt:latest -f backend/services/mtp/mqtt/build/Dockerfile backend/services/mtp/mqtt
+      - 
+        name: Push Docker image to Docker Hub
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/mqtt:latest
+  
