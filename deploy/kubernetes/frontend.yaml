@@ -8,7 +8,7 @@ spec:
     matchLabels:
       app: frontend
   strategy:
-    type: Recreate       # Specify the Recreate strategy
+    type: Recreate # Specify the Recreate strategy
   template:
     metadata:
       labels:
@@ -16,16 +16,22 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: rogersacchelli/frontend:1.0.3
-          ports: 
+          image: oktopusp/frontend:latest
+          resources:
+                requests:
+                  memory: 64Mi
+                  cpu: 100m
+                limits:
+                  memory: 256Mi
+                  cpu: 200m
+          ports:
             - containerPort: 3000
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: NEXT_PUBLIC_REST_ENDPOINT
               value: "192.168.1.130:30003"
             - name: NEXT_PUBLIC_WS_ENDPOINT
-              value: "192.168.1.130:30002"
-
+              value: "192.168.1.130:30005"
 ---
 apiVersion: v1
 kind: Service

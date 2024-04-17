@@ -31,13 +31,13 @@ spec:
           image: oktopusp/ws:latest
           ports:
             - containerPort: 8080
-              #resources:
-              #requests:
-              #memory: 64Mi
-              #cpu: 0.1
-              #limits:
-              #memory: 256Mi
-              #cpu: 0.2
+              resources:
+                requests:
+                  memory: 64Mi
+                  cpu: 100m
+                limits:
+                memory: 256Mi
+                cpu: 200m
           imagePullPolicy: IfNotPresent
           env:
             - name: SERVER_PORT

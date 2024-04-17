@@ -9,7 +9,8 @@ spec:
     - protocol: TCP
       port: 1883
       targetPort: 1883
-  type: ClusterIP
+      nodePort: 30000
+  type: NodePort
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -33,10 +34,10 @@ spec:
           resources:
             requests:
               memory: 64Mi
-              cpu: 0.1
+              cpu: 100m
             limits:
               memory: 256Mi
-              cpu: 0.2
+              cpu: 200m
           imagePullPolicy: IfNotPresent
           env:
             - name: MQTT_PORT
