@@ -4,9 +4,9 @@ name: Oktopus MQTT Broker
 # events but only for the master branch
 on:
   push:
-    branches: [ dev ]
+    branches: [ main ]
   pull_request:
-    branches: [ dev ]
+    branches: [ main ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -21,9 +21,6 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
       -
@@ -32,12 +29,11 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Build and push
-        uses: docker/build-push-action@v2
-        with:
-          context: ./backend/services/mtp/mqtt/
-          file: ./build/Dockerfile
-          platforms: linux/amd64
-          push: true
-          tags: rogersacchelli/mqtt:latest
+
+      - 
+        name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/mqtt:latest -f backend/services/mtp/mqtt/build/Dockerfile backend/services/mtp/mqtt
+      - 
+        name: Push Docker image to Docker Hub
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/mqtt:latest
+  
