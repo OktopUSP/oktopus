@@ -2,7 +2,7 @@ FROM node:16.20.2-alpine as builder
 
 WORKDIR /app
 
-COPY ./ ./
+COPY ../ ./
 
 RUN npm install 
 
