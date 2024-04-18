@@ -29,12 +29,8 @@ type CPE struct {
 	Manufacturer         string
 	OUI                  string
 	ConnectionRequestURL string
-	XmppId               string
-	XmppUsername         string
-	XmppPassword         string
 	SoftwareVersion      string
 	ExternalIPAddress    string
-	State                string
 	Queue                *lane.Queue
 	Waiting              *Request
 	HardwareVersion      string
@@ -86,8 +82,6 @@ func (h *Handler) CwmpHandler(w http.ResponseWriter, r *http.Request) {
 	body := string(tmp)
 	len := len(body)
 
-	//log.Printf("body:\n %v", body)
-
 	var envelope cwmp.SoapEnvelope
 	xml.Unmarshal(tmp, &envelope)
 
@@ -136,7 +130,8 @@ func (h *Handler) CwmpHandler(w http.ResponseWriter, r *http.Request) {
 				DataModel:            Inform.GetDataModelType(),
 				KeepConnectionOpen:   false,
 			}
-			h.pub("cwmp.v1."+sn+".info", tmp) //TODO: send right info
+			go h.handleCpeStatus(sn)
+			h.pub("cwmp.v1."+sn+".info", tmp)
 		}
 		obj := h.cpes[sn]
 		cpe := &obj

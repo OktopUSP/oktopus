@@ -64,7 +64,6 @@ func parseDeviceInfoMsg(sn, subject string, data []byte, mtp db.MTP) db.Device {
 	}
 
 	device.Status = db.Online
-	device.Protocol = db.USP
 
 	return device
 }

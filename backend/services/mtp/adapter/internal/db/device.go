@@ -15,6 +15,7 @@ const (
 	MQTT
 	STOMP
 	WEBSOCKETS
+	CWMP
 )
 
 type Status uint8
@@ -23,15 +24,6 @@ const (
 	Offline Status = iota
 	Associating
 	Online
-)
-
-type ManagementProtocol uint8
-
-const (
-	UNKNOWN ManagementProtocol = iota
-	USP
-	CWMP
-	MATTER
 )
 
 type Device struct {
@@ -45,7 +37,7 @@ type Device struct {
 	Mqtt         Status
 	Stomp        Status
 	Websockets   Status
-	Protocol     ManagementProtocol
+	Cwmp         Status
 }
 
 func (d *Database) CreateDevice(device Device) error {
@@ -55,27 +47,28 @@ func (d *Database) CreateDevice(device Device) error {
 	d.m.Lock()
 	defer d.m.Unlock()
 
-	if device.Protocol == USP {
-		/* ------------------ Do not overwrite status of other mtp ------------------ */
-		err := d.devices.FindOne(d.ctx, bson.D{{"sn", device.SN}}, nil).Decode(&deviceExistent)
-		if err == nil {
-			if deviceExistent.Mqtt == Online {
-				device.Mqtt = Online
-			}
-			if deviceExistent.Stomp == Online {
-				device.Stomp = Online
-			}
-			if deviceExistent.Websockets == Online {
-				device.Websockets = Online
-			}
-		} else {
-			if err != mongo.ErrNoDocuments {
-				log.Println(err)
-				return err
-			}
+	/* ------------------ Do not overwrite status of other mtp ------------------ */
+	err := d.devices.FindOne(d.ctx, bson.D{{"sn", device.SN}}, nil).Decode(&deviceExistent)
+	if err == nil {
+		if deviceExistent.Mqtt == Online {
+			device.Mqtt = Online
 		}
-		/* -------------------------------------------------------------------------- */
+		if deviceExistent.Stomp == Online {
+			device.Stomp = Online
+		}
+		if deviceExistent.Websockets == Online {
+			device.Websockets = Online
+		}
+		if deviceExistent.Cwmp == Online {
+			device.Cwmp = Online
+		}
+	} else {
+		if err != mongo.ErrNoDocuments {
+			log.Println(err)
+			return err
+		}
 	}
+	/* -------------------------------------------------------------------------- */
 
 	callback := func(sessCtx mongo.SessionContext) (interface{}, error) {
 		// Important: You must pass sessCtx as the Context parameter to the operations for them to be executed in the
@@ -173,6 +166,8 @@ func (m MTP) String() string {
 		return "stomp"
 	case WEBSOCKETS:
 		return "websockets"
+	case CWMP:
+		return "cwmp"
 	}
 	return "unknown"
 }

@@ -35,16 +35,18 @@ func (d *Database) UpdateStatus(sn string, status Status, mtp MTP) error {
 		result.Stomp = status
 	case WEBSOCKETS:
 		result.Websockets = status
+	case CWMP:
+		result.Cwmp = status
 	}
 
 	/*
 		check if the global status needs update
 	*/
 	var globalStatus primitive.E
-	if result.Mqtt == Offline && result.Stomp == Offline && result.Websockets == Offline {
+	if result.Mqtt == Offline && result.Stomp == Offline && result.Websockets == Offline && result.Cwmp == Offline {
 		globalStatus = primitive.E{"status", Offline}
 	}
-	if result.Mqtt == Online || result.Stomp == Online || result.Websockets == Online {
+	if result.Mqtt == Online || result.Stomp == Online || result.Websockets == Online || result.Cwmp == Online {
 		globalStatus = primitive.E{"status", Online}
 	}
 

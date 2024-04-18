@@ -33,9 +33,8 @@ func parseDeviceInfoMsg(data []byte) db.Device {
 	device.Version = inform.GetSoftwareVersion()
 	device.ProductClass = inform.DeviceId.ProductClass
 	device.SN = inform.DeviceId.SerialNumber
-
+	device.Cwmp = db.Online
 	device.Status = db.Online
-	device.Protocol = db.CWMP
 
 	return device
 }
