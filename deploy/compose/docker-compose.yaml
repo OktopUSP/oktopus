@@ -66,6 +66,8 @@ services:
     container_name: websockets
     ports:
     - 8080:8080
+    env_file:
+      - .env.ws
     networks:
       usp_network:
         ipv4_address: 172.16.235.7
