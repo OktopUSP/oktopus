@@ -6,7 +6,12 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
+)
+
+type MsgType string
+
+const (
+	INFORM = "Inform"
 )
 
 type SoapEnvelope struct {
@@ -401,53 +406,6 @@ func ChangeDuState(ops []fmt.Stringer) string {
 </soap:Envelope>`
 
 	return ret
-}
-
-// CPE side
-
-func Inform(serial string) string {
-	return `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0"><soap:Header><cwmp:ID soap:mustUnderstand="1">5058</cwmp:ID></soap:Header>
-	<soap:Body><cwmp:Inform><DeviceId><Manufacturer>ADB Broadband</Manufacturer>
-<OUI>0013C8</OUI>
-<ProductClass>VV5522</ProductClass>
-<SerialNumber>` + serial + `</SerialNumber>
-</DeviceId>
-<Event soap-enc:arrayType="cwmp:EventStruct[1]">
-<EventStruct><EventCode>6 CONNECTION REQUEST</EventCode>
-<CommandKey></CommandKey>
-</EventStruct>
-</Event>
-<MaxEnvelopes>1</MaxEnvelopes>
-<CurrentTime>` + time.Now().Format(time.RFC3339) + `</CurrentTime>
-<RetryCount>0</RetryCount>
-<ParameterList soap-enc:arrayType="cwmp:ParameterValueStruct[8]">
-<ParameterValueStruct><Name>InternetGatewayDevice.ManagementServer.ConnectionRequestURL</Name>
-<Value xsi:type="xsd:string">http://104.199.175.27:7547/ConnectionRequest-` + serial + `</Value>
-</ParameterValueStruct>
-<ParameterValueStruct><Name>InternetGatewayDevice.ManagementServer.ParameterKey</Name>
-<Value xsi:type="xsd:string"></Value>
-</ParameterValueStruct>
-<ParameterValueStruct><Name>InternetGatewayDevice.DeviceSummary</Name>
-<Value xsi:type="xsd:string">InternetGatewayDevice:1.2[](Baseline:1,EthernetLAN:1,WiFiLAN:1,ADSLWAN:1,EthernetWAN:1,QoS:1,QoSDynamicFlow:1,Bridging:1,Time:1,IPPing:1,TraceRoute:1,DeviceAssociation:1,UDPConnReq:1),VoiceService:1.0[1](TAEndpoint:1,SIPEndpoint:1)</Value>
-</ParameterValueStruct>
-<ParameterValueStruct><Name>InternetGatewayDevice.DeviceInfo.HardwareVersion</Name>
-<Value xsi:type="xsd:string">` + serial + `</Value>
-</ParameterValueStruct>
-<ParameterValueStruct><Name>InternetGatewayDevice.DeviceInfo.ProvisioningCode</Name>
-<Value xsi:type="xsd:string">ABCD</Value>
-</ParameterValueStruct>
-<ParameterValueStruct><Name>InternetGatewayDevice.DeviceInfo.SoftwareVersion</Name>
-<Value xsi:type="xsd:string">4.0.8.17785</Value>
-</ParameterValueStruct>
-<ParameterValueStruct><Name>InternetGatewayDevice.DeviceInfo.SpecVersion</Name>
-<Value xsi:type="xsd:string">1.0</Value>
-</ParameterValueStruct>
-<ParameterValueStruct><Name>InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.ExternalIPAddress</Name>
-<Value xsi:type="xsd:string">12.0.0.10</Value>
-</ParameterValueStruct>
-</ParameterList>
-</cwmp:Inform>
-</soap:Body></soap:Envelope>`
 }
 
 /*

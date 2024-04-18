@@ -25,6 +25,15 @@ const (
 	Online
 )
 
+type ManagementProtocol uint8
+
+const (
+	UNKNOWN ManagementProtocol = iota
+	USP
+	CWMP
+	MATTER
+)
+
 type Device struct {
 	SN           string
 	Model        string
@@ -36,6 +45,7 @@ type Device struct {
 	Mqtt         Status
 	Stomp        Status
 	Websockets   Status
+	Protocol     ManagementProtocol
 }
 
 func (d *Database) CreateDevice(device Device) error {
@@ -45,32 +55,34 @@ func (d *Database) CreateDevice(device Device) error {
 	d.m.Lock()
 	defer d.m.Unlock()
 
-	/* ------------------ Do not overwrite status of other mtp ------------------ */
-	err := d.devices.FindOne(d.ctx, bson.D{{"sn", device.SN}}, nil).Decode(&deviceExistent)
-	if err == nil {
-		if deviceExistent.Mqtt == Online {
-			device.Mqtt = Online
+	if device.Protocol == USP {
+		/* ------------------ Do not overwrite status of other mtp ------------------ */
+		err := d.devices.FindOne(d.ctx, bson.D{{"sn", device.SN}}, nil).Decode(&deviceExistent)
+		if err == nil {
+			if deviceExistent.Mqtt == Online {
+				device.Mqtt = Online
+			}
+			if deviceExistent.Stomp == Online {
+				device.Stomp = Online
+			}
+			if deviceExistent.Websockets == Online {
+				device.Websockets = Online
+			}
+		} else {
+			if err != mongo.ErrNoDocuments {
+				log.Println(err)
+				return err
+			}
 		}
-		if deviceExistent.Stomp == Online {
-			device.Stomp = Online
-		}
-		if deviceExistent.Websockets == Online {
-			device.Websockets = Online
-		}
-	} else {
-		if err != nil && err != mongo.ErrNoDocuments {
-			log.Println(err)
-			return err
-		}
+		/* -------------------------------------------------------------------------- */
 	}
-	/* -------------------------------------------------------------------------- */
 
 	callback := func(sessCtx mongo.SessionContext) (interface{}, error) {
 		// Important: You must pass sessCtx as the Context parameter to the operations for them to be executed in the
 		// transaction.
 		opts := options.FindOneAndReplace().SetUpsert(true)
 
-		err = d.devices.FindOneAndReplace(d.ctx, bson.D{{"sn", device.SN}}, device, opts).Decode(&result)
+		err := d.devices.FindOneAndReplace(d.ctx, bson.D{{"sn", device.SN}}, device, opts).Decode(&result)
 		if err != nil {
 			if err == mongo.ErrNoDocuments {
 				log.Printf("New device %s added to database", device.SN)

@@ -1,4 +1,4 @@
-package handler
+package cwmp_handler
 
 import (
 	"github.com/OktopUSP/oktopus/backend/services/mtp/adapter/internal/db"

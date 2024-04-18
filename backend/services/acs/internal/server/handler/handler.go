@@ -86,7 +86,7 @@ func (h *Handler) CwmpHandler(w http.ResponseWriter, r *http.Request) {
 	body := string(tmp)
 	len := len(body)
 
-	log.Printf("body:\n %v", body)
+	//log.Printf("body:\n %v", body)
 
 	var envelope cwmp.SoapEnvelope
 	xml.Unmarshal(tmp, &envelope)
@@ -134,7 +134,9 @@ func (h *Handler) CwmpHandler(w http.ResponseWriter, r *http.Request) {
 				OUI:                  Inform.DeviceId.OUI,
 				Queue:                lane.NewQueue(),
 				DataModel:            Inform.GetDataModelType(),
-				KeepConnectionOpen:   false}
+				KeepConnectionOpen:   false,
+			}
+			h.pub("cwmp.v1."+sn+".info", tmp) //TODO: send right info
 		}
 		obj := h.cpes[sn]
 		cpe := &obj

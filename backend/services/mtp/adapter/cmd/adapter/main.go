@@ -9,7 +9,8 @@ import (
 	"github.com/OktopUSP/oktopus/backend/services/mtp/adapter/internal/config"
 	"github.com/OktopUSP/oktopus/backend/services/mtp/adapter/internal/db"
 	"github.com/OktopUSP/oktopus/backend/services/mtp/adapter/internal/events"
-	"github.com/OktopUSP/oktopus/backend/services/mtp/adapter/internal/events/handler"
+	"github.com/OktopUSP/oktopus/backend/services/mtp/adapter/internal/events/cwmp_handler"
+	"github.com/OktopUSP/oktopus/backend/services/mtp/adapter/internal/events/usp_handler"
 	"github.com/OktopUSP/oktopus/backend/services/mtp/adapter/internal/nats"
 	"github.com/OktopUSP/oktopus/backend/services/mtp/adapter/internal/reqs"
 )
@@ -24,9 +25,10 @@ func main() {
 
 	db := db.NewDatabase(c.Mongo.Ctx, c.Mongo.Uri)
 
-	handler := handler.NewHandler(nc, js, db, c.Controller.ControllerId)
+	usp_handler := usp_handler.NewHandler(nc, js, db, c.Controller.ControllerId)
+	cwmp_handler := cwmp_handler.NewHandler(nc, js, db, c.Controller.ControllerId)
 
-	events.StartEventsListener(c.Nats.Ctx, js, handler)
+	events.StartEventsListener(c.Nats.Ctx, js, usp_handler, cwmp_handler)
 
 	reqs.StartRequestsListener(c.Nats.Ctx, nc, db)
 
