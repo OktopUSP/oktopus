@@ -1,6 +1,7 @@
 package main
 
 import (
+	"oktopUSP/backend/services/acs/internal/bridge"
 	"oktopUSP/backend/services/acs/internal/config"
 	"oktopUSP/backend/services/acs/internal/nats"
 	"oktopUSP/backend/services/acs/internal/server"
@@ -14,6 +15,13 @@ func main() {
 	natsActions := nats.StartNatsClient(c.Nats)
 
 	h := handler.NewHandler(natsActions.Publish, natsActions.Subscribe)
+
+	b := bridge.NewBridge(
+		natsActions.Publish,
+		natsActions.Subscribe,
+		h,
+	)
+	b.StartBridge()
 
 	server.Run(c.Acs, natsActions, h)
 }

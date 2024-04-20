@@ -12,7 +12,6 @@ import (
 func Run(c config.Acs, natsActions nats.NatsActions, h *handler.Handler) {
 
 	http.HandleFunc(c.Route, h.CwmpHandler)
-
 	log.Printf("ACS running at %s%s", c.Port, c.Route)
 
 	err := http.ListenAndServe(c.Port, nil)

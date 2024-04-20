@@ -5,7 +5,6 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -36,37 +35,37 @@ func Auth(username string, password string, uri string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	if resp.StatusCode == 401 {
-		var authorization map[string]string = DigestAuthParams(resp)
-		realmHeader := authorization["realm"]
-		qopHeader := authorization["qop"]
-		nonceHeader := authorization["nonce"]
-		opaqueHeader := authorization["opaque"]
-		realm := realmHeader
-		// A1
-		h := md5.New()
-		A1 := fmt.Sprintf("%s:%s:%s", username, realm, password)
-		io.WriteString(h, A1)
-		HA1 := fmt.Sprintf("%x", h.Sum(nil))
+	// if resp.StatusCode == 401 {
+	// 	var authorization map[string]string = DigestAuthParams(resp)
+	// 	realmHeader := authorization["realm"]
+	// 	qopHeader := authorization["qop"]
+	// 	nonceHeader := authorization["nonce"]
+	// 	opaqueHeader := authorization["opaque"]
+	// 	realm := realmHeader
+	// 	// A1
+	// 	h := md5.New()
+	// 	A1 := fmt.Sprintf("%s:%s:%s", username, realm, password)
+	// 	io.WriteString(h, A1)
+	// 	HA1 := fmt.Sprintf("%x", h.Sum(nil))
 
-		// A2
-		h = md5.New()
-		A2 := fmt.Sprintf("GET:%s", "/auth")
-		io.WriteString(h, A2)
-		HA2 := fmt.Sprintf("%x", h.Sum(nil))
+	// 	// A2
+	// 	h = md5.New()
+	// 	A2 := fmt.Sprintf("GET:%s", "/auth")
+	// 	io.WriteString(h, A2)
+	// 	HA2 := fmt.Sprintf("%x", h.Sum(nil))
 
-		// response
-		cnonce := RandomKey()
-		response := H(strings.Join([]string{HA1, nonceHeader, "00000001", cnonce, qopHeader, HA2}, ":"))
+	// 	// response
+	// 	cnonce := RandomKey()
+	// 	response := H(strings.Join([]string{HA1, nonceHeader, "00000001", cnonce, qopHeader, HA2}, ":"))
 
-		// now make header
-		AuthHeader := fmt.Sprintf(`Digest username="%s", realm="%s", nonce="%s", uri="%s", cnonce="%s", nc=00000001, qop=%s, response="%s", opaque="%s", algorithm=MD5`,
-			username, realmHeader, nonceHeader, "/auth", cnonce, qopHeader, response, opaqueHeader)
-		req.Header.Set("Authorization", AuthHeader)
-		resp, err = client.Do(req)
-	} else {
-		return false, fmt.Errorf("response status code should have been 401, it was %v", resp.StatusCode)
-	}
+	// 	// now make header
+	// 	AuthHeader := fmt.Sprintf(`Digest username="%s", realm="%s", nonce="%s", uri="%s", cnonce="%s", nc=00000001, qop=%s, response="%s", opaque="%s", algorithm=MD5`,
+	// 		username, realmHeader, nonceHeader, "/auth", cnonce, qopHeader, response, opaqueHeader)
+	// 	req.Header.Set("Authorization", AuthHeader)
+	// 	resp, err = client.Do(req)
+	// } else {
+	// 	return false, fmt.Errorf("response status code should have been 401, it was %v", resp.StatusCode)
+	// }
 	return resp.StatusCode == 200, err
 }
 

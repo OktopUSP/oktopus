@@ -7,14 +7,14 @@ import (
 
 // TODO: make these consts dynamic via config
 const (
-	CHECK_STATUS_INTERVAL = 5 * time.Second
-	KEEP_ALIVE_INTERVAL   = 10 * time.Second
+	CHECK_STATUS_INTERVAL = 10 * time.Second
+	KEEP_ALIVE_INTERVAL   = 600 * time.Second
 )
 
 func (h *Handler) handleCpeStatus(cpe string) {
 	for {
-		if time.Since(h.cpes[cpe].LastConnection) > KEEP_ALIVE_INTERVAL {
-			delete(h.cpes, cpe)
+		if time.Since(h.Cpes[cpe].LastConnection) > KEEP_ALIVE_INTERVAL {
+			delete(h.Cpes, cpe)
 			break
 		}
 		time.Sleep(CHECK_STATUS_INTERVAL)

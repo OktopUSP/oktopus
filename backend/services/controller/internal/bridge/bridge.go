@@ -204,3 +204,45 @@ func NatsReqWithoutHttpSet[T entity.DataType](
 
 	return answer, nil
 }
+
+func NatsCwmpInteraction(
+	subj string,
+	body []byte,
+	w http.ResponseWriter,
+	nc *nats.Conn,
+) ([]byte, error) {
+
+	log.Println("Sending cwmp message")
+	log.Println("Subject: ", subj)
+
+	var answer entity.MsgAnswer[[]byte]
+
+	msg, err := nc.Request(subj, body, local.NATS_REQUEST_TIMEOUT)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(utils.Marshall("Error to communicate with nats: " + err.Error()))
+		return nil, err
+	}
+
+	err = json.Unmarshal(msg.Data, &answer)
+	if err != nil {
+
+		var errMsg *entity.MsgAnswer[*string]
+		err = json.Unmarshal(msg.Data, &errMsg)
+
+		if err != nil {
+			log.Println("Bad answer message formatting: ", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(msg.Data)
+			return nil, err
+		}
+
+		log.Printf("Error message received, msg: %s, code: %d", *errMsg.Msg, errMsg.Code)
+		w.WriteHeader(errMsg.Code)
+		w.Write(utils.Marshall(*errMsg.Msg))
+		return nil, errNatsMsgReceivedWithErrorData
+	}
+
+	return answer.Msg, nil
+}
