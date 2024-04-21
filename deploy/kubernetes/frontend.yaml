@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: oktopusp/frontend:latest
+          image: rogersacchelli/frontend:1.0.3
           resources:
                 requests:
                   memory: 64Mi
@@ -25,11 +25,11 @@ spec:
                   memory: 256Mi
                   cpu: 200m
           ports:
-            - containerPort: 8080
+            - containerPort: 3000
           imagePullPolicy: IfNotPresent
           env:
-            #  - name: NEXT_PUBLIC_REST_ENDPOINT
-            #  value: "192.168.1.130:30003"
+              - name: NEXT_PUBLIC_REST_ENDPOINT
+                value: "/api"
             #- name: NEXT_PUBLIC_WS_ENDPOINT
             #  value: "192.168.1.130:30005"
 ---
@@ -42,7 +42,7 @@ spec:
     app: frontend
   ports:
     - protocol: TCP
-      port: 8080
-      targetPort: 8080
-  externalTrafficPolicy: Local
-  type: LoadBalancer
+      port: 3000
+      targetPort: 3000
+        #externalTrafficPolicy: Local
+  type: ClusterIP
