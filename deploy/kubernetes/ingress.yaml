@@ -24,4 +24,11 @@ spec:
             name: controller-svc
             port:
               number: 8000
+      - path: /socket.io
+        pathType: Prefix
+        backend:
+          service:
+            name: socketio-svc
+            port:
+              number: 5000
 
