@@ -53,7 +53,7 @@ This repository aims to promote the development of a multi-vendor management pla
 
 <ul><li><h4>Infrastructure:</h4></li></ul>
 
-![image](https://github.com/OktopUSP/oktopus/assets/83298718/67873f6c-d3db-4045-8569-7e1135fc5fa7)
+![image](https://github.com/OktopUSP/oktopus/assets/83298718/aa6feb7f-ac32-465c-b166-aa6b3ee5b68a)
 
 <ul>
     <li>
@@ -68,13 +68,15 @@ This repository aims to promote the development of a multi-vendor management pla
 <ul>
     <li>
         <h4>Quick start:</h4>
-Run app using Docker:
+Run app using <u><b>Docker Compose</b></u>:
 <pre>
 user@user-laptop:~$ cd oktopus/deploy/compose
 user@user-laptop:~/oktopus/deploy/compose$ COMPOSE_PROFILES=nats,controller,mqtt,stomp,ws,adapter,frontend,portainer docker compose up -d
 </pre>
+Oktopus deployment in <u><b>Kubernetes</b></u> still is in beta phase: <a href="https://github.com/OktopUSP/oktopus/blob/main/deploy/kubernetes/README.md"> Instructions for Kubernetes deployment</a><p></p>
         UI will open at port 3000:
         <img src="https://github.com/OktopUSP/oktopus/assets/83298718/65f7c5b9-c08d-479a-8a13-fdfc634b5ca2"/>
+
 </li>
     <li>
       <h4>Device test agent (obuspa):</h4>
