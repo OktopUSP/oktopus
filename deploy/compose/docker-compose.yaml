@@ -180,7 +180,7 @@ services:
     image: oktopusp/acs
     container_name: acs
     ports:
-      - 7547:7547
+      - 9292:9292
     env_file:
       - .env.acs
     networks:
