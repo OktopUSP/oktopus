@@ -15,6 +15,7 @@ const (
 	MQTT
 	STOMP
 	WEBSOCKETS
+	CWMP
 )
 
 type Status uint8
@@ -36,6 +37,7 @@ type Device struct {
 	Mqtt         Status
 	Stomp        Status
 	Websockets   Status
+	Cwmp         Status
 }
 
 func (d *Database) CreateDevice(device Device) error {
@@ -57,8 +59,11 @@ func (d *Database) CreateDevice(device Device) error {
 		if deviceExistent.Websockets == Online {
 			device.Websockets = Online
 		}
+		if deviceExistent.Cwmp == Online {
+			device.Cwmp = Online
+		}
 	} else {
-		if err != nil && err != mongo.ErrNoDocuments {
+		if err != mongo.ErrNoDocuments {
 			log.Println(err)
 			return err
 		}
@@ -70,7 +75,7 @@ func (d *Database) CreateDevice(device Device) error {
 		// transaction.
 		opts := options.FindOneAndReplace().SetUpsert(true)
 
-		err = d.devices.FindOneAndReplace(d.ctx, bson.D{{"sn", device.SN}}, device, opts).Decode(&result)
+		err := d.devices.FindOneAndReplace(d.ctx, bson.D{{"sn", device.SN}}, device, opts).Decode(&result)
 		if err != nil {
 			if err == mongo.ErrNoDocuments {
 				log.Printf("New device %s added to database", device.SN)
@@ -161,6 +166,8 @@ func (m MTP) String() string {
 		return "stomp"
 	case WEBSOCKETS:
 		return "websockets"
+	case CWMP:
+		return "cwmp"
 	}
 	return "unknown"
 }

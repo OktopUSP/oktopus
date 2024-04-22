@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adapter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: adapter
+  strategy:
+    type: Recreate       # Specify the Recreate strategy
+  template:
+    metadata:
+      labels:
+        app: adapter
+    spec:
+      containers:
+        - name: adapter
+          image: oktopusp/adapter:latest
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 0.1
+            limits:
+              memory: 128Mi
+              cpu: 0.2
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NATS_URL
+              value: "nats://nats:4222"
+            - name: NATS_NAME
+              value: "adapter"
+            - name: NATS_VERIFY_CERTIFICATES
+              value: "false"
+            - name: MONGO_URI
+              value: "mongodb://oktopusp:oktopusp@mongodb-0.mongodb-svc.mongodb.svc.cluster.local:27017,mongodb-1.mongodb-svc.mongodb.svc.cluster.local:27017,mongodb-2.mongodb-svc.mongodb.svc.cluster.local:27017/adapter?replicaSet=mongodb&ssl=false"
+            - name: CONTROLLER_ID
+              value: "oktopusController"
+

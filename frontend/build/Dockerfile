@@ -2,11 +2,11 @@ FROM node:16.20.2-alpine as builder
 
 WORKDIR /app
 
-COPY ../ .
+COPY ../ ./
 
 RUN npm install 
 
-RUN NEXT_PUBLIC_REST_ENPOINT=REST_API_URL NEXT_PUBLIC_WS_ENPOINT=WS_URL npm run build
+RUN NEXT_PUBLIC_REST_ENDPOINT=REST_API_URL NEXT_PUBLIC_WS_ENDPOINT=WS_URL npm run build
 
 RUN ls -la && echo "Listing directory contents done"
 

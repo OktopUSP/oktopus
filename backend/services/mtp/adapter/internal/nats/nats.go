@@ -17,6 +17,7 @@ const (
 	STOMP_STREAM_NAME  = "stomp"
 	LORA_STREAM_NAME   = "lora"
 	OPC_STREAM_NAME    = "opc"
+	CWMP_STREAM_NAME   = "cwmp"
 	ADAPTER_SUBJECT    = "adapter" + USP_SUBJECT
 	USP_SUBJECT        = ".usp.v1."
 	BUCKET_NAME        = "devices-auth"
@@ -118,6 +119,7 @@ func defineStreams() []string {
 		STOMP_STREAM_NAME,
 		LORA_STREAM_NAME,
 		OPC_STREAM_NAME,
+		CWMP_STREAM_NAME,
 	}
 }
 
@@ -128,6 +130,7 @@ func defineConsumers() []string {
 		STOMP_STREAM_NAME,
 		LORA_STREAM_NAME,
 		OPC_STREAM_NAME,
+		CWMP_STREAM_NAME,
 	}
 }
 

@@ -8,6 +8,8 @@ services:
       - 4222:4222
       - 8222:8222
     command: -n oktopus -m 8222 -js
+    volumes:
+      - ./nats_data:/tmp/nats/jetstream
     networks:
       usp_network:
         ipv4_address: 172.16.235.2
@@ -64,6 +66,8 @@ services:
     container_name: websockets
     ports:
     - 8080:8080
+    env_file:
+      - .env.ws
     networks:
       usp_network:
         ipv4_address: 172.16.235.7
