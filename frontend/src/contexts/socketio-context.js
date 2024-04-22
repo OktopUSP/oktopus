@@ -21,7 +21,7 @@ export const WsProvider = (props) => {
 	const userVideo = useRef();
 	const connectionRef = useRef();
   const auth = useAuth()
-  const socket = io(process.env.NEXT_PUBLIC_WS_ENPOINT)
+  const socket = io(process.env.NEXT_PUBLIC_WS_ENDPOINT)
 
   const initialize = async () => {
     // Prevent from calling twice in development mode with React.StrictMode enable

@@ -146,7 +146,7 @@ export const AuthProvider = (props) => {
       redirect: 'follow'
     };
 
-    let result = await fetch(process.env.NEXT_PUBLIC_REST_ENPOINT+"/auth/login", requestOptions)
+    let result = await fetch(process.env.NEXT_PUBLIC_REST_ENDPOINT+"/auth/login", requestOptions)
     
     if (result.status != 200) {
       throw new Error('Please check your email and password');
@@ -195,7 +195,7 @@ export const AuthProvider = (props) => {
       redirect: 'follow'
     };
 
-    let result = await fetch(process.env.NEXT_PUBLIC_REST_ENPOINT+"/auth/admin/register", requestOptions)
+    let result = await fetch(process.env.NEXT_PUBLIC_REST_ENDPOINT+"/auth/admin/register", requestOptions)
 
     if (result.status == 200) {
       router.push("/auth/login")
