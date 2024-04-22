@@ -1,0 +1,1 @@
+NATS_URL=nats://msg_broker:4222

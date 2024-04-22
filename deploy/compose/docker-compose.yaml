@@ -181,6 +181,8 @@ services:
     container_name: acs
     ports:
       - 7547:7547
+    env_file:
+      - .env.acs
     networks:
       usp_network:
         ipv4_address: 172.16.235.16
