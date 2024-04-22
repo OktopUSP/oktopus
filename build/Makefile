@@ -24,6 +24,7 @@ build: build-frontend build-backend
 
 build-backend:
 	@make build -C ../backend/services/controller/build/ DOCKER_USER=${DOCKER_USER}
+	@make build -C ../backend/services/acs/build/ DOCKER_USER=${DOCKER_USER}
 	@make build -C ../backend/services/utils/socketio/build/ DOCKER_USER=${DOCKER_USER}
 	@make build -C ../backend/services/mtp/adapter/build/ DOCKER_USER=${DOCKER_USER}
 	@make build -C ../backend/services/mtp/ws-adapter/build/ DOCKER_USER=${DOCKER_USER}
