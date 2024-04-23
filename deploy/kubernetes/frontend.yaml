@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: rogersacchelli/frontend:1.0.3
+          image: oktopusp/frontend:latest
           resources:
                 requests:
                   memory: 64Mi
