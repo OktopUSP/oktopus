@@ -46,3 +46,6 @@ spec:
               value: "false"
             - name: LOG_LEVEL
               value: "0"  # 0 - DEBUG
+            - name: REDIS_ENABLE
+              value: "false"
+
