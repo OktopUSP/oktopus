@@ -38,7 +38,7 @@ const Page = () => {
         redirect: 'follow',
     };
 
-    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENPOINT}/info/general`, requestOptions))
+    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/info/general`, requestOptions))
     if (result.status === 401){
     router.push("/auth/login")
     }else if (result.status != 200){

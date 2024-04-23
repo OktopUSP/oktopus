@@ -46,7 +46,7 @@ const Page = () => {
       redirect: 'follow'
     }
 
-    fetch(process.env.NEXT_PUBLIC_REST_ENPOINT+'/device', requestOptions)
+    fetch(process.env.NEXT_PUBLIC_REST_ENDPOINT+'/device', requestOptions)
       .then(response => {
         if (response.status === 401)
           router.push("/auth/login")
@@ -86,7 +86,7 @@ const Page = () => {
     p = p - 1
     p = p.toString()
 
-    fetch(process.env.NEXT_PUBLIC_REST_ENPOINT+'/device?page_number='+p, requestOptions)
+    fetch(process.env.NEXT_PUBLIC_REST_ENDPOINT+'/device?page_number='+p, requestOptions)
     .then(response => {
       if (response.status === 401)
         router.push("/auth/login")
@@ -115,7 +115,7 @@ const Page = () => {
     }
 
     if (id == ""){
-      return fetch(process.env.NEXT_PUBLIC_REST_ENPOINT+'/device', requestOptions)
+      return fetch(process.env.NEXT_PUBLIC_REST_ENDPOINT+'/device', requestOptions)
       .then(response => {
         if (response.status === 401)
           router.push("/auth/login")
@@ -133,7 +133,7 @@ const Page = () => {
       });
     }
 
-    let response = await fetch(process.env.NEXT_PUBLIC_REST_ENPOINT+'/device?id='+id, requestOptions)
+    let response = await fetch(process.env.NEXT_PUBLIC_REST_ENDPOINT+'/device?id='+id, requestOptions)
     if (response.status === 401)
       router.push("/auth/login")
     let json = await response.json()

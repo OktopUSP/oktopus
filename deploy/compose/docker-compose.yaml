@@ -175,6 +175,17 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./portainer_data:/data
+  
+  acs:
+    image: oktopusp/acs
+    container_name: acs
+    ports:
+      - 9292:9292
+    env_file:
+      - .env.acs
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.16
 
 networks:
    usp_network:
