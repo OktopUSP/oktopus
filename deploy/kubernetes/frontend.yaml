@@ -28,10 +28,8 @@ spec:
             - containerPort: 3000
           imagePullPolicy: IfNotPresent
           env:
-            - name: NEXT_PUBLIC_REST_ENDPOINT
-              value: "192.168.1.130:30003"
-            - name: NEXT_PUBLIC_WS_ENDPOINT
-              value: "192.168.1.130:30005"
+              - name: NEXT_PUBLIC_REST_ENDPOINT
+                value: "/api"
 ---
 apiVersion: v1
 kind: Service
@@ -44,5 +42,5 @@ spec:
     - protocol: TCP
       port: 3000
       targetPort: 3000
-      nodePort: 30001
-  type: NodePort
+        #externalTrafficPolicy: Local
+  type: ClusterIP

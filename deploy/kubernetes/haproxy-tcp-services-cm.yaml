@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: haproxy-tcp
-  namespace: default
-data:
-  1883:                      # Port where the frontend is going to listen to.
-    default/mqtt-svc:1883    # Kubernetes service in the format NS/ServiceName:ServicePort

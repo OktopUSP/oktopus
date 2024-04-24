@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-ingress
+  namespace: default
+  annotations:
+spec:
+  ingressClassName: "haproxy"
+  rules:
+  - host: oktopus.rdss.cloud
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-svc
+            port:
+              number: 3000
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: controller-svc
+            port:
+              number: 8000
+      - path: /socket.io
+        pathType: Prefix
+        backend:
+          service:
+            name: socketio-svc
+            port:
+              number: 5000
+
