@@ -24,6 +24,10 @@ func (h *Handler) CwmpHandler(w http.ResponseWriter, r *http.Request) {
 	tmp, _ := ioutil.ReadAll(r.Body)
 	body := string(tmp)
 
+	if h.acsConfig.DebugMode {
+		log.Println("Received message: ", body)
+	}
+
 	var envelope cwmp.SoapEnvelope
 	xml.Unmarshal(tmp, &envelope)
 

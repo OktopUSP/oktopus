@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"oktopUSP/backend/services/acs/internal/config"
 	"time"
 
 	"github.com/nats-io/nats.go"
@@ -53,9 +54,10 @@ type MsgCPEs struct {
 }
 
 type Handler struct {
-	pub  func(string, []byte) error
-	sub  func(string, func(*nats.Msg)) error
-	Cpes map[string]CPE
+	pub       func(string, []byte) error
+	sub       func(string, func(*nats.Msg)) error
+	Cpes      map[string]CPE
+	acsConfig config.Acs
 }
 
 const (
@@ -64,10 +66,15 @@ const (
 	NATS_ADAPTER_SUBJECT_PREFIX      = "adapter.v1."
 )
 
-func NewHandler(pub func(string, []byte) error, sub func(string, func(*nats.Msg)) error) *Handler {
+func NewHandler(
+	pub func(string, []byte) error,
+	sub func(string, func(*nats.Msg)) error,
+	cAcs config.Acs,
+) *Handler {
 	return &Handler{
-		pub:  pub,
-		sub:  sub,
-		Cpes: make(map[string]CPE),
+		pub:       pub,
+		sub:       sub,
+		Cpes:      make(map[string]CPE),
+		acsConfig: cAcs,
 	}
 }
