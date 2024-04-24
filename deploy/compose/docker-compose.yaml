@@ -186,6 +186,7 @@ services:
     networks:
       usp_network:
         ipv4_address: 172.16.235.16
+    profiles: [cwmp]
 
 networks:
    usp_network:

@@ -14,7 +14,7 @@ func main() {
 
 	natsActions := nats.StartNatsClient(c.Nats)
 
-	h := handler.NewHandler(natsActions.Publish, natsActions.Subscribe)
+	h := handler.NewHandler(natsActions.Publish, natsActions.Subscribe, c.Acs)
 
 	b := bridge.NewBridge(
 		natsActions.Publish,

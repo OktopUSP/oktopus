@@ -71,7 +71,7 @@ This repository aims to promote the development of a multi-vendor management pla
 Run app using <u><b>Docker Compose</b></u>:
 <pre>
 user@user-laptop:~$ cd oktopus/deploy/compose
-user@user-laptop:~/oktopus/deploy/compose$ COMPOSE_PROFILES=nats,controller,mqtt,stomp,ws,adapter,frontend,portainer docker compose up -d
+user@user-laptop:~/oktopus/deploy/compose$ COMPOSE_PROFILES=nats,controller,cwmp,mqtt,stomp,ws,adapter,frontend,portainer docker compose up -d
 </pre>
 Oktopus deployment in <u><b>Kubernetes</b></u> still is in beta phase: <a href="https://github.com/OktopUSP/oktopus/blob/main/deploy/kubernetes/README.md"> Instructions for Kubernetes deployment</a><p></p>
         UI will open at port 3000:
