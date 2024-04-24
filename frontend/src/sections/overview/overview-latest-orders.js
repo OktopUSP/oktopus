@@ -97,13 +97,11 @@ export const OverviewLatestOrders = (props) => {
                     </SeverityPill>
                     </TableCell>
                     <TableCell>
-                      { order.Status == 2 && (order.Mqtt == 0 && order.Websockets == 0 && order.Stomp == 0) ? <span></span>: <SvgIcon 
+                      { order.Mqtt == 0 && order.Websockets == 0 && order.Stomp == 0 ? <span></span>: <SvgIcon 
                         fontSize="small" 
                         sx={{cursor: order.Status == 2 && 'pointer'}} 
                         onClick={()=>{
-                            if (order.Status == 2){
                               router.push("devices/"+order.SN+"/discovery")
-                            }
                           }
                         }
                       >
