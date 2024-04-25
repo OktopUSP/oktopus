@@ -9,6 +9,7 @@ import (
 	"github.com/leandrofars/oktopus/internal/api/auth"
 	"github.com/leandrofars/oktopus/internal/db"
 	"github.com/leandrofars/oktopus/internal/utils"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (a *Api) retrieveUsers(w http.ResponseWriter, r *http.Request) {
@@ -20,6 +21,11 @@ func (a *Api) retrieveUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, x := range users {
+		objectID, ok := x["_id"].(primitive.ObjectID)
+		if ok {
+			creationTime := objectID.Timestamp()
+			x["createdAt"] = creationTime.Format("02/01/2006")
+		}
 		delete(x, "password")
 	}
 
