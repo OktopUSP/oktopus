@@ -112,8 +112,7 @@ func (a *Api) deleteUser(w http.ResponseWriter, r *http.Request) {
 
 	userEmail := mux.Vars(r)["user"]
 
-	if rUser.Email == userEmail || (rUser.Level == AdminUser && rUser.Email != userEmail) { //Admin can delete any user, but can't delete himself
-		if err := a.db.DeleteUser(userEmail); err != nil {
+	if rUser.Email == userEmail || (rUser.Level == AdminUser && rUser.Email != userEmail) { //Admin can delete any account, but admin account can never be deleted
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(err)
 			return
