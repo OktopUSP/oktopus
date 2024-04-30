@@ -2,6 +2,8 @@ import ChartBarIcon from '@heroicons/react/24/solid/ChartBarIcon';
 import CogIcon from '@heroicons/react/24/solid/CogIcon';
 import ChatBubbleLeftRightIcon from '@heroicons/react/24/solid/ChatBubbleLeftRightIcon'
 import MapIcon from '@heroicons/react/24/solid/MapIcon'
+import UserGroupIcon from '@heroicons/react/24/solid/UserGroupIcon'
+import KeyIcon from '@heroicons/react/24/solid/KeyIcon'
 import CpuChip from '@heroicons/react/24/solid/CpuChipIcon';
 import { SvgIcon } from '@mui/material';
 
@@ -42,6 +44,24 @@ export const items = [
   //      </SvgIcon>
   //    )
   //  },
+  // {
+  //   title: 'Credentials',
+  //   path: '/credentials',
+  //   icon: (
+  //     <SvgIcon fontSize="small">
+  //     <KeyIcon/>
+  //     </SvgIcon>
+  //   )
+  // },
+  {
+    title: 'Users',
+    path: '/users',
+    icon: (
+      <SvgIcon fontSize="small">
+      <UserGroupIcon/>
+      </SvgIcon>
+    )
+   },
   {
     title: 'Settings',
     path: '/settings',

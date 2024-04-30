@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -33,6 +34,15 @@ func NewDatabase(ctx context.Context, mongoUri string) Database {
 	log.Println("Connected to MongoDB-->", mongoUri)
 
 	db.users = client.Database("account-mngr").Collection("users")
+	indexField := bson.M{"email": 1}
+	_, err = db.users.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys:    indexField,
+		Options: options.Index().SetUnique(true),
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	db.ctx = ctx
 
 	return db

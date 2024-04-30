@@ -19,6 +19,8 @@ spec:
           env:
             - name: NATS_URL
               value: "nats:4222"
+            - name: CORS_ALLOWED_ORIGINS
+              value: ""
 ---
 apiVersion: v1
 kind: Service
@@ -31,5 +33,3 @@ spec:
     - protocol: TCP
       port: 5000
       targetPort: 5000
-      nodePort: 30002
-  type: NodePort

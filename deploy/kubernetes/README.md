@@ -19,6 +19,15 @@ git clone https://github.com/OktopUSP/oktopus
 export DEPLOYMENT_PATH=oktopus/deploy/kubernetes
 ```
 
+## HAProxy Ingress Controller
+
+```shell
+helm install haproxy-kubernetes-ingress haproxytech/kubernetes-ingress \
+  --create-namespace \
+  --namespace haproxy-controller \
+  --set controller.kind=DaemonSet \
+  --set controller.daemonset.useHostPort=true
+```
 
 ## MongoBD
 
@@ -48,27 +57,6 @@ helm install nats nats/nats --set config.jetstream.enabled=true
 ```
  
 ## Oktopus
-
-
-<b>Node Ports</b>
-
-For this deployment, we are not using a load balancer and kubernetes is deployed on-premises so we are using Nodeports to insource the client traffic into cluster. below the ports set on deployment files:
-
-1. MQTT broker service (mqtt-svc): 30000
-2. Frontend (frontend-svc): 30001
-3. SocketIO: (socketio-svc): 30002
-4. Controller (controller-svc): 30003
-5. WebSocket (ws-svc): 30005
-
-Before deploying the files, edit the frontend.yaml file to set the correct enviroment variables:
-
-```yaml
-env:
-    - name: NEXT_PUBLIC_REST_ENDPOINT
-        value: "<FRONTEND_IP>:30003"
-    - name: NEXT_PUBLIC_WS_ENDPOINT
-        value: "<FRONTEND_IP>:30005"
-``` 
 
 ```shell
 kubectl apply -f $DEPLOYMENT_PATH/mqtt.yaml

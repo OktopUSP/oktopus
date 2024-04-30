@@ -31,7 +31,7 @@ spec:
             - name: NATS_VERIFY_CERTIFICATES
               value: "false"
             - name: MQTT_URL
-              value: "tcp://mqtt:1883"
+              value: "tcp://mqtt-svc:1883"
             - name: MQTT_CLIENT_ID
               value: "mqtt-adapter"
             - name: MQTT_USERNAME

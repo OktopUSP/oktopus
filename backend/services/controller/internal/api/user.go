@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"net/mail"
 
 	"github.com/gorilla/mux"
 	"github.com/leandrofars/oktopus/internal/api/auth"
 	"github.com/leandrofars/oktopus/internal/db"
 	"github.com/leandrofars/oktopus/internal/utils"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (a *Api) retrieveUsers(w http.ResponseWriter, r *http.Request) {
@@ -20,6 +22,11 @@ func (a *Api) retrieveUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, x := range users {
+		objectID, ok := x["_id"].(primitive.ObjectID)
+		if ok {
+			creationTime := objectID.Timestamp()
+			x["createdAt"] = creationTime.Format("02/01/2006")
+		}
 		delete(x, "password")
 	}
 
@@ -27,7 +34,6 @@ func (a *Api) retrieveUsers(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	return
 }
 
 func (a *Api) registerUser(w http.ResponseWriter, r *http.Request) {
@@ -64,10 +70,25 @@ func (a *Api) registerUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if user.Email == "" || user.Password == "" || !valid(user.Email) {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	if err := a.db.RegisterUser(user); err != nil {
+		if err == db.ErrorUserExists {
+			w.WriteHeader(http.StatusConflict)
+			w.Write([]byte("User with this email already exists"))
+			return
+		}
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+}
+
+func valid(email string) bool {
+	_, err := mail.ParseAddress(email)
+	return err == nil
 }
 
 func (a *Api) deleteUser(w http.ResponseWriter, r *http.Request) {
@@ -84,21 +105,21 @@ func (a *Api) deleteUser(w http.ResponseWriter, r *http.Request) {
 
 	//Check if user which is requesting deletion has the necessary privileges
 	rUser, err := a.db.FindUser(email)
-	if rUser.Level != AdminUser {
-		w.WriteHeader(http.StatusForbidden)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	userEmail := mux.Vars(r)["user"]
-	if userEmail == email {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
 
-	if err := a.db.DeleteUser(userEmail); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err)
-		return
+	if rUser.Email == userEmail || (rUser.Level == AdminUser && rUser.Email != userEmail) { //Admin can delete any account, but admin account can never be deleted
+		if err := a.db.DeleteUser(userEmail); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(err)
+			return
+		}
+	} else {
+		w.WriteHeader(http.StatusForbidden)
 	}
 }
 
