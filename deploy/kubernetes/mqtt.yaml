@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: mqtt
-          image: rogersacchelli/mqtt:latest
+          image: oktopusp/mqtt:latest
           ports:
             - containerPort: 1883
           resources:
