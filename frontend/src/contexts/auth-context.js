@@ -82,18 +82,22 @@ export const AuthProvider = (props) => {
       console.error(err);
     }
 
+    console.log("isAuthenticated: ", isAuthenticated)
     if (isAuthenticated) {
       const user = {
         id: '5e86809283e28b96d2d38537',
         avatar: '/assets/avatars/default-avatar.png',
         name: 'Oktopus',
         email: 'anika.visser@devias.io',
+        token: localStorage.getItem("token")
       };
 
       dispatch({
         type: HANDLERS.INITIALIZE,
         payload: user
       });
+
+      console.log("AUTH CONTEXT --> auth.user.token:", user.token)
     } else {
       dispatch({
         type: HANDLERS.INITIALIZE
