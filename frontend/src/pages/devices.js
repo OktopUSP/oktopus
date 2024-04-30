@@ -22,7 +22,7 @@ const Page = () => {
   const router = useRouter()
   const auth = useAuth();
   const [devices, setDevices] = useState([]);
-  const [deviceFound, setDeviceFound] = useState(false)
+  const [deviceFound, setDeviceFound] = useState(true)
   const [pages, setPages] = useState(0);
   const [page, setPage] = useState(null);
   const [Loading, setLoading] = useState(true);
@@ -104,6 +104,7 @@ const Page = () => {
 
   const fetchDevicePerId = async (id) => {
     setLoading(true)
+    setDeviceFound(true)
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", auth.user.token);
