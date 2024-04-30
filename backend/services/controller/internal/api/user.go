@@ -105,21 +105,21 @@ func (a *Api) deleteUser(w http.ResponseWriter, r *http.Request) {
 
 	//Check if user which is requesting deletion has the necessary privileges
 	rUser, err := a.db.FindUser(email)
-	if rUser.Level != AdminUser {
-		w.WriteHeader(http.StatusForbidden)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	userEmail := mux.Vars(r)["user"]
-	if userEmail == email {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
 
-	if err := a.db.DeleteUser(userEmail); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err)
-		return
+	if rUser.Email == userEmail || (rUser.Level == AdminUser && rUser.Email != userEmail) { //Admin can delete any user, but can't delete himself
+		if err := a.db.DeleteUser(userEmail); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(err)
+			return
+		}
+	} else {
+		w.WriteHeader(http.StatusForbidden)
 	}
 }
 
