@@ -1,6 +1,7 @@
 package db
 
 import (
+	"errors"
 	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,7 +14,10 @@ type User struct {
 	Name     string `json:"name"`
 	Password string `json:"password,omitempty"`
 	Level    int    `json:"level"`
+	Phone    string `json:"phone"`
 }
+
+var ErrorUserExists = errors.New("User already exists")
 
 func (d *Database) RegisterUser(user User) error {
 	err := d.users.FindOne(d.ctx, bson.D{{"email", user.Email}}).Err()
@@ -23,8 +27,10 @@ func (d *Database) RegisterUser(user User) error {
 			return err
 		}
 		log.Println(err)
+		return err
+	} else {
+		return ErrorUserExists
 	}
-	return err
 }
 
 func (d *Database) UpdatePassword(user User) error {

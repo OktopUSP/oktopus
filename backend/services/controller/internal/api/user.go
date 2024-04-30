@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"net/mail"
 
 	"github.com/gorilla/mux"
 	"github.com/leandrofars/oktopus/internal/api/auth"
@@ -33,7 +34,6 @@ func (a *Api) retrieveUsers(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	return
 }
 
 func (a *Api) registerUser(w http.ResponseWriter, r *http.Request) {
@@ -70,10 +70,25 @@ func (a *Api) registerUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if user.Email == "" || user.Password == "" || !valid(user.Email) {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	if err := a.db.RegisterUser(user); err != nil {
+		if err == db.ErrorUserExists {
+			w.WriteHeader(http.StatusConflict)
+			w.Write([]byte("User with this email already exists"))
+			return
+		}
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+}
+
+func valid(email string) bool {
+	_, err := mail.ParseAddress(email)
+	return err == nil
 }
 
 func (a *Api) deleteUser(w http.ResponseWriter, r *http.Request) {
