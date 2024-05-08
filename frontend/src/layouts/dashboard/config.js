@@ -44,15 +44,15 @@ export const items = [
   //      </SvgIcon>
   //    )
   //  },
-  // {
-  //   title: 'Credentials',
-  //   path: '/credentials',
-  //   icon: (
-  //     <SvgIcon fontSize="small">
-  //     <KeyIcon/>
-  //     </SvgIcon>
-  //   )
-  // },
+  {
+    title: 'Credentials',
+    path: '/credentials',
+    icon: (
+      <SvgIcon fontSize="small">
+      <KeyIcon/>
+      </SvgIcon>
+    )
+  },
   {
     title: 'Users',
     path: '/users',

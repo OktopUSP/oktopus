@@ -188,7 +188,7 @@ func (a *Api) deviceAuth(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		utils.MarshallEncoder("No id provided", w)
 
-	} else if r.Method == http.MethodPut {
+	} else if r.Method == http.MethodPost {
 
 		var deviceAuth DeviceAuth
 
@@ -200,12 +200,26 @@ func (a *Api) deviceAuth(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if deviceAuth.User != "" {
-			_, err := a.kv.PutString(r.Context(), deviceAuth.User, deviceAuth.Password)
+			_, err := a.kv.Get(r.Context(), deviceAuth.User)
+
 			if err != nil {
+
+				if err == jetstream.ErrKeyNotFound {
+					_, err = a.kv.PutString(r.Context(), deviceAuth.User, deviceAuth.Password)
+					if err != nil {
+						w.WriteHeader(http.StatusInternalServerError)
+						utils.MarshallEncoder(err, w)
+					}
+					return
+				}
+
 				w.WriteHeader(http.StatusInternalServerError)
 				utils.MarshallEncoder(err, w)
 				return
 			}
+
+			w.WriteHeader(http.StatusConflict)
+			utils.MarshallEncoder("Username already exists", w)
 			return
 		}
 
