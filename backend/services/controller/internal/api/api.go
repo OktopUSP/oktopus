@@ -56,7 +56,7 @@ func (a *Api) StartApi() {
 	authentication.HandleFunc("/admin/register", a.registerAdminUser).Methods("POST")
 	authentication.HandleFunc("/admin/exists", a.adminUserExists).Methods("GET")
 	iot := r.PathPrefix("/api/device").Subrouter()
-	iot.HandleFunc("/auth", a.deviceAuth).Methods("GET", "PUT", "DELETE")
+	iot.HandleFunc("/auth", a.deviceAuth).Methods("GET", "POST", "DELETE")
 	iot.HandleFunc("/cwmp/{sn}/getParameterNames", a.cwmpGetParameterNamesMsg).Methods("GET", "PUT", "DELETE")
 	iot.HandleFunc("", a.retrieveDevices).Methods("GET")
 	iot.HandleFunc("/{id}", a.retrieveDevices).Methods("GET")
