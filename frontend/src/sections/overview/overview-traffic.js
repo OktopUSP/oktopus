@@ -72,7 +72,9 @@ const useChartOptions = (labels,title) => {
     options.colors = [
       theme.palette.primary.main,
       theme.palette.info.main,
-      theme.palette.warning.main
+      theme.palette.warning.main,
+      theme.palette.graphics.lightest, 
+      theme.palette.graphics.light,
     ]
   }
   return options
