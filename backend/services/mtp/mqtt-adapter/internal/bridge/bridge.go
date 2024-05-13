@@ -283,6 +283,11 @@ func tcpInfo(conn *net.TCPConn) (*unix.TCPInfo, error) {
 }
 
 func (b *Bridge) setMqttPassword() {
-	entry, _ := b.kv.Get(b.Ctx, b.Mqtt.Username)
+	entry, err := b.kv.Get(b.Ctx, b.Mqtt.Username)
+	if err != nil {
+		log.Printf("Error getting key %s: %v", b.Mqtt.Username, err)
+		return
+	}
+
 	b.Mqtt.Password = string(entry.Value())
 }
