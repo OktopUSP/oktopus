@@ -58,7 +58,8 @@ const Page = () => {
         setDevicesStatus([onlinePercentage, 100 - onlinePercentage])
       }else{
         onlinePercentage = Number(onlinePercentage.toFixed(1))
-        setDevicesStatus([onlinePercentage, 100 - onlinePercentage])
+        let offlinePercentage = 100 - onlinePercentage
+        setDevicesStatus([onlinePercentage, Number(offlinePercentage.toFixed(1))])
       }
 
       let prodClassLabels = []
