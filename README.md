@@ -25,26 +25,10 @@ This repository aims to promote the development of a multi-vendor management pla
 <ul>
     <li>
         <h4>💼 Commercial Support:</h4>
+        <a href="https://oktopus.app.br/controller#offer"> Pricing Plans </a>
         <p>
             Our solution has an open-source software license, meaning you can modify/study the code and use it for free. You can perform all the configurations, allocate servers, and set it up on your network with the classic "do it yourself" approach, or save time and money: contact us for a quote and get commercial support.
         </p>
-        <ul>
-            <li> 
-            Software customization according to your needs and preferences
-            </li>
-            <li> 
-            Full support to your team
-            </li>
-            <li> 
-            Affordable prices for companies of all sizes
-            </li>
-            <li> 
-            Trust and assistance from experts
-            </li>
-            <li> 
-            Complete solution for production environments, from the server provisionning to devices connection
-            </li>
-        </ul>
         <p>Contact <a href="">leandro@oktopus.app.br</a> via email and get a quote.</p>
     </li> 
 </ul>
