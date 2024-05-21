@@ -180,6 +180,10 @@ func GetParameterMultiValues(leaves []string) string {
 	return msg
 }
 
+type SetParameterValuesResponse struct {
+	Status int `xml:"Body>SetParameterValuesResponse>Status"`
+}
+
 func SetParameterValues(leaf string, value string) string {
 	return `<?xml version="1.0" encoding="UTF-8"?>
 <soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
