@@ -46,3 +46,38 @@ func (a *Api) cwmpGetParameterNamesMsg(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(data)
 }
+
+func (a *Api) cwmpGetParameterValuesMsg(w http.ResponseWriter, r *http.Request) {
+	sn := getSerialNumberFromRequest(r)
+
+	payload, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(utils.Marshall(err.Error()))
+		return
+	}
+
+	data, err := bridge.NatsCwmpInteraction(
+		nats.NATS_CWMP_ADAPTER_SUBJECT_PREFIX+sn+".api",
+		payload,
+		w,
+		a.nc,
+	)
+	if err != nil {
+		return
+	}
+
+	var response cwmp.GetParameterValuesResponse
+	err = xml.Unmarshal(data, &response)
+	if err != nil {
+		err = json.Unmarshal(data, &response)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(utils.Marshall(err))
+			return
+		}
+		return
+	}
+
+	w.Write(data)
+}
