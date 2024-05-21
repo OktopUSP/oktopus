@@ -30,6 +30,8 @@ type Acs struct {
 	Password          string
 	Route             string
 	DebugMode         bool
+	ConnReqUsername   string
+	ConnReqPassword   string
 }
 
 type Config struct {
@@ -47,6 +49,8 @@ func NewConfig() *Config {
 	natsVerifyCertificates := flag.Bool("nats_verify_certificates", lookupEnvOrBool("NATS_VERIFY_CERTIFICATES", false), "verify validity of certificates from nats server")
 	acsPort := flag.String("acs_port", lookupEnvOrString("ACS_PORT", ":9292"), "port for acs server")
 	acsRoute := flag.String("acs_route", lookupEnvOrString("ACS_ROUTE", "/acs"), "route for acs server")
+	connReqUser := flag.String("connrq_user", lookupEnvOrString("CONN_RQ_USER", ""), "Connection Request Username")
+	connReqPasswd := flag.String("connrq_passwd", lookupEnvOrString("CONN_RQ_PASSWD", ""), "Connection Request Password")
 	acsKeepAliveInterval := flag.Int("acs_keep_alive_interval", lookupEnvOrInt("KEEP_ALIVE_INTERVAL", 300), "keep alive interval in seconds for acs server")
 	cwmpDebugMode := flag.Bool("debug_mode", lookupEnvOrBool("CWMP_DEBUG", false), "enable or disable cwmp logs in debug mode")
 	flHelp := flag.Bool("help", false, "Help")
@@ -77,8 +81,10 @@ func NewConfig() *Config {
 		Acs: Acs{
 			Port:              *acsPort,
 			Route:             *acsRoute,
-			KeepAliveInterval: time.Duration(*acsKeepAliveInterval),
+			KeepAliveInterval: time.Duration(*acsKeepAliveInterval) * time.Second,
 			DebugMode:         *cwmpDebugMode,
+			ConnReqUsername:   *connReqUser,
+			ConnReqPassword:   *connReqPasswd,
 		},
 	}
 }

@@ -40,8 +40,9 @@ func NewBridge(
 }
 
 func (b *Bridge) StartBridge() {
+
 	b.sub(handler.NATS_CWMP_ADAPTER_SUBJECT_PREFIX+"*.api", func(msg *nats.Msg) {
-		log.Printf("Received message: %s", string(msg.Data))
+		//log.Printf("Received message: %s", string(msg.Data))
 		log.Printf("Subject: %s", msg.Subject)
 		log.Printf("Reply: %s", msg.Reply)
 
@@ -53,6 +54,8 @@ func (b *Bridge) StartBridge() {
 			return
 		}
 		if cpe.Queue.Size() > 0 {
+			log.Println("Queue size: ", cpe.Queue.Size())
+			log.Println("Queue data: ", cpe.Queue)
 			log.Printf("Device %s is busy", device)
 			respondMsg(msg.Respond, http.StatusConflict, "Device is busy")
 			return
@@ -77,6 +80,8 @@ func (b *Bridge) StartBridge() {
 
 		//req := cpe.Queue.Dequeue().(handler.Request)
 		//cpe.Waiting = &req
+
+		defer cpe.Queue.Dequeue()
 
 		select {
 		case response := <-deviceAnswer:

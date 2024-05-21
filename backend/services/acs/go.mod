@@ -7,7 +7,6 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/nats-io/nats.go v1.34.1
 	github.com/oleiade/lane v1.0.1
-	golang.org/x/net v0.24.0
 )
 
 require (
