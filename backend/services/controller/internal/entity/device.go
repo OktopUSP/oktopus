@@ -11,6 +11,7 @@ type Device struct {
 	Mqtt         Status
 	Stomp        Status
 	Websockets   Status
+	Cwmp         Status
 }
 
 type VendorsCount struct {
