@@ -9,6 +9,12 @@ import (
 	"time"
 )
 
+const WRITABLE = "1"
+
+func ParamTypeIsWritable(param string) bool {
+	return param == WRITABLE
+}
+
 type SoapEnvelope struct {
 	XMLName xml.Name
 	Header  SoapHeader
@@ -41,6 +47,12 @@ type ParameterInfoStruct struct {
 	Writable string
 }
 
+type ParameterAttributeStruct struct {
+	Name         string
+	Notification int
+	AccessList   []string
+}
+
 type SetParameterValues_ struct {
 	ParameterList []ParameterValueStruct `xml:"Body>SetParameterValues>ParameterList>ParameterValueStruct"`
 	ParameterKey  string                 `xml:"Body>SetParameterValues>ParameterKey>string"`
@@ -55,12 +67,20 @@ type GetParameterNames_ struct {
 	NextLevel     string   `xml:"Body>GetParameterNames>NextLevel"`
 }
 
+type GetParameterAttributes_ struct {
+	ParameterNames []string `xml:"Body>GetParameterAttributes>ParameterNames>string"`
+}
+
 type GetParameterValuesResponse struct {
 	ParameterList []ParameterValueStruct `xml:"Body>GetParameterValuesResponse>ParameterList>ParameterValueStruct"`
 }
 
 type GetParameterNamesResponse struct {
 	ParameterList []ParameterInfoStruct `xml:"Body>GetParameterNamesResponse>ParameterList>ParameterInfoStruct"`
+}
+
+type GetParameterAttributesResponse struct {
+	ParameterList []ParameterAttributeStruct `xml:"Body>GetParameterAttributesResponse>ParameterList>ParameterAttributeStruct"`
 }
 
 type CWMPInform struct {
