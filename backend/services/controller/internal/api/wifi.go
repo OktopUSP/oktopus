@@ -1,17 +1,13 @@
 package api
 
 import (
-	"encoding/json"
-	"encoding/xml"
 	"log"
 	"net/http"
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/leandrofars/oktopus/internal/bridge"
 	"github.com/leandrofars/oktopus/internal/cwmp"
 	"github.com/leandrofars/oktopus/internal/entity"
-	"github.com/leandrofars/oktopus/internal/nats"
 	"github.com/leandrofars/oktopus/internal/utils"
 )
 
@@ -223,25 +219,8 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 
 			payload := cwmp.GetParameterNames("InternetGatewayDevice.LANDevice.", 1)
 
-			data, err := bridge.NatsCwmpInteraction(
-				nats.NATS_CWMP_ADAPTER_SUBJECT_PREFIX+sn+".api",
-				[]byte(payload),
-				w,
-				a.nc,
-			)
+			response, err := cwmpInteraction[cwmp.GetParameterNamesResponse](sn, payload, w, a.nc)
 			if err != nil {
-				return
-			}
-
-			var response cwmp.GetParameterNamesResponse
-			err = xml.Unmarshal(data, &response)
-			if err != nil {
-				err = json.Unmarshal(data, &response)
-				if err != nil {
-					w.WriteHeader(http.StatusBadRequest)
-					w.Write(utils.Marshall(err))
-					return
-				}
 				return
 			}
 
@@ -253,25 +232,8 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 
 				payload = cwmp.GetParameterNames(x.Name+"WLANConfiguration.", 1)
 
-				data, err := bridge.NatsCwmpInteraction(
-					nats.NATS_CWMP_ADAPTER_SUBJECT_PREFIX+sn+".api",
-					[]byte(payload),
-					w,
-					a.nc,
-				)
+				response, err := cwmpInteraction[cwmp.GetParameterNamesResponse](sn, payload, w, a.nc)
 				if err != nil {
-					return
-				}
-
-				var response cwmp.GetParameterNamesResponse
-				err = xml.Unmarshal(data, &response)
-				if err != nil {
-					err = json.Unmarshal(data, &response)
-					if err != nil {
-						w.WriteHeader(http.StatusBadRequest)
-						w.Write(utils.Marshall(err))
-						return
-					}
 					return
 				}
 
@@ -281,30 +243,12 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 
 					payload = cwmp.GetParameterNames(y.Name, 1)
 
-					data, err := bridge.NatsCwmpInteraction(
-						nats.NATS_CWMP_ADAPTER_SUBJECT_PREFIX+sn+".api",
-						[]byte(payload),
-						w,
-						a.nc,
-					)
+					response, err := cwmpInteraction[cwmp.GetParameterNamesResponse](sn, payload, w, a.nc)
 					if err != nil {
 						return
 					}
-					log.Println("y.name: ", y.Name)
 
-					var response cwmp.GetParameterNamesResponse
-					err = xml.Unmarshal(data, &response)
-					if err != nil {
-						err = json.Unmarshal(data, &response)
-						if err != nil {
-							w.WriteHeader(http.StatusBadRequest)
-							w.Write(utils.Marshall(err))
-							return
-						}
-						return
-					}
-
-					// y = InternetGatewayDevice.LanDevice.*.WLANConfiguration.*.<Parameter>
+					// z = InternetGatewayDevice.LanDevice.*.WLANConfiguration.*.<Parameter>
 					for _, z := range response.ParameterList {
 						path := strings.Split(z.Name, ".")
 						parameter := path[len(path)-1]
@@ -335,36 +279,17 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 						y.Name+"Standard",
 						y.Name+"PreSharedKey.1.KeyPassphrase",
 					)
-					//parameters_to_get_values = append(parameters_to_get_values, y.Name+"NamePreSharedKey.1.KeyPassphrase")
+
 					wlans[wlanConfigurationInstances].Path = y.Name
 					wlanConfigurationInstances = wlanConfigurationInstances + 1
 				}
 			}
 			log.Println("wlanConfigurationInstances: ", wlanConfigurationInstances)
-			//utils.MarshallEncoder(wlans, w)
 
 			payload = cwmp.GetParameterMultiValues(parameters_to_get_values)
-			//log.Println("payload:", payload)
 
-			data, err = bridge.NatsCwmpInteraction(
-				nats.NATS_CWMP_ADAPTER_SUBJECT_PREFIX+sn+".api",
-				[]byte(payload),
-				w,
-				a.nc,
-			)
+			parameterValuesResp, err := cwmpInteraction[cwmp.GetParameterValuesResponse](sn, payload, w, a.nc)
 			if err != nil {
-				return
-			}
-
-			var parameterValuesResp cwmp.GetParameterValuesResponse
-			err = xml.Unmarshal(data, &parameterValuesResp)
-			if err != nil {
-				err = json.Unmarshal(data, &parameterValuesResp)
-				if err != nil {
-					w.WriteHeader(http.StatusBadRequest)
-					w.Write(utils.Marshall(err))
-					return
-				}
 				return
 			}
 
@@ -374,7 +299,6 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 			for _, a := range parameterValuesResp.ParameterList {
 				path := strings.Split(a.Name, ".")
 				parameter := path[len(path)-1]
-				//log.Println("parameter:", parameter)
 
 				switch parameter {
 				case "Enable":
@@ -396,12 +320,7 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 					wlanIndex = wlanIndex + 1
 					i = 0
 				}
-
-				// log.Println("parameter:", a.Name)
-				// log.Println("value:", a.Value)
 			}
-
-			//log.Printf("%++v", wlans)
 
 			utils.MarshallEncoder(wlans, w)
 
@@ -449,27 +368,9 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 			}
 
 			payload := cwmp.SetParameterMultiValues(fmtBody)
-			log.Println(payload)
 
-			data, err := bridge.NatsCwmpInteraction(
-				nats.NATS_CWMP_ADAPTER_SUBJECT_PREFIX+sn+".api",
-				[]byte(payload),
-				w,
-				a.nc,
-			)
+			setParameterValuesResp, err := cwmpInteraction[cwmp.SetParameterValuesResponse](sn, payload, w, a.nc)
 			if err != nil {
-				return
-			}
-
-			var setParameterValuesResp cwmp.SetParameterValuesResponse
-			err = xml.Unmarshal(data, &setParameterValuesResp)
-			if err != nil {
-				err = json.Unmarshal(data, &setParameterValuesResp)
-				if err != nil {
-					w.WriteHeader(http.StatusBadRequest)
-					w.Write(utils.Marshall(err))
-					return
-				}
 				return
 			}
 
