@@ -9,6 +9,27 @@ import (
 	"time"
 )
 
+/*
+A successful response to SetParameterValues method returns an integer enumeration defined as follows:
+
+0 = All Parameter changes have been validated and applied.
+1 = All Parameter changes have been validated and committed, but some or all are not yet applied (for example, if a reboot is required before the new values are applied).
+*/
+type SetParameterValuesResponseStatus int
+
+const (
+	ALL_OK       = 0
+	SOME_PENDING = 1
+)
+
+/* -------------------------------------------------------------------------- */
+
+const WRITABLE = "1"
+
+func ParamTypeIsWritable(param string) bool {
+	return param == WRITABLE
+}
+
 type SoapEnvelope struct {
 	XMLName xml.Name
 	Header  SoapHeader
@@ -41,6 +62,12 @@ type ParameterInfoStruct struct {
 	Writable string
 }
 
+type ParameterAttributeStruct struct {
+	Name         string
+	Notification int
+	AccessList   []string
+}
+
 type SetParameterValues_ struct {
 	ParameterList []ParameterValueStruct `xml:"Body>SetParameterValues>ParameterList>ParameterValueStruct"`
 	ParameterKey  string                 `xml:"Body>SetParameterValues>ParameterKey>string"`
@@ -55,12 +82,20 @@ type GetParameterNames_ struct {
 	NextLevel     string   `xml:"Body>GetParameterNames>NextLevel"`
 }
 
+type GetParameterAttributes_ struct {
+	ParameterNames []string `xml:"Body>GetParameterAttributes>ParameterNames>string"`
+}
+
 type GetParameterValuesResponse struct {
 	ParameterList []ParameterValueStruct `xml:"Body>GetParameterValuesResponse>ParameterList>ParameterValueStruct"`
 }
 
 type GetParameterNamesResponse struct {
 	ParameterList []ParameterInfoStruct `xml:"Body>GetParameterNamesResponse>ParameterList>ParameterInfoStruct"`
+}
+
+type GetParameterAttributesResponse struct {
+	ParameterList []ParameterAttributeStruct `xml:"Body>GetParameterAttributesResponse>ParameterList>ParameterAttributeStruct"`
 }
 
 type CWMPInform struct {
@@ -180,6 +215,10 @@ func GetParameterMultiValues(leaves []string) string {
 	return msg
 }
 
+type SetParameterValuesResponse struct {
+	Status int `xml:"Body>SetParameterValuesResponse>Status"`
+}
+
 func SetParameterValues(leaf string, value string) string {
 	return `<?xml version="1.0" encoding="UTF-8"?>
 <soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -210,7 +249,7 @@ func SetParameterMultiValues(data map[string]string) string {
   <soap:Header/>
   <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
     <cwmp:SetParameterValues>
-      <ParameterList soapenc:arrayType="cwmp:ParameterValueStruct[` + string(len(data)) + `]">`
+      <ParameterList soapenc:arrayType="cwmp:ParameterValueStruct[` + fmt.Sprint(len(data)) + `]">`
 
 	for key, value := range data {
 		msg += `<ParameterValueStruct>

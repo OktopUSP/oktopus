@@ -16,6 +16,7 @@ type Request struct {
 	User     string
 	Password string
 	CwmpMsg  []byte
+	Time     time.Time
 	Callback chan []byte
 }
 

@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
@@ -69,7 +68,7 @@ func (h *Handler) CwmpHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println("New device: " + sn)
 			h.Cpes[sn] = CPE{
 				SerialNumber:         sn,
-				LastConnection:       time.Now().UTC(),
+				LastConnection:       time.Now(),
 				SoftwareVersion:      Inform.GetSoftwareVersion(),
 				HardwareVersion:      Inform.GetHardwareVersion(),
 				ExternalIPAddress:    addr,
@@ -78,21 +77,21 @@ func (h *Handler) CwmpHandler(w http.ResponseWriter, r *http.Request) {
 				Queue:                lane.NewQueue(),
 				DataModel:            Inform.GetDataModelType(),
 			}
-			go h.handleCpeStatus(sn)
 			h.pub(NATS_CWMP_SUBJECT_PREFIX+sn+".info", tmp)
 		}
 		obj := h.Cpes[sn]
 		cpe := &obj
-		cpe.LastConnection = time.Now().UTC()
+		cpe.LastConnection = time.Now()
 
-		log.Printf("Received an Inform from  device %s withEventCodes %s", addr, Inform.GetEvents())
+		log.Printf("Received an Inform from device %s withEventCodes %s", addr, Inform.GetEvents())
 
 		expiration := time.Now().AddDate(0, 0, 1)
 
 		cookie := http.Cookie{Name: "oktopus", Value: sn, Expires: expiration}
 		http.SetCookie(w, &cookie)
-		data, _ := xml.Marshal(cwmp.InformResponse(envelope.Header.Id))
-		w.Write(data)
+		//data, _ := xml.Marshal(cwmp.InformResponse(envelope.Header.Id))
+		fmt.Fprintf(w, cwmp.InformResponse(envelope.Header.Id))
+
 	} else if messageType == "TransferComplete" {
 
 	} else if messageType == "GetRPC" {
@@ -104,34 +103,27 @@ func (h *Handler) CwmpHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if cpe.Waiting != nil {
+
 			log.Println("CPE was waiting for a response, now received something")
+
 			var e cwmp.SoapEnvelope
 			xml.Unmarshal([]byte(body), &e)
 			log.Println("Kind of envelope: ", e.KindOf())
 
 			if e.KindOf() == "GetParameterNamesResponse" {
-				// var envelope cwmp.GetParameterNamesResponse
-				// xml.Unmarshal([]byte(body), &envelope)
-
-				// msg := new(NatsSendMessage)
-				// msg.MsgType = "GetParameterNamesResponse"
-				// msg.Data, _ = json.Marshal(envelope)
 				log.Println("Receive GetParameterNamesResponse from CPE:", cpe.SerialNumber)
-				cpe.Waiting.Callback <- tmp
-
+				msgAnswer(cpe.Waiting.Callback, cpe.Waiting.Time, h.acsConfig.DeviceAnswerTimeout, tmp)
 			} else if e.KindOf() == "GetParameterValuesResponse" {
-				var envelope cwmp.GetParameterValuesResponse
-				xml.Unmarshal([]byte(body), &envelope)
-
-				msg := new(NatsSendMessage)
-				msg.MsgType = "GetParameterValuesResponse"
-				msg.Data, _ = json.Marshal(envelope)
-
-				cpe.Waiting.Callback <- tmp
-
+				log.Println("Receive GetParameterValuesResponse from CPE:", cpe.SerialNumber)
+				msgAnswer(cpe.Waiting.Callback, cpe.Waiting.Time, h.acsConfig.DeviceAnswerTimeout, tmp)
+			} else if e.KindOf() == "Fault" {
+				log.Println("Receive FaultResponse from CPE:", cpe.SerialNumber)
+				msgAnswer(cpe.Waiting.Callback, cpe.Waiting.Time, h.acsConfig.DeviceAnswerTimeout, tmp)
+				log.Println(body)
 			} else {
 				log.Println("Unknown message type")
-				cpe.Waiting.Callback <- tmp
+				log.Println("Envelope:", e)
+				msgAnswer(cpe.Waiting.Callback, cpe.Waiting.Time, h.acsConfig.DeviceAnswerTimeout, tmp)
 			}
 			cpe.Waiting = nil
 		} else {
@@ -152,17 +144,33 @@ func (h *Handler) CwmpHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	h.Cpes[cpe.SerialNumber] = cpe
+	log.Println("---End of CWMP Handler---")
 }
 
 func (h *Handler) ConnectionRequest(cpe CPE) error {
 	log.Println("--> ConnectionRequest, CPE: ", cpe.SerialNumber)
-	// log.Println("ConnectionRequestURL: ", cpe.ConnectionRequestURL)
+	//  log.Println("ConnectionRequestURL: ", cpe.ConnectionRequestURL)
 	// log.Println("ConnectionRequestUsername: ", cpe.Username)
 	// log.Println("ConnectionRequestPassword: ", cpe.Password)
 
-	ok, err := auth.Auth("", "", cpe.ConnectionRequestURL)
+	ok, err := auth.Auth(h.acsConfig.ConnReqUsername, h.acsConfig.ConnReqPassword, cpe.ConnectionRequestURL)
 	if !ok {
+		cpe.Queue.Dequeue()
 		log.Println("Error while authenticating to CPE: ", err)
 	}
+	log.Println("<-- Successfully authenticated to CPE", cpe.SerialNumber)
 	return err
+}
+
+func msgAnswer(
+	callback chan []byte,
+	timeMsgWasSent time.Time,
+	timeOut time.Duration,
+	msgAnswer []byte,
+) {
+	if time.Since(timeMsgWasSent) > timeOut {
+		log.Println("CPE took too long to answer the request, the message will be discarded")
+	} else {
+		callback <- msgAnswer
+	}
 }

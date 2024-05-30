@@ -20,6 +20,7 @@ func main() {
 		natsActions.Publish,
 		natsActions.Subscribe,
 		h,
+		&c.Acs,
 	)
 	b.StartBridge()
 

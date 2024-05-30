@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"oktopUSP/backend/services/acs/internal/config"
 	"oktopUSP/backend/services/acs/internal/server/handler"
 	"strings"
 	"time"
@@ -17,6 +18,7 @@ type Bridge struct {
 	sub  func(string, func(*nats.Msg)) error
 	cpes map[string]handler.CPE
 	h    *handler.Handler
+	conf *config.Acs
 }
 
 type msgAnswer struct {
@@ -24,24 +26,25 @@ type msgAnswer struct {
 	Msg  any
 }
 
-const DEVICE_ANSWER_TIMEOUT = 5 * time.Second
-
 func NewBridge(
 	pub func(string, []byte) error,
 	sub func(string, func(*nats.Msg)) error,
 	h *handler.Handler,
+	c *config.Acs,
 ) *Bridge {
 	return &Bridge{
 		pub:  pub,
 		sub:  sub,
 		cpes: h.Cpes,
 		h:    h,
+		conf: c,
 	}
 }
 
 func (b *Bridge) StartBridge() {
+
 	b.sub(handler.NATS_CWMP_ADAPTER_SUBJECT_PREFIX+"*.api", func(msg *nats.Msg) {
-		log.Printf("Received message: %s", string(msg.Data))
+		//log.Printf("Received message: %s", string(msg.Data))
 		log.Printf("Subject: %s", msg.Subject)
 		log.Printf("Reply: %s", msg.Reply)
 
@@ -53,6 +56,8 @@ func (b *Bridge) StartBridge() {
 			return
 		}
 		if cpe.Queue.Size() > 0 {
+			log.Println("Queue size: ", cpe.Queue.Size())
+			log.Println("Queue data: ", cpe.Queue)
 			log.Printf("Device %s is busy", device)
 			respondMsg(msg.Respond, http.StatusConflict, "Device is busy")
 			return
@@ -65,6 +70,7 @@ func (b *Bridge) StartBridge() {
 			Id:       uuid.NewString(),
 			CwmpMsg:  msg.Data,
 			Callback: deviceAnswer,
+			Time:     time.Now(),
 		})
 
 		err := b.h.ConnectionRequest(cpe)
@@ -78,14 +84,19 @@ func (b *Bridge) StartBridge() {
 		//req := cpe.Queue.Dequeue().(handler.Request)
 		//cpe.Waiting = &req
 
+		defer cpe.Queue.Dequeue()
+
 		select {
 		case response := <-deviceAnswer:
-			log.Println("Received response from device: ", string(response))
+			if b.conf.DebugMode {
+				log.Printf("Received response from cpe: %s payload: %s ", cpe.SerialNumber, string(response))
+			}
 			respondMsg(msg.Respond, http.StatusOK, response)
-		case <-time.After(DEVICE_ANSWER_TIMEOUT):
+		case <-time.After(b.conf.DeviceAnswerTimeout):
 			log.Println("Device response timed out")
 			respondMsg(msg.Respond, http.StatusRequestTimeout, "Request timeout")
 		}
+
 	})
 }
 

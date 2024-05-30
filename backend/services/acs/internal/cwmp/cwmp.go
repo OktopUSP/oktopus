@@ -63,6 +63,11 @@ type GetParameterNamesResponse struct {
 	ParameterList []ParameterInfoStruct `xml:"Body>GetParameterNamesResponse>ParameterList>ParameterInfoStruct"`
 }
 
+type Fault struct {
+	FaultCode   uint
+	FaultString string
+}
+
 type CWMPInform struct {
 	DeviceId      DeviceID               `xml:"Body>Inform>DeviceId"`
 	Events        []EventStruct          `xml:"Body>Inform>Event>EventStruct"`

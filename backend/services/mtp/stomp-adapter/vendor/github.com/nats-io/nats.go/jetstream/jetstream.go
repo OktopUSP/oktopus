@@ -773,7 +773,7 @@ func validateStreamName(stream string) error {
 	if stream == "" {
 		return ErrStreamNameRequired
 	}
-	if strings.Contains(stream, ".") {
+	if strings.ContainsAny(stream, ">*. /\\") {
 		return fmt.Errorf("%w: '%s'", ErrInvalidStreamName, stream)
 	}
 	return nil
@@ -783,7 +783,7 @@ func validateSubject(subject string) error {
 	if subject == "" {
 		return fmt.Errorf("%w: %s", ErrInvalidSubject, "subject cannot be empty")
 	}
-	if !subjectRegexp.MatchString(subject) {
+	if subject[0] == '.' || subject[len(subject)-1] == '.' || !subjectRegexp.MatchString(subject) {
 		return fmt.Errorf("%w: %s", ErrInvalidSubject, subject)
 	}
 	return nil
@@ -791,9 +791,11 @@ func validateSubject(subject string) error {
 
 // AccountInfo fetches account information from the server, containing details
 // about the account associated with this JetStream connection. If account is
-// not enabled for JetStream, ErrJetStreamNotEnabledForAccount is returned. If
-// the server does not have JetStream enabled, ErrJetStreamNotEnabled is
-// returned.
+// not enabled for JetStream, ErrJetStreamNotEnabledForAccount is returned.
+//
+// If the server does not have JetStream enabled, ErrJetStreamNotEnabled is
+// returned (for a single server setup). For clustered topologies, AccountInfo
+// will time out.
 func (js *jetStream) AccountInfo(ctx context.Context) (*AccountInfo, error) {
 	ctx, cancel := wrapContextWithoutDeadline(ctx)
 	if cancel != nil {

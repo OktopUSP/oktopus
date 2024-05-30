@@ -5,14 +5,21 @@ import (
 	"time"
 )
 
-func (h *Handler) handleCpeStatus(cpe string) {
+func (h *Handler) HandleCpeStatus() {
 	for {
-		if time.Since(h.Cpes[cpe].LastConnection) > h.acsConfig.KeepAliveInterval {
-			delete(h.Cpes, cpe)
-			break
+		for cpe := range h.Cpes {
+			if cpe == "" {
+				continue
+			}
+			log.Println("Checking CPE " + cpe + " status")
+			if time.Since(h.Cpes[cpe].LastConnection) > h.acsConfig.KeepAliveInterval {
+				log.Printf("LastConnection: %s, KeepAliveInterval: %s", h.Cpes[cpe].LastConnection, h.acsConfig.KeepAliveInterval)
+				log.Println("CPE", cpe, "is offline")
+				h.pub("cwmp.v1."+cpe+".status", []byte("0"))
+				delete(h.Cpes, cpe)
+				break
+			}
 		}
-		time.Sleep(h.acsConfig.KeepAliveInterval)
+		time.Sleep(10 * time.Second)
 	}
-	log.Println("CPE", cpe, "is offline")
-	h.pub("cwmp.v1."+cpe+".status", []byte("0"))
 }

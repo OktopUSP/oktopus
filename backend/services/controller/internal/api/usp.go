@@ -1,8 +1,10 @@
 package api
 
 import (
+	"log"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/leandrofars/oktopus/internal/bridge"
 	local "github.com/leandrofars/oktopus/internal/nats"
 	"github.com/leandrofars/oktopus/internal/usp/usp_msg"
@@ -158,6 +160,44 @@ func (a *Api) deviceOperateMsg(w http.ResponseWriter, r *http.Request) {
 
 	utils.MarshallDecoder(&operate, r.Body)
 	msg := usp_utils.NewOperateMsg(operate)
+
+	err = sendUspMsg(msg, sn, w, a.nc, mtp)
+	if err != nil {
+		return
+	}
+}
+
+func (a *Api) deviceNotifyMsg(w http.ResponseWriter, r *http.Request) {
+
+	sn := getSerialNumberFromRequest(r)
+	mtp, err := getMtpFromRequest(r, w)
+	if err != nil {
+		return
+	}
+
+	if mtp == "" {
+		var ok bool
+		mtp, ok = deviceStateOK(w, a.nc, sn)
+		if !ok {
+			return
+		}
+	}
+
+	// var notify usp_msg.Notify
+	notify := usp_msg.Notify{
+		SubscriptionId: uuid.NewString(),
+		SendResp:       true,
+		Notification: &usp_msg.Notify_Event_{
+			Event: &usp_msg.Notify_Event{
+				EventName: "Push!",
+				ObjPath:   "Device.BulkData.Profile.1.",
+			},
+		},
+	}
+
+	log.Printf("Notify %s:", notify.String())
+
+	msg := usp_utils.NewNotifyMsg(notify)
 
 	err = sendUspMsg(msg, sn, w, a.nc, mtp)
 	if err != nil {

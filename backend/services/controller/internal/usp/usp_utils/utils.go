@@ -145,3 +145,21 @@ func NewOperateMsg(getStuff usp_msg.Operate) usp_msg.Msg {
 		},
 	}
 }
+
+func NewNotifyMsg(notify usp_msg.Notify) usp_msg.Msg {
+	return usp_msg.Msg{
+		Header: &usp_msg.Header{
+			MsgId:   uuid.NewString(),
+			MsgType: usp_msg.Header_NOTIFY,
+		},
+		Body: &usp_msg.Body{
+			MsgBody: &usp_msg.Body_Request{
+				Request: &usp_msg.Request{
+					ReqType: &usp_msg.Request_Notify{
+						Notify: &notify,
+					},
+				},
+			},
+		},
+	}
+}

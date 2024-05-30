@@ -655,7 +655,7 @@ const getDeviceParameterInstances = async (raw) =>{
     let paramsInfo = {}
     let commandsInfo = {}
 
-    let supportedParams = content.req_obj_results[0].supported_objs[0].supported_params
+    let supportedParams = content.req_obj_results[0].supported_objs[0].supported_params //TODO: fixme when more then one supported_objs
     let supportedCommands = content.req_obj_results[0].supported_objs[0].supported_commands
 
     let parametersToFetch = () => {
@@ -725,7 +725,7 @@ const getDeviceParameterInstances = async (raw) =>{
                     // console.log(y.result_params[key])
                     // console.log({[key]:paramsInfo[key]})
 
-                    console.log("Take a look here mate: ",{...paramsInfo[key], value: y.result_params[key]})
+                    //console.log("Take a look here mate: ",{...paramsInfo[key], value: y.result_params[key]})
                     if (!values[y.resolved_path]){
                         values[y.resolved_path] = []
                     }
@@ -751,12 +751,13 @@ const getDeviceParameterInstances = async (raw) =>{
                 })
             }
 
-            console.log("values:", values)
+            //console.log("values:", values)
             setDeviceParametersValue(values)
-            console.log("commands:", commandsInfo)
+            //console.log("commands:", commandsInfo)
             setDeviceCommands(commandsInfo)
         })
-        
+        console.log("values:", values)
+        console.log("commands:", commandsInfo)
         console.log("/-------------------------------------------------------/")
         setDeviceParameters(content)
     }else{

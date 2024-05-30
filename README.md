@@ -20,36 +20,20 @@ This repository aims to promote the development of a multi-vendor management pla
 
 <p>If you'd like to know how to donate above <a href="https://github.com/sponsors/leandrofars">Github Sponsors</a> values, start a partnership or somehow to contribute to the project, email <a href="">leandro@oktopus.app.br</a>, every contribution is welcome, and the resources will help the project to move on. Also, if your company uses this project and you'd like your logo to appear up here, contact us.
 
---------------------------------------------------------------------------------------------------------------------------------------------------------
-
 <ul>
     <li>
         <h4>💼 Commercial Support:</h4>
+        <a href="https://oktopus.app.br/controller#offer"> Pricing Plans </a>
         <p>
             Our solution has an open-source software license, meaning you can modify/study the code and use it for free. You can perform all the configurations, allocate servers, and set it up on your network with the classic "do it yourself" approach, or save time and money: contact us for a quote and get commercial support.
         </p>
-        <ul>
-            <li> 
-            Software customization according to your needs and preferences
-            </li>
-            <li> 
-            Full support to your team
-            </li>
-            <li> 
-            Affordable prices for companies of all sizes
-            </li>
-            <li> 
-            Trust and assistance from experts
-            </li>
-            <li> 
-            Complete solution for production environments, from the server provisionning to devices connection
-            </li>
-        </ul>
         <p>Contact <a href="">leandro@oktopus.app.br</a> via email and get a quote.</p>
     </li> 
 </ul>
 
---------------------------------------------------------------------------------------------------------------------------------------------------------
+<h1>Controller</h1>
+
+That's Oktopus Core, I's responsable for the devices management. Made by different microservices that can be run indepently and work together to provide the best experience for the user and make available different options for device connetion. Below here you will find some helpfull information about how the software works, the parts of it, the architecture and infrastructure.
 
 <ul><li><h4>Infrastructure:</h4></li></ul>
 
@@ -76,6 +60,9 @@ user@user-laptop:~/oktopus/deploy/compose$ COMPOSE_PROFILES=nats,controller,cwmp
 Oktopus deployment in <u><b>Kubernetes</b></u> still is in beta phase: <a href="https://github.com/OktopUSP/oktopus/blob/main/deploy/kubernetes/README.md"> Instructions for Kubernetes deployment</a><p></p>
         UI will open at port 3000:
         <img src="https://github.com/OktopUSP/oktopus/assets/83298718/65f7c5b9-c08d-479a-8a13-fdfc634b5ca2"/>
+<h2>Agent</h2>
+
+Agent is a piece of software taht runs on the CPE or IoT device and is responsable for connecting it to the Controller (Oktopus) through CWMP and/or USP.
 
 </li>
     <li>
@@ -88,8 +75,6 @@ Oktopus deployment in <u><b>Kubernetes</b></u> still is in beta phase: <a href="
         <img src="https://github.com/OktopUSP/oktopus/assets/83298718/501b4ccd-6147-4957-9096-695134e34b5e"/>
     </li>
 </ul>
-
---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <ul>
     <li>
@@ -177,8 +162,6 @@ Seeking to solve the challenges mentioned above, providers and manufacturers tog
         </ul>
     </li>
 </ul> 
-
---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <ul>
     <li>
