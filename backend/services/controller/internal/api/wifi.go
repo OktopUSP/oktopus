@@ -1,5 +1,36 @@
 package api
 
+import (
+	"encoding/json"
+	"encoding/xml"
+	"log"
+	"net/http"
+	"strings"
+
+	"github.com/gorilla/mux"
+	"github.com/leandrofars/oktopus/internal/bridge"
+	"github.com/leandrofars/oktopus/internal/cwmp"
+	"github.com/leandrofars/oktopus/internal/entity"
+	"github.com/leandrofars/oktopus/internal/nats"
+	"github.com/leandrofars/oktopus/internal/utils"
+)
+
+type ParamData struct {
+	Writable bool        `json:"writable"`
+	Value    interface{} `json:"value"`
+}
+
+type WiFi struct {
+	Path     string    `json:"path"`
+	Name     ParamData `json:"name"`
+	SSID     ParamData `json:"ssid"`
+	Password ParamData `json:"password"`
+	Security ParamData `json:"security"`
+	//SecurityCapabilities []ParamData `json:"securityCapabilities"`
+	Enable ParamData `json:"enable"`
+	Status ParamData `json:"status"`
+}
+
 // import (
 // 	"encoding/json"
 // 	"log"
@@ -169,3 +200,301 @@ package api
 // 		}
 // 	}
 // }
+
+func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	sn := vars["sn"]
+
+	device, err := getDeviceInfo(w, sn, a.nc)
+	if err != nil {
+		return
+	}
+
+	if r.Method == http.MethodGet {
+
+		if device.Cwmp == entity.Online {
+
+			var (
+				NUMBER_OF_WIFI_PARAMS_TO_GET = 5
+			)
+
+			var wlans []WiFi
+
+			payload := cwmp.GetParameterNames("InternetGatewayDevice.LANDevice.", 1)
+
+			data, err := bridge.NatsCwmpInteraction(
+				nats.NATS_CWMP_ADAPTER_SUBJECT_PREFIX+sn+".api",
+				[]byte(payload),
+				w,
+				a.nc,
+			)
+			if err != nil {
+				return
+			}
+
+			var response cwmp.GetParameterNamesResponse
+			err = xml.Unmarshal(data, &response)
+			if err != nil {
+				err = json.Unmarshal(data, &response)
+				if err != nil {
+					w.WriteHeader(http.StatusBadRequest)
+					w.Write(utils.Marshall(err))
+					return
+				}
+				return
+			}
+
+			parameters_to_get_values := []string{}
+			wlanConfigurationInstances := 0
+
+			// x = InternetGatewayDevice.LanDevice.*.
+			for _, x := range response.ParameterList {
+
+				payload = cwmp.GetParameterNames(x.Name+"WLANConfiguration.", 1)
+
+				data, err := bridge.NatsCwmpInteraction(
+					nats.NATS_CWMP_ADAPTER_SUBJECT_PREFIX+sn+".api",
+					[]byte(payload),
+					w,
+					a.nc,
+				)
+				if err != nil {
+					return
+				}
+
+				var response cwmp.GetParameterNamesResponse
+				err = xml.Unmarshal(data, &response)
+				if err != nil {
+					err = json.Unmarshal(data, &response)
+					if err != nil {
+						w.WriteHeader(http.StatusBadRequest)
+						w.Write(utils.Marshall(err))
+						return
+					}
+					return
+				}
+
+				// y = InternetGatewayDevice.LanDevice.*.WLANConfiguration.*
+				for _, y := range response.ParameterList {
+					wlans = append(wlans, WiFi{})
+
+					payload = cwmp.GetParameterNames(y.Name, 1)
+
+					data, err := bridge.NatsCwmpInteraction(
+						nats.NATS_CWMP_ADAPTER_SUBJECT_PREFIX+sn+".api",
+						[]byte(payload),
+						w,
+						a.nc,
+					)
+					if err != nil {
+						return
+					}
+					log.Println("y.name: ", y.Name)
+
+					var response cwmp.GetParameterNamesResponse
+					err = xml.Unmarshal(data, &response)
+					if err != nil {
+						err = json.Unmarshal(data, &response)
+						if err != nil {
+							w.WriteHeader(http.StatusBadRequest)
+							w.Write(utils.Marshall(err))
+							return
+						}
+						return
+					}
+
+					// y = InternetGatewayDevice.LanDevice.*.WLANConfiguration.*.<Parameter>
+					for _, z := range response.ParameterList {
+						path := strings.Split(z.Name, ".")
+						parameter := path[len(path)-1]
+
+						switch parameter {
+						case "Enable":
+							wlans[wlanConfigurationInstances].Enable.Writable = cwmp.ParamTypeIsWritable(z.Writable)
+						case "Name":
+							wlans[wlanConfigurationInstances].Name.Writable = cwmp.ParamTypeIsWritable(z.Writable)
+						case "Status":
+							wlans[wlanConfigurationInstances].Status.Writable = cwmp.ParamTypeIsWritable(z.Writable)
+						case "SSID":
+							wlans[wlanConfigurationInstances].SSID.Writable = cwmp.ParamTypeIsWritable(z.Writable)
+						case "Standard":
+							wlans[wlanConfigurationInstances].Security.Writable = cwmp.ParamTypeIsWritable(z.Writable)
+						case "KeyPassphrase":
+							wlans[wlanConfigurationInstances].Password.Writable = cwmp.ParamTypeIsWritable(z.Writable)
+						}
+
+					}
+
+					parameters_to_get_values = append(
+						parameters_to_get_values,
+						y.Name+"Enable",
+						y.Name+"Name",
+						y.Name+"Status",
+						y.Name+"SSID",
+						y.Name+"Standard",
+						y.Name+"PreSharedKey.1.KeyPassphrase",
+					)
+					//parameters_to_get_values = append(parameters_to_get_values, y.Name+"NamePreSharedKey.1.KeyPassphrase")
+					wlans[wlanConfigurationInstances].Path = y.Name
+					wlanConfigurationInstances = wlanConfigurationInstances + 1
+				}
+			}
+			log.Println("wlanConfigurationInstances: ", wlanConfigurationInstances)
+			//utils.MarshallEncoder(wlans, w)
+
+			payload = cwmp.GetParameterMultiValues(parameters_to_get_values)
+			//log.Println("payload:", payload)
+
+			data, err = bridge.NatsCwmpInteraction(
+				nats.NATS_CWMP_ADAPTER_SUBJECT_PREFIX+sn+".api",
+				[]byte(payload),
+				w,
+				a.nc,
+			)
+			if err != nil {
+				return
+			}
+
+			var parameterValuesResp cwmp.GetParameterValuesResponse
+			err = xml.Unmarshal(data, &parameterValuesResp)
+			if err != nil {
+				err = json.Unmarshal(data, &parameterValuesResp)
+				if err != nil {
+					w.WriteHeader(http.StatusBadRequest)
+					w.Write(utils.Marshall(err))
+					return
+				}
+				return
+			}
+
+			i := 0
+			wlanIndex := 0
+
+			for _, a := range parameterValuesResp.ParameterList {
+				path := strings.Split(a.Name, ".")
+				parameter := path[len(path)-1]
+				//log.Println("parameter:", parameter)
+
+				switch parameter {
+				case "Enable":
+					wlans[wlanIndex].Enable.Value = a.Value
+				case "Name":
+					wlans[wlanIndex].Name.Value = a.Value
+				case "Status":
+					wlans[wlanIndex].Status.Value = a.Value
+				case "SSID":
+					wlans[wlanIndex].SSID.Value = a.Value
+				case "Standard":
+					wlans[wlanIndex].Security.Value = a.Value
+				case "KeyPassphrase":
+					wlans[wlanIndex].Password.Value = a.Value
+				}
+
+				i = i + 1
+				if i == (NUMBER_OF_WIFI_PARAMS_TO_GET + 1) {
+					wlanIndex = wlanIndex + 1
+					i = 0
+				}
+
+				// log.Println("parameter:", a.Name)
+				// log.Println("value:", a.Value)
+			}
+
+			//log.Printf("%++v", wlans)
+
+			utils.MarshallEncoder(wlans, w)
+
+			return
+		}
+
+		if device.Mqtt == entity.Online || device.Stomp == entity.Online || device.Websockets == entity.Online {
+			w.WriteHeader(http.StatusNotImplemented)
+			w.Write(utils.Marshall("This feature is only working with CWMP devices"))
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(utils.Marshall("Device is Offline"))
+	}
+
+	if r.Method == http.MethodPut {
+
+		if device.Cwmp == entity.Online {
+
+			var body []WiFi
+
+			err := utils.MarshallDecoder(&body, r.Body)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write(utils.Marshall("Couldn't decode received payload, err: " + err.Error()))
+				return
+			}
+
+			fmtBody := map[string]string{}
+
+			for _, x := range body {
+
+				if x.Name.Value != nil {
+					fmtBody[x.Path+"Name"] = x.Name.Value.(string)
+				}
+
+				if x.SSID.Value != nil {
+					fmtBody[x.Path+"SSID"] = x.SSID.Value.(string)
+				}
+
+				if x.Enable.Value != nil {
+					fmtBody[x.Path+"Enable"] = x.Enable.Value.(string)
+				}
+			}
+
+			payload := cwmp.SetParameterMultiValues(fmtBody)
+			log.Println(payload)
+
+			data, err := bridge.NatsCwmpInteraction(
+				nats.NATS_CWMP_ADAPTER_SUBJECT_PREFIX+sn+".api",
+				[]byte(payload),
+				w,
+				a.nc,
+			)
+			if err != nil {
+				return
+			}
+
+			var setParameterValuesResp cwmp.SetParameterValuesResponse
+			err = xml.Unmarshal(data, &setParameterValuesResp)
+			if err != nil {
+				err = json.Unmarshal(data, &setParameterValuesResp)
+				if err != nil {
+					w.WriteHeader(http.StatusBadRequest)
+					w.Write(utils.Marshall(err))
+					return
+				}
+				return
+			}
+
+			if setParameterValuesResp.Status == cwmp.ALL_OK {
+				log.Printf("All parameters sent to the cpe %s were applied", device.SN)
+				w.Write(utils.Marshall(cwmp.ALL_OK))
+				return
+			}
+
+			if setParameterValuesResp.Status == cwmp.SOME_PENDING {
+				log.Printf("All parameters sent to the cpe %s were committed, but not all of them were applied, maybe you need to wait sometime or have a reboot", device.SN)
+				w.Write(utils.Marshall(cwmp.SOME_PENDING))
+				return
+			}
+
+		}
+
+		if device.Mqtt == entity.Online || device.Stomp == entity.Online || device.Websockets == entity.Online {
+			w.WriteHeader(http.StatusNotImplemented)
+			w.Write(utils.Marshall("This feature is only working with CWMP devices"))
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(utils.Marshall("Device is Offline"))
+	}
+
+}
