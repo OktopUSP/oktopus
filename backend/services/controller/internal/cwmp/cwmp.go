@@ -9,6 +9,21 @@ import (
 	"time"
 )
 
+/*
+A successful response to SetParameterValues method returns an integer enumeration defined as follows:
+
+0 = All Parameter changes have been validated and applied.
+1 = All Parameter changes have been validated and committed, but some or all are not yet applied (for example, if a reboot is required before the new values are applied).
+*/
+type SetParameterValuesResponseStatus int
+
+const (
+	ALL_OK       = 0
+	SOME_PENDING = 1
+)
+
+/* -------------------------------------------------------------------------- */
+
 const WRITABLE = "1"
 
 func ParamTypeIsWritable(param string) bool {
@@ -234,7 +249,7 @@ func SetParameterMultiValues(data map[string]string) string {
   <soap:Header/>
   <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
     <cwmp:SetParameterValues>
-      <ParameterList soapenc:arrayType="cwmp:ParameterValueStruct[` + string(len(data)) + `]">`
+      <ParameterList soapenc:arrayType="cwmp:ParameterValueStruct[` + fmt.Sprint(len(data)) + `]">`
 
 	for key, value := range data {
 		msg += `<ParameterValueStruct>
