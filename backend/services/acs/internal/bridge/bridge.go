@@ -24,7 +24,7 @@ type msgAnswer struct {
 	Msg  any
 }
 
-const DEVICE_ANSWER_TIMEOUT = 5 * time.Second
+const DEVICE_ANSWER_TIMEOUT = 10 * time.Second
 
 func NewBridge(
 	pub func(string, []byte) error,
