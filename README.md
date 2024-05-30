@@ -20,8 +20,6 @@ This repository aims to promote the development of a multi-vendor management pla
 
 <p>If you'd like to know how to donate above <a href="https://github.com/sponsors/leandrofars">Github Sponsors</a> values, start a partnership or somehow to contribute to the project, email <a href="">leandro@oktopus.app.br</a>, every contribution is welcome, and the resources will help the project to move on. Also, if your company uses this project and you'd like your logo to appear up here, contact us.
 
---------------------------------------------------------------------------------------------------------------------------------------------------------
-
 <ul>
     <li>
         <h4>💼 Commercial Support:</h4>
@@ -33,7 +31,6 @@ This repository aims to promote the development of a multi-vendor management pla
     </li> 
 </ul>
 
---------------------------------------------------------------------------------------------------------------------------------------------------------
 <h1>Controller</h1>
 
 That's Oktopus Core, I's responsable for the devices management. Made by different microservices that can be run indepently and work together to provide the best experience for the user and make available different options for device connetion. Below here you will find some helpfull information about how the software works, the parts of it, the architecture and infrastructure.
@@ -78,8 +75,6 @@ Agent is a piece of software taht runs on the CPE or IoT device and is responsab
         <img src="https://github.com/OktopUSP/oktopus/assets/83298718/501b4ccd-6147-4957-9096-695134e34b5e"/>
     </li>
 </ul>
-
---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <ul>
     <li>
@@ -167,8 +162,6 @@ Seeking to solve the challenges mentioned above, providers and manufacturers tog
         </ul>
     </li>
 </ul> 
-
---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <ul>
     <li>
