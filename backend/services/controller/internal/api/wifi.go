@@ -219,7 +219,7 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 
 			payload := cwmp.GetParameterNames("InternetGatewayDevice.LANDevice.", 1)
 
-			response, err := cwmpInteraction[cwmp.GetParameterNamesResponse](sn, payload, w, a.nc)
+			_, response, err := cwmpInteraction[cwmp.GetParameterNamesResponse](sn, []byte(payload), w, a.nc)
 			if err != nil {
 				return
 			}
@@ -232,7 +232,7 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 
 				payload = cwmp.GetParameterNames(x.Name+"WLANConfiguration.", 1)
 
-				response, err := cwmpInteraction[cwmp.GetParameterNamesResponse](sn, payload, w, a.nc)
+				_, response, err := cwmpInteraction[cwmp.GetParameterNamesResponse](sn, []byte(payload), w, a.nc)
 				if err != nil {
 					return
 				}
@@ -243,7 +243,7 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 
 					payload = cwmp.GetParameterNames(y.Name, 1)
 
-					response, err := cwmpInteraction[cwmp.GetParameterNamesResponse](sn, payload, w, a.nc)
+					_, response, err := cwmpInteraction[cwmp.GetParameterNamesResponse](sn, []byte(payload), w, a.nc)
 					if err != nil {
 						return
 					}
@@ -284,11 +284,10 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 					wlanConfigurationInstances = wlanConfigurationInstances + 1
 				}
 			}
-			log.Println("wlanConfigurationInstances: ", wlanConfigurationInstances)
 
 			payload = cwmp.GetParameterMultiValues(parameters_to_get_values)
 
-			parameterValuesResp, err := cwmpInteraction[cwmp.GetParameterValuesResponse](sn, payload, w, a.nc)
+			_, parameterValuesResp, err := cwmpInteraction[cwmp.GetParameterValuesResponse](sn, []byte(payload), w, a.nc)
 			if err != nil {
 				return
 			}
@@ -369,7 +368,7 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 
 			payload := cwmp.SetParameterMultiValues(fmtBody)
 
-			setParameterValuesResp, err := cwmpInteraction[cwmp.SetParameterValuesResponse](sn, payload, w, a.nc)
+			_, setParameterValuesResp, err := cwmpInteraction[cwmp.SetParameterValuesResponse](sn, []byte(payload), w, a.nc)
 			if err != nil {
 				return
 			}
