@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"oktopUSP/backend/services/acs/internal/config"
 	"oktopUSP/backend/services/acs/internal/server/handler"
 	"strings"
 	"time"
@@ -17,6 +18,7 @@ type Bridge struct {
 	sub  func(string, func(*nats.Msg)) error
 	cpes map[string]handler.CPE
 	h    *handler.Handler
+	conf *config.Acs
 }
 
 type msgAnswer struct {
@@ -24,18 +26,18 @@ type msgAnswer struct {
 	Msg  any
 }
 
-const DEVICE_ANSWER_TIMEOUT = 10 * time.Second
-
 func NewBridge(
 	pub func(string, []byte) error,
 	sub func(string, func(*nats.Msg)) error,
 	h *handler.Handler,
+	c *config.Acs,
 ) *Bridge {
 	return &Bridge{
 		pub:  pub,
 		sub:  sub,
 		cpes: h.Cpes,
 		h:    h,
+		conf: c,
 	}
 }
 
@@ -68,6 +70,7 @@ func (b *Bridge) StartBridge() {
 			Id:       uuid.NewString(),
 			CwmpMsg:  msg.Data,
 			Callback: deviceAnswer,
+			Time:     time.Now(),
 		})
 
 		err := b.h.ConnectionRequest(cpe)
@@ -85,12 +88,15 @@ func (b *Bridge) StartBridge() {
 
 		select {
 		case response := <-deviceAnswer:
-			log.Println("Received response from device: ", string(response))
+			if b.conf.DebugMode {
+				log.Printf("Received response from cpe: %s payload: %s ", cpe.SerialNumber, string(response))
+			}
 			respondMsg(msg.Respond, http.StatusOK, response)
-		case <-time.After(DEVICE_ANSWER_TIMEOUT):
+		case <-time.After(b.conf.DeviceAnswerTimeout):
 			log.Println("Device response timed out")
 			respondMsg(msg.Respond, http.StatusRequestTimeout, "Request timeout")
 		}
+
 	})
 }
 

@@ -21,17 +21,18 @@ type Nats struct {
 }
 
 type Acs struct {
-	Port              string
-	Tls               bool
-	TlsPort           bool
-	NoTls             bool
-	KeepAliveInterval time.Duration
-	Username          string
-	Password          string
-	Route             string
-	DebugMode         bool
-	ConnReqUsername   string
-	ConnReqPassword   string
+	Port                string
+	Tls                 bool
+	TlsPort             bool
+	NoTls               bool
+	KeepAliveInterval   time.Duration
+	Username            string
+	Password            string
+	Route               string
+	DebugMode           bool
+	ConnReqUsername     string
+	ConnReqPassword     string
+	DeviceAnswerTimeout time.Duration
 }
 
 type Config struct {
@@ -53,6 +54,7 @@ func NewConfig() *Config {
 	connReqPasswd := flag.String("connrq_passwd", lookupEnvOrString("CONN_RQ_PASSWD", ""), "Connection Request Password")
 	acsKeepAliveInterval := flag.Int("acs_keep_alive_interval", lookupEnvOrInt("KEEP_ALIVE_INTERVAL", 300), "keep alive interval in seconds for acs server")
 	cwmpDebugMode := flag.Bool("debug_mode", lookupEnvOrBool("CWMP_DEBUG", false), "enable or disable cwmp logs in debug mode")
+	deviceAnswerTimeout := flag.Int("device_answer_timeout", lookupEnvOrInt("DEVICE_ANSWER_TIMEOUT", 10), "device answer timeout in seconds")
 	flHelp := flag.Bool("help", false, "Help")
 
 	/*
@@ -79,12 +81,13 @@ func NewConfig() *Config {
 			Ctx:                ctx,
 		},
 		Acs: Acs{
-			Port:              *acsPort,
-			Route:             *acsRoute,
-			KeepAliveInterval: time.Duration(*acsKeepAliveInterval) * time.Second,
-			DebugMode:         *cwmpDebugMode,
-			ConnReqUsername:   *connReqUser,
-			ConnReqPassword:   *connReqPasswd,
+			Port:                *acsPort,
+			Route:               *acsRoute,
+			KeepAliveInterval:   time.Duration(*acsKeepAliveInterval) * time.Second,
+			DebugMode:           *cwmpDebugMode,
+			ConnReqUsername:     *connReqUser,
+			ConnReqPassword:     *connReqPasswd,
+			DeviceAnswerTimeout: time.Duration(*deviceAnswerTimeout) * time.Second,
 		},
 	}
 }
