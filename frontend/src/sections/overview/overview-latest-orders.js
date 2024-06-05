@@ -38,6 +38,14 @@ const status = (s)=>{
   }
 }
 
+const getDeviceProtocol = (order) => {
+  if (order.Mqtt == 0 && order.Websockets == 0 && order.Stomp == 0) {
+    return "cwmp"
+  }else {
+    return "usp"
+  }
+}
+
 export const OverviewLatestOrders = (props) => {
   const { orders = [], sx } = props;
 
@@ -97,17 +105,19 @@ export const OverviewLatestOrders = (props) => {
                     </SeverityPill>
                     </TableCell>
                     <TableCell>
-                      { order.Mqtt == 0 && order.Websockets == 0 && order.Stomp == 0 ? <span></span>: <Button
-                      onClick={()=>{
-                        router.push("devices/"+order.SN+"/discovery")
-                        }
-                      }>
-                      <SvgIcon 
-                        fontSize="small" 
-                        sx={{cursor: order.Status == 2 && 'pointer'}} 
+                    {order.Status == 2 && 
+                      <Button
+                        onClick={()=>{
+                          router.push("devices/"+ getDeviceProtocol(order) +"/"+order.SN+"/wifi")
+                        }}
                       >
-                        <ArrowTopRightOnSquareIcon />
-                      </SvgIcon></Button>}
+                        <SvgIcon 
+                          fontSize="small" 
+                          sx={{cursor: 'pointer'}} 
+                        >
+                          <ArrowTopRightOnSquareIcon />
+                        </SvgIcon>
+                      </Button>}
                     </TableCell>
                   </TableRow>
                 );

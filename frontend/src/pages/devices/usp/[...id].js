@@ -11,6 +11,7 @@ import EnvelopeIcon from '@heroicons/react/24/outline/EnvelopeIcon';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import WifiIcon from '@heroicons/react/24/solid/WifiIcon';
 import { useEffect, useState } from 'react';
+import { DevicesWiFi } from 'src/sections/devices/usp/devices-wifi';
 
 const Page = () => {
     const router = useRouter()
@@ -24,6 +25,8 @@ const Page = () => {
                 return <DevicesRPC/>
             case "discovery":
                 return <DevicesDiscovery/>
+            case "wifi":
+                return <DevicesWiFi/>
             default:
                 return <p>Hello World</p>
         }
@@ -55,9 +58,9 @@ const Page = () => {
                 }}
                 mb={3}>
                     <Tabs value={router.query.id[1]}  aria-label="icon label tabs example">
-                        <Tab icon={<SvgIcon><WifiIcon/></SvgIcon>} iconPosition={"end"} label="Wi-Fi" />
-                        <Tab value={"discovery"} onClick={()=>{router.push(`/devices/${deviceID}/discovery`)}} icon={<SvgIcon><MagnifyingGlassIcon/></SvgIcon>} iconPosition={"end"} label="Discover Parameters" />
-                        <Tab value={"msg"} onClick={()=>{router.push(`/devices/${deviceID}/msg`)}} icon={<SvgIcon><EnvelopeIcon/></SvgIcon>} iconPosition={"end"} label="Remote Messages" />
+                        <Tab icon={<SvgIcon><WifiIcon/></SvgIcon>} iconPosition={"end"} label="Wi-Fi" onClick={()=>{router.push(`/devices/usp/${deviceID}/wifi`)}} value={"wifi"}/>
+                        <Tab value={"discovery"} onClick={()=>{router.push(`/devices/usp/${deviceID}/discovery`)}} icon={<SvgIcon><MagnifyingGlassIcon/></SvgIcon>} iconPosition={"end"} label="Discover Parameters" />
+                        <Tab value={"msg"} onClick={()=>{router.push(`/devices/usp/${deviceID}/msg`)}} icon={<SvgIcon><EnvelopeIcon/></SvgIcon>} iconPosition={"end"} label="Remote Messages" />
                     </Tabs>
                 </Box>
 
