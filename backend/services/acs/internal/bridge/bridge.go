@@ -44,9 +44,11 @@ func NewBridge(
 func (b *Bridge) StartBridge() {
 
 	b.sub(handler.NATS_CWMP_ADAPTER_SUBJECT_PREFIX+"*.api", func(msg *nats.Msg) {
-		//log.Printf("Received message: %s", string(msg.Data))
-		log.Printf("Subject: %s", msg.Subject)
-		log.Printf("Reply: %s", msg.Reply)
+		if b.conf.DebugMode {
+			log.Printf("Received message: %s", string(msg.Data))
+			log.Printf("Subject: %s", msg.Subject)
+			log.Printf("Reply: %s", msg.Reply)
+		}
 
 		device := getDeviceFromSubject(msg.Subject)
 		cpe, ok := b.cpes[device]
@@ -80,9 +82,6 @@ func (b *Bridge) StartBridge() {
 			respondMsg(msg.Respond, http.StatusBadRequest, err.Error())
 			return
 		}
-
-		//req := cpe.Queue.Dequeue().(handler.Request)
-		//cpe.Waiting = &req
 
 		defer cpe.Queue.Dequeue()
 

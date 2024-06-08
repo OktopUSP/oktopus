@@ -104,7 +104,7 @@ func (h *Handler) CwmpHandler(w http.ResponseWriter, r *http.Request) {
 
 		if cpe.Waiting != nil {
 
-			log.Println("CPE was waiting for a response, now received something")
+			log.Println("ACS was waiting for a response from the CPE, now received something")
 
 			var e cwmp.SoapEnvelope
 			xml.Unmarshal([]byte(body), &e)
@@ -122,7 +122,7 @@ func (h *Handler) CwmpHandler(w http.ResponseWriter, r *http.Request) {
 				log.Println(body)
 			} else {
 				log.Println("Unknown message type")
-				log.Println("Envelope:", e)
+				log.Println("Body:", body)
 				msgAnswer(cpe.Waiting.Callback, cpe.Waiting.Time, h.acsConfig.DeviceAnswerTimeout, tmp)
 			}
 			cpe.Waiting = nil
