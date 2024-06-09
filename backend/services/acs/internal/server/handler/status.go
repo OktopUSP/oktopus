@@ -11,7 +11,9 @@ func (h *Handler) HandleCpeStatus() {
 			if cpe == "" {
 				continue
 			}
-			log.Println("Checking CPE " + cpe + " status")
+			if h.acsConfig.DebugMode {
+				log.Println("Checking CPE " + cpe + " status")
+			}
 			if time.Since(h.Cpes[cpe].LastConnection) > h.acsConfig.KeepAliveInterval {
 				log.Printf("LastConnection: %s, KeepAliveInterval: %s", h.Cpes[cpe].LastConnection, h.acsConfig.KeepAliveInterval)
 				log.Println("CPE", cpe, "is offline")
