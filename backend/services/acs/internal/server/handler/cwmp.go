@@ -79,9 +79,6 @@ func (h *Handler) CwmpHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			h.pub(NATS_CWMP_SUBJECT_PREFIX+sn+".info", tmp)
 		}
-		obj := h.Cpes[sn]
-		cpe := &obj
-		cpe.LastConnection = time.Now()
 
 		log.Printf("Received an Inform from device %s withEventCodes %s", addr, Inform.GetEvents())
 
@@ -116,7 +113,10 @@ func (h *Handler) CwmpHandler(w http.ResponseWriter, r *http.Request) {
 			} else if e.KindOf() == "GetParameterValuesResponse" {
 				log.Println("Receive GetParameterValuesResponse from CPE:", cpe.SerialNumber)
 				msgAnswer(cpe.Waiting.Callback, cpe.Waiting.Time, h.acsConfig.DeviceAnswerTimeout, tmp)
-			} else if e.KindOf() == "Fault" {
+			} else if e.KindOf() == "SetParameterValuesResponse" {
+				log.Println("Receive SetParameterValuesResponse from CPE:", cpe.SerialNumber)
+				msgAnswer(cpe.Waiting.Callback, cpe.Waiting.Time, h.acsConfig.DeviceAnswerTimeout, tmp)
+			}else if e.KindOf() == "Fault" {
 				log.Println("Receive FaultResponse from CPE:", cpe.SerialNumber)
 				msgAnswer(cpe.Waiting.Callback, cpe.Waiting.Time, h.acsConfig.DeviceAnswerTimeout, tmp)
 				log.Println(body)
@@ -143,13 +143,13 @@ func (h *Handler) CwmpHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(204)
 		}
 	}
+	cpe.LastConnection = time.Now()
 	h.Cpes[cpe.SerialNumber] = cpe
-	log.Println("---End of CWMP Handler---")
 }
 
 func (h *Handler) ConnectionRequest(cpe CPE) error {
 	log.Println("--> ConnectionRequest, CPE: ", cpe.SerialNumber)
-	//  log.Println("ConnectionRequestURL: ", cpe.ConnectionRequestURL)
+	// log.Println("ConnectionRequestURL: ", cpe.ConnectionRequestURL)
 	// log.Println("ConnectionRequestUsername: ", cpe.Username)
 	// log.Println("ConnectionRequestPassword: ", cpe.Password)
 
