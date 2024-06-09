@@ -24,6 +24,19 @@ export const SideNav = (props) => {
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
 
+  const isItemActive = (currentPath, itemPath) => {
+    if (currentPath === itemPath) {
+      return true;
+    }
+
+    if (currentPath.includes(itemPath) && itemPath !== '/') {
+      return true;
+    }
+
+    return false;
+    //TODO: test frontend with color of the landing page
+  }
+
   const content = (
     <Scrollbar
       sx={{
@@ -100,7 +113,7 @@ export const SideNav = (props) => {
             }}
           >
             {items.map((item) => {
-              const active = item.path ? (pathname === item.path) : false;
+              const active = isItemActive(pathname, item.path);
 
               return (
                 <SideNavItem
