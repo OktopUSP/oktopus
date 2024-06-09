@@ -17,14 +17,15 @@ type ParamData struct {
 }
 
 type WiFi struct {
-	Path     string    `json:"path"`
-	Name     ParamData `json:"name"`
-	SSID     ParamData `json:"ssid"`
-	Password ParamData `json:"password"`
-	Security ParamData `json:"security"`
-	//SecurityCapabilities []ParamData `json:"securityCapabilities"`
-	Enable ParamData `json:"enable"`
-	Status ParamData `json:"status"`
+	Path                 string      `json:"path"`
+	Name                 ParamData   `json:"name"`
+	SSID                 ParamData   `json:"ssid"`
+	Password             ParamData   `json:"password"`
+	Security             ParamData   `json:"security"`
+	SecurityCapabilities []ParamData `json:"securityCapabilities"`
+	Standard             ParamData   `json:"standard"`
+	Enable               ParamData   `json:"enable"`
+	Status               ParamData   `json:"status"`
 }
 
 // import (
@@ -263,7 +264,7 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 						case "SSID":
 							wlans[wlanConfigurationInstances].SSID.Writable = cwmp.ParamTypeIsWritable(z.Writable)
 						case "Standard":
-							wlans[wlanConfigurationInstances].Security.Writable = cwmp.ParamTypeIsWritable(z.Writable)
+							wlans[wlanConfigurationInstances].Standard.Writable = cwmp.ParamTypeIsWritable(z.Writable)
 						case "KeyPassphrase":
 							wlans[wlanConfigurationInstances].Password.Writable = cwmp.ParamTypeIsWritable(z.Writable)
 						}
@@ -309,7 +310,7 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 				case "SSID":
 					wlans[wlanIndex].SSID.Value = a.Value
 				case "Standard":
-					wlans[wlanIndex].Security.Value = a.Value
+					wlans[wlanIndex].Standard.Value = a.Value
 				case "KeyPassphrase":
 					wlans[wlanIndex].Password.Value = a.Value
 				}
