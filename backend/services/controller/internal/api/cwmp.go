@@ -85,7 +85,25 @@ func (a *Api) cwmpSetParameterValuesMsg(w http.ResponseWriter, r *http.Request) 
 	w.Write(data)
 }
 
-func cwmpInteraction[T cwmp.SetParameterValuesResponse | cwmp.GetParameterAttributesResponse | cwmp.GetParameterNamesResponse | cwmp.GetParameterValuesResponse](
+func (a *Api) cwmpAddObjectMsg(w http.ResponseWriter, r *http.Request) {
+	sn := getSerialNumberFromRequest(r)
+
+	payload, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(utils.Marshall(err.Error()))
+		return
+	}
+
+	data, _, err := cwmpInteraction[cwmp.AddObjectResponse](sn, payload, w, a.nc)
+	if err != nil {
+		return
+	}
+
+	w.Write(data)
+}
+
+func cwmpInteraction[T cwmp.SetParameterValuesResponse | cwmp.GetParameterAttributesResponse | cwmp.GetParameterNamesResponse | cwmp.GetParameterValuesResponse | cwmp.AddObjectResponse](
 	sn string, payload []byte, w http.ResponseWriter, nc *nats.Conn,
 ) ([]byte, T, error) {
 
