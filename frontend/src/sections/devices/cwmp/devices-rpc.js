@@ -51,13 +51,36 @@ const [value, setValue] = useState(`<?xml version="1.0" encoding="UTF-8"?>
   </soap:Body>
 </soap:Envelope>`)
 
+var prettifyXml = function(sourceXml)
+{
+    var xmlDoc = new DOMParser().parseFromString(sourceXml, 'application/xml');
+    var xsltDoc = new DOMParser().parseFromString([
+        // describes how we want to modify the XML - indent everything
+        '<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform">',
+        '  <xsl:strip-space elements="*"/>',
+        '  <xsl:template match="para[content-style][not(text())]">', // change to just text() to strip space in text nodes
+        '    <xsl:value-of select="normalize-space(.)"/>',
+        '  </xsl:template>',
+        '  <xsl:template match="node()|@*">',
+        '    <xsl:copy><xsl:apply-templates select="node()|@*"/></xsl:copy>',
+        '  </xsl:template>',
+        '  <xsl:output indent="yes"/>',
+        '</xsl:stylesheet>',
+    ].join('\n'), 'application/xml');
+
+    var xsltProcessor = new XSLTProcessor();    
+    xsltProcessor.importStylesheet(xsltDoc);
+    var resultDoc = xsltProcessor.transformToDocument(xmlDoc);
+    var resultXml = new XMLSerializer().serializeToString(resultDoc);
+    return resultXml;
+};
+
 const handleClose = () => {
   setOpen(false);
 };
 const handleOpen = () => {
   setOpen(true);
   var myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
   myHeaders.append("Authorization", localStorage.getItem("token"));
 
  var raw = value
@@ -73,21 +96,21 @@ const handleOpen = () => {
 
   switch(age) {
     case 1:
-      method="add"
+      method="addObject"
       break;
     case 2:
-      method="get"
+      method="getParameterValues"
       break;
     case 3:
-      method="set"
+      method="setParameterValues"
       break;
     case 4:
-      method="del"
+      method="deleteObject"
     break;
   }
 
  
-  fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/device/${router.query.id[0]}/any/${method}`, requestOptions)
+  fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/device/cwmp/${router.query.id[0]}/${method}`, requestOptions)
     .then(response => response.text())
     .then(result => {
       if (result.status === 401){
@@ -95,7 +118,7 @@ const handleOpen = () => {
       }
       setOpen(false)
       setAnswer(true)
-      let teste =  JSON.stringify(JSON.parse(result), null, 2)
+      let teste =  prettifyXml(result)
       console.log(teste)
       setContent(teste)
     })
