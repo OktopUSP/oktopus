@@ -98,6 +98,15 @@ type GetParameterAttributesResponse struct {
 	ParameterList []ParameterAttributeStruct `xml:"Body>GetParameterAttributesResponse>ParameterList>ParameterAttributeStruct"`
 }
 
+type AddObjectResponse struct {
+	InstanceNumber string `xml:"Body>AddObjectResponse>InstanceNumber"`
+	Status         int    `xml:"Body>AddObjectResponse>Status"`
+}
+
+type DeleteObjectResponse struct {
+	Status int `xml:"Body>DeleteObjectResponse>Status"`
+}
+
 type CWMPInform struct {
 	DeviceId      DeviceID               `xml:"Body>Inform>DeviceId"`
 	Events        []EventStruct          `xml:"Body>Inform>Event>EventStruct"`
