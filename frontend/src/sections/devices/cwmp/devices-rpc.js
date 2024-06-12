@@ -38,15 +38,18 @@ const [answer, setAnswer] = useState(false)
 const [content, setContent] = useState('')
 const [age, setAge] = useState(2);
 
-const [value, setValue] = useState(`{
-  "param_paths": [
-      "Device.WiFi.SSID.[Name==wlan0].",
-      "Device.IP.Interface.*.Alias",
-      "Device.DeviceInfo.FirmwareImage.*.Alias",
-      "Device.IP.Interface.1.IPv4Address.1.IPAddress"
-  ],
-  "max_depth": 2
-}`)
+const [value, setValue] = useState(`<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <soap:Header/>
+  <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <cwmp:GetParameterValues>
+      <ParameterNames>
+        <string>InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.</string>
+        <string>InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.</string>
+       </ParameterNames>
+    </cwmp:GetParameterValues>
+  </soap:Body>
+</soap:Envelope>`)
 
 const handleClose = () => {
   setOpen(false);
@@ -103,58 +106,66 @@ const handleOpen = () => {
     setAge(event.target.value);
     switch(event.target.value) {
       case 1:
-        setValue(`{
-          "allow_partial": true,
-          "create_objs": [
-              {
-                  "obj_path": "Device.IP.Interface.",
-                  "param_settings": [
-                      {
-                          "param": "Alias",
-                          "value": "test",
-                          "required": true
-                      }
-                  ]
-              }
-          ]
-      }`)
+        setValue(`<?xml version="1.0" encoding="UTF-8"?>
+        <soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <soap:Header/>
+          <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+            <cwmp:AddObject>
+              <ObjectName>InternetGatewayDevice.LANDevice.</ObjectName>
+              <ParameterKey></ParameterKey>
+            </cwmp:AddObject>
+          </soap:Body>
+        </soap:Envelope>`)
         break;
       case 2:
-        setValue(`{
-          "param_paths": [
-              "Device.WiFi.SSID.[Name==wlan0].",
-              "Device.IP.Interface.*.Alias",
-              "Device.DeviceInfo.FirmwareImage.*.Alias",
-              "Device.IP.Interface.1.IPv4Address.1.IPAddress"
-          ],
-          "max_depth": 2
-      }`)
+        setValue(`<?xml version="1.0" encoding="UTF-8"?>
+        <soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <soap:Header/>
+          <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+            <cwmp:GetParameterValues>
+              <ParameterNames>
+                <string>InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.</string>
+                <string>InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.</string>
+                <string>InternetGatewayDevice.LANDevice.2.WLANConfiguration.2.</string>
+                <string>InternetGatewayDevice.LANDevice.2.WLANConfiguration.1.</string>
+               </ParameterNames>
+            </cwmp:GetParameterValues>
+          </soap:Body>
+        </soap:Envelope>`)
         break;
       case 3:
         setValue(`
-        {
-          "allow_partial":true,
-          "update_objs":[
-              {
-                  "obj_path":"Device.IP.Interface.[Alias==pamonha].",
-                  "param_settings":[
-                      {
-                      "param":"Alias",
-                      "value":"goiaba",
-                      "required":true
-                      }
-                  ]
-              }
-          ]
-      }`)
+        <?xml version="1.0" encoding="UTF-8"?>
+        <soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <soap:Header/>
+          <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+            <cwmp:SetParameterValues>
+              <ParameterList soapenc:arrayType="cwmp:ParameterValueStruct[3]">
+            <ParameterValueStruct>
+                <Name>InternetGatewayDevice.LANDevice.1.WLANConfiguration.1.Enable</Name>
+                <Value>0</Value>
+                </ParameterValueStruct>
+                <ParameterValueStruct>
+                <Name>InternetGatewayDevice.LANDevice.1.WLANConfiguration.2.SSID</Name>
+                <Value>HUAWEI_TEST-2</Value>
+                </ParameterValueStruct>
+              </ParameterList>
+              <ParameterKey>LC1309123</ParameterKey>
+            </cwmp:SetParameterValues>
+          </soap:Body>
+        </soap:Envelope>`)
         break;
       case 4:
-        setValue(`{
-          "allow_partial": true,
-          "obj_paths": [
-              "Device.IP.Interface.3."
-          ]
-      }`)
+        setValue(`<?xml version="1.0" encoding="UTF-8"?>
+        <soap:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cwmp="urn:dslforum-org:cwmp-1-0" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:schemaLocation="urn:dslforum-org:cwmp-1-0 ..\schemas\wt121.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <soap:Header/>
+          <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+            <cwmp:DeleteObject>
+              <ObjectName>InternetGatewayDevice.LANDevice.3.</ObjectName>
+              <ParameterKey></ParameterKey>
+            </cwmp:DeleteObject>
+          </soap:Body>
+        </soap:Envelope>`)
         break;
       default:
         // code block
@@ -207,7 +218,7 @@ const handleOpen = () => {
               onChange={handleChange}
               value={value}
               fullWidth
-              rows="9"
+              rows="15"
             />
           </Stack>
         </CardContent>
