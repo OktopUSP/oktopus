@@ -5,8 +5,8 @@ Tabs,
 SvgIcon } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useRouter } from 'next/router';
-import { DevicesRPC } from 'src/sections/devices/devices-rpc';
-import { DevicesDiscovery } from 'src/sections/devices/devices-discovery';
+import { DevicesRPC } from 'src/sections/devices/cwmp/devices-rpc';
+import { DevicesDiscovery } from 'src/sections/devices/cwmp/devices-discovery';
 import EnvelopeIcon from '@heroicons/react/24/outline/EnvelopeIcon';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import WifiIcon from '@heroicons/react/24/solid/WifiIcon';
