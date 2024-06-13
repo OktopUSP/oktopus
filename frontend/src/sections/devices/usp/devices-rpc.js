@@ -207,7 +207,7 @@ const handleOpen = () => {
               onChange={handleChange}
               value={value}
               fullWidth
-              rows="9"
+              rows="15"
             />
           </Stack>
         </CardContent>

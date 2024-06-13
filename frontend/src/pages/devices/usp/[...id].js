@@ -25,8 +25,8 @@ const Page = () => {
                 return <DevicesRPC/>
             case "discovery":
                 return <DevicesDiscovery/>
-            case "wifi":
-                return <DevicesWiFi/>
+            // case "wifi":
+            //     return <DevicesWiFi/>
             default:
                 return <p>Hello World</p>
         }
@@ -58,7 +58,7 @@ const Page = () => {
                 }}
                 mb={3}>
                     <Tabs value={router.query.id[1]}  aria-label="icon label tabs example">
-                        <Tab icon={<SvgIcon><WifiIcon/></SvgIcon>} iconPosition={"end"} label="Wi-Fi" onClick={()=>{router.push(`/devices/usp/${deviceID}/wifi`)}} value={"wifi"}/>
+                        {/* <Tab icon={<SvgIcon><WifiIcon/></SvgIcon>} iconPosition={"end"} label="Wi-Fi" onClick={()=>{router.push(`/devices/usp/${deviceID}/wifi`)}} value={"wifi"}/> */}
                         <Tab value={"discovery"} onClick={()=>{router.push(`/devices/usp/${deviceID}/discovery`)}} icon={<SvgIcon><MagnifyingGlassIcon/></SvgIcon>} iconPosition={"end"} label="Discover Parameters" />
                         <Tab value={"msg"} onClick={()=>{router.push(`/devices/usp/${deviceID}/msg`)}} icon={<SvgIcon><EnvelopeIcon/></SvgIcon>} iconPosition={"end"} label="Remote Messages" />
                     </Tabs>
