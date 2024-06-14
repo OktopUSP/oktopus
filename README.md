@@ -32,7 +32,7 @@ That's Oktopus Core, I's responsable for the devices management. Made by differe
 
 <ul><li><h4>Architecture:</h4></li></ul>
 
-![Oktopus-Core drawio](https://github.com/OktopUSP/oktopus/assets/83298718/795f38f6-fd22-4c25-8ca4-f1c429395889)
+![Oktopus-Core drawio](https://github.com/OktopUSP/oktopus/assets/83298718/515b2ac3-4206-4f90-8b54-967a4b2495c3)
 
 <ul>
     <li>
