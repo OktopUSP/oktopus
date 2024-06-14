@@ -35,9 +35,9 @@ This repository aims to promote the development of a multi-vendor management pla
 
 That's Oktopus Core, I's responsable for the devices management. Made by different microservices that can be run indepently and work together to provide the best experience for the user and make available different options for device connetion. Below here you will find some helpfull information about how the software works, the parts of it, the architecture and infrastructure.
 
-<ul><li><h4>Infrastructure:</h4></li></ul>
+<ul><li><h4>Architec:</h4></li></ul>
 
-![image](https://github.com/OktopUSP/oktopus/assets/83298718/aa6feb7f-ac32-465c-b166-aa6b3ee5b68a)
+![Oktopus-Core drawio](https://github.com/OktopUSP/oktopus/assets/83298718/795f38f6-fd22-4c25-8ca4-f1c429395889)
 
 <ul>
     <li>
