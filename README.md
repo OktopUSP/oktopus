@@ -35,7 +35,7 @@ This repository aims to promote the development of a multi-vendor management pla
 
 That's Oktopus Core, I's responsable for the devices management. Made by different microservices that can be run indepently and work together to provide the best experience for the user and make available different options for device connetion. Below here you will find some helpfull information about how the software works, the parts of it, the architecture and infrastructure.
 
-<ul><li><h4>Architec:</h4></li></ul>
+<ul><li><h4>Architecture:</h4></li></ul>
 
 ![Oktopus-Core drawio](https://github.com/OktopUSP/oktopus/assets/83298718/795f38f6-fd22-4c25-8ca4-f1c429395889)
 
@@ -59,10 +59,10 @@ user@user-laptop:~/oktopus/deploy/compose$ COMPOSE_PROFILES=nats,controller,cwmp
 </pre>
 Oktopus deployment in <u><b>Kubernetes</b></u> still is in beta phase: <a href="https://github.com/OktopUSP/oktopus/blob/main/deploy/kubernetes/README.md"> Instructions for Kubernetes deployment</a><p></p>
         UI will open at port 3000:
-        <img src="https://github.com/OktopUSP/oktopus/assets/83298718/65f7c5b9-c08d-479a-8a13-fdfc634b5ca2"/>
-<h2>Agent</h2>
+        <img src="https://github.com/OktopUSP/oktopus/assets/83298718/65f7c5b9-c08d-479a-8a13-fdfc634b5ca2"/><br/><br/>
+<h1>Agent</h1>
 
-Agent is a piece of software taht runs on the CPE or IoT device and is responsable for connecting it to the Controller (Oktopus) through CWMP and/or USP.
+Agent is a piece of software that runs on the CPE or IoT device and is responsable for connecting it to the Controller (Oktopus) through CWMP and/or USP.
 
 </li>
     <li>
