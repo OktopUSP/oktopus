@@ -1,4 +1,4 @@
-FROM node:16.20.2-alpine as builder
+FROM node:18.17.0-alpine as builder
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ RUN NEXT_PUBLIC_REST_ENDPOINT=REST_API_URL NEXT_PUBLIC_WS_ENDPOINT=WS_URL npm ru
 
 RUN ls -la && echo "Listing directory contents done"
 
-FROM node:16.20.2-alpine as runner
+FROM node:18.17.0-alpine as runner
 
 WORKDIR /app
 
