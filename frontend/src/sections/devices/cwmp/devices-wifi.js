@@ -140,9 +140,18 @@ export const DevicesWiFi = () => {
                                     {item.password.value != null &&
                                     <TextField
                                         fullWidth
+                                        type="password"
                                         label="Password"
                                         disabled={!item.password.writable}
                                         value={item.password.value}
+                                        onChange={(e) => {
+                                            applyContent[index].hasChanges = true
+                                            applyContent[index].password = {
+                                                value : e.target.value
+                                            }
+                                            setApplyContent([...applyContent])
+                                            item.password.value = e.target.value
+                                        }}
                                     />}
                                     {item.standard.value != null &&
                                     <TextField
@@ -150,6 +159,14 @@ export const DevicesWiFi = () => {
                                         label="Standard"
                                         disabled={!item.standard.writable}
                                         value={item.standard.value}
+                                        onChange={(e) => {
+                                            applyContent[index].hasChanges = true
+                                            applyContent[index].standard = {
+                                                value : e.target.value
+                                            }
+                                            setApplyContent([...applyContent])
+                                            item.standard.value = e.target.value
+                                        }}
                                     />}
                                 </Stack>
                                 <CardActions sx={{display:"flex", justifyContent:"flex-end"}}>
