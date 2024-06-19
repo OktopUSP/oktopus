@@ -34,6 +34,10 @@ That's Oktopus Core, I's responsable for the devices management. Made by differe
 
 ![Oktopus-Core drawio](https://github.com/OktopUSP/oktopus/assets/83298718/515b2ac3-4206-4f90-8b54-967a4b2495c3)
 
+<ul><li><h4>Microservices:</h4></li></ul>
+
+![Oktopus-Microservices drawio](https://github.com/OktopUSP/oktopus/assets/83298718/04653478-dafa-4f6e-ae34-af6b270ff4da)
+
 <ul>
     <li>
         <h4>API:</h4>
