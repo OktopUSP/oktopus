@@ -78,6 +78,7 @@ func (a *Api) StartApi() {
 	iot.HandleFunc("/{sn}/{mtp}/fw_update", a.deviceFwUpdate).Methods("PUT") //TODO: put it to work and generalize for usp and cwmp
 	if a.enterpise {
 		iot.HandleFunc("/{sn}/sitesurvey", a.deviceSiteSurvey).Methods("GET")
+		iot.HandleFunc("/{sn}/connecteddevices", a.deviceConnectedDevices).Methods("GET")
 	}
 	iot.HandleFunc("/{sn}/wifi", a.deviceWifi).Methods("PUT", "GET")
 	dash := r.PathPrefix("/api/info").Subrouter()
