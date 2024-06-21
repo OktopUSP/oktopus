@@ -246,3 +246,50 @@ func NatsCwmpInteraction(
 
 	return answer.Msg, nil
 }
+
+func NatsEnterpriseInteraction(
+	subj string,
+	body []byte,
+	w http.ResponseWriter,
+	nc *nats.Conn,
+) error {
+
+	log.Println("Sending enterprise message")
+	log.Println("Subject: ", subj)
+
+	var answer entity.MsgAnswer[[]byte]
+
+	msg, err := nc.Request(subj, body, local.NATS_REQUEST_TIMEOUT)
+	if err != nil {
+		if err == nats.ErrNoResponders {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(utils.Marshall("You have no enterprise license, to get one contact: leandro@oktopus.app.br"))
+			return err
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(utils.Marshall("Error to communicate with nats: " + err.Error()))
+		return err
+	}
+
+	err = json.Unmarshal(msg.Data, &answer)
+	if err != nil {
+
+		var errMsg *entity.MsgAnswer[*string]
+		err = json.Unmarshal(msg.Data, &errMsg)
+
+		if err != nil {
+			log.Println("Bad answer message formatting: ", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(msg.Data)
+			return err
+		}
+
+		log.Printf("Error message received, msg: %s, code: %d", *errMsg.Msg, errMsg.Code)
+		w.WriteHeader(errMsg.Code)
+		w.Write(utils.Marshall(*errMsg.Msg))
+		return errNatsMsgReceivedWithErrorData
+	}
+
+	w.Write(answer.Msg)
+	return nil
+}

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -212,6 +213,11 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 
 		if device.Cwmp == entity.Online {
 
+			if a.enterpise {
+				a.getEnterpriseResource("wifi", "get", device, sn, w, []byte{})
+				return
+			}
+
 			var (
 				NUMBER_OF_WIFI_PARAMS_TO_GET = 5
 			)
@@ -340,6 +346,17 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPut {
 
 		if device.Cwmp == entity.Online {
+
+			if a.enterpise {
+				payload, err := io.ReadAll(r.Body)
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					w.Write(utils.Marshall(err.Error()))
+					return
+				}
+				a.getEnterpriseResource("wifi", "set", device, sn, w, payload)
+				return
+			}
 
 			var body []WiFi
 

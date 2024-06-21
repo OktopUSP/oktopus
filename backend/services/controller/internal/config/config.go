@@ -30,9 +30,10 @@ type RestApi struct {
 }
 
 type Config struct {
-	RestApi RestApi
-	Nats    Nats
-	Mongo   Mongo
+	RestApi    RestApi
+	Nats       Nats
+	Mongo      Mongo
+	Enterprise bool
 }
 
 func NewConfig() *Config {
@@ -45,6 +46,7 @@ func NewConfig() *Config {
 	natsVerifyCertificates := flag.Bool("nats_verify_certificates", lookupEnvOrBool("NATS_VERIFY_CERTIFICATES", false), "verify validity of certificates from nats server")
 	flApiPort := flag.String("api_port", lookupEnvOrString("REST_API_PORT", "8000"), "Rest api port")
 	mongoUri := flag.String("mongo_uri", lookupEnvOrString("MONGO_URI", "mongodb://localhost:27017"), "uri for mongodb server")
+	enterpise := flag.Bool("enterprise", lookupEnvOrBool("ENTERPRISE", false), "enterprise version enable")
 	flHelp := flag.Bool("help", false, "Help")
 
 	/*
@@ -78,6 +80,7 @@ func NewConfig() *Config {
 			Uri: *mongoUri,
 			Ctx: ctx,
 		},
+		Enterprise: *enterpise,
 	}
 }
 

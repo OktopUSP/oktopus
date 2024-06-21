@@ -3,15 +3,19 @@ package api
 import (
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"io"
 	"net/http"
 
 	"github.com/leandrofars/oktopus/internal/bridge"
 	"github.com/leandrofars/oktopus/internal/cwmp"
+	"github.com/leandrofars/oktopus/internal/entity"
 	n "github.com/leandrofars/oktopus/internal/nats"
 	"github.com/leandrofars/oktopus/internal/utils"
 	"github.com/nats-io/nats.go"
 )
+
+var errDeviceModelNotFound = errors.New("device model not found")
 
 func (a *Api) cwmpGetParameterNamesMsg(w http.ResponseWriter, r *http.Request) {
 	sn := getSerialNumberFromRequest(r)
@@ -146,4 +150,18 @@ func cwmpInteraction[T cwmp.SetParameterValuesResponse | cwmp.DeleteObjectRespon
 		}
 	}
 	return data, response, err
+}
+
+func cwmpGetDeviceModel(device *entity.Device, w http.ResponseWriter) (string, error) {
+	var model string
+	if device.Model != "" {
+		model = device.Model
+	} else if device.ProductClass != "" {
+		model = device.ProductClass
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(utils.Marshall("Couldn't get device model"))
+		return model, errDeviceModelNotFound
+	}
+	return model, nil
 }

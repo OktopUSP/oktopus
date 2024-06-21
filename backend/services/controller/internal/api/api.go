@@ -17,13 +17,14 @@ import (
 )
 
 type Api struct {
-	port   string
-	js     jetstream.JetStream
-	nc     *nats.Conn
-	bridge bridge.Bridge
-	db     db.Database
-	kv     jetstream.KeyValue
-	ctx    context.Context
+	port      string
+	js        jetstream.JetStream
+	nc        *nats.Conn
+	bridge    bridge.Bridge
+	db        db.Database
+	kv        jetstream.KeyValue
+	ctx       context.Context
+	enterpise bool
 }
 
 const REQUEST_TIMEOUT = time.Second * 30
@@ -33,15 +34,16 @@ const (
 	AdminUser
 )
 
-func NewApi(c config.RestApi, js jetstream.JetStream, nc *nats.Conn, bridge bridge.Bridge, d db.Database, kv jetstream.KeyValue) Api {
+func NewApi(c *config.Config, js jetstream.JetStream, nc *nats.Conn, bridge bridge.Bridge, d db.Database, kv jetstream.KeyValue) Api {
 	return Api{
-		port:   c.Port,
-		js:     js,
-		nc:     nc,
-		ctx:    c.Ctx,
-		bridge: bridge,
-		db:     d,
-		kv:     kv,
+		port:      c.RestApi.Port,
+		js:        js,
+		nc:        nc,
+		ctx:       c.RestApi.Ctx,
+		bridge:    bridge,
+		db:        d,
+		kv:        kv,
+		enterpise: c.Enterprise,
 	}
 }
 
@@ -73,10 +75,8 @@ func (a *Api) StartApi() {
 	iot.HandleFunc("/{sn}/{mtp}/parameters", a.deviceGetSupportedParametersMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/{mtp}/instances", a.deviceGetParameterInstances).Methods("PUT")
 	iot.HandleFunc("/{sn}/{mtp}/operate", a.deviceOperateMsg).Methods("PUT")
-	iot.HandleFunc("/{sn}/{mtp}/fw_update", a.deviceFwUpdate).Methods("PUT")
+	iot.HandleFunc("/{sn}/{mtp}/fw_update", a.deviceFwUpdate).Methods("PUT") //TODO: put it to work and generalize for usp and cwmp
 	iot.HandleFunc("/{sn}/wifi", a.deviceWifi).Methods("PUT", "GET")
-	// mtp := r.PathPrefix("/api/mtp").Subrouter()
-	// mtp.HandleFunc("", a.mtpInfo).Methods("GET")
 	dash := r.PathPrefix("/api/info").Subrouter()
 	dash.HandleFunc("/vendors", a.vendorsInfo).Methods("GET")
 	dash.HandleFunc("/status", a.statusInfo).Methods("GET")
