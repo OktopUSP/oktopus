@@ -28,7 +28,7 @@ Oktopus is a multi-vendor management platform for CPEs and IoTs. <b>Any device t
 
 <h1>Controller</h1>
 
-That's Oktopus Core, I's responsable for the devices management. Made by different microservices that can be run indepently and work together to provide the best experience for the user and make available different options for device connetion. Below here you will find some helpfull information about how the software works, the parts of it, the architecture and infrastructure.
+That's Oktopus Core, It's responsable for the devices management. Made by different microservices that can be run indepently and work together to provide the best experience for the user and make available different options for device connetion. Below here you will find some helpfull information about how the software works, the parts of it, the architecture and infrastructure.
 
 <ul><li><h4>Architecture:</h4></li></ul>
 
