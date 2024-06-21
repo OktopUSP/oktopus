@@ -214,7 +214,7 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 		if device.Cwmp == entity.Online {
 
 			if a.enterpise {
-				a.getEnterpriseResource("wifi", "get", device, sn, w, []byte{})
+				a.getEnterpriseResource("wifi", "get", device, sn, w, []byte{}, "cwmp", "098")
 				return
 			}
 
@@ -354,7 +354,7 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 					w.Write(utils.Marshall(err.Error()))
 					return
 				}
-				a.getEnterpriseResource("wifi", "set", device, sn, w, payload)
+				a.getEnterpriseResource("wifi", "set", device, sn, w, payload, "cwmp", "098")
 				return
 			}
 

@@ -14,11 +14,13 @@ func (a *Api) getEnterpriseResource(
 	sn string,
 	w http.ResponseWriter,
 	body []byte,
+	protocol, datamodel string,
 ) error {
 	model, err := cwmpGetDeviceModel(device, w)
 	if err != nil {
 		return err
 	}
-	err = bridge.NatsEnterpriseInteraction("enterprise.v1.cwmp."+model+"."+sn+"."+resource+"."+action, body, w, a.nc)
+
+	err = bridge.NatsEnterpriseInteraction("enterprise.v1."+protocol+"."+datamodel+"."+model+"."+sn+"."+resource+"."+action, body, w, a.nc)
 	return err
 }

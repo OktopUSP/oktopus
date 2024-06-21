@@ -267,7 +267,7 @@ func NatsEnterpriseInteraction(
 			return err
 		}
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(utils.Marshall("Error to communicate with nats: " + err.Error()))
+		w.Write(utils.Marshall("Error to communicate with nats:" + err.Error()))
 		return err
 	}
 
