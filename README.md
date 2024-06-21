@@ -2,7 +2,7 @@
 <img src="https://github.com/OktopUSP/oktopus/assets/83298718/fc05c512-951d-448c-8c31-1e0881783460"/></p>
 <br/>     
 <p>
-This repository aims to promote the development of a multi-vendor management platform for CPEs and IoTs. <b>Any device that follows the TR-369 or TR-069 protocol can be managed</b>. The main objective is to facilitate and unify device management, which generates countless benefits for the end user and service providers, suppressing the demands that today's technologies require: device interconnection, data collection, speed, availability and more.
+Oktopus is a multi-vendor management platform for CPEs and IoTs. <b>Any device that follows the TR-369 or TR-069 protocol can be managed</b>. The main objective is to facilitate and unify device management, which generates countless benefits for the end user and service providers, suppressing the demands that today's technologies require: device interconnection, data collection, speed, near real time feedback, and scalability.
 </p>
 
 <ul><li><h4>Sponsors:</h4></li></ul>
