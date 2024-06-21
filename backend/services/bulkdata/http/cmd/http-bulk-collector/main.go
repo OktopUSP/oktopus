@@ -7,6 +7,7 @@ import (
 	"syscall"
 
 	"github.com/oktopUSP/backend/services/bulkdata/internal/api"
+	"github.com/oktopUSP/backend/services/bulkdata/internal/bridge"
 	"github.com/oktopUSP/backend/services/bulkdata/internal/config"
 	"github.com/oktopUSP/backend/services/bulkdata/internal/nats"
 )
@@ -18,9 +19,11 @@ func main() {
 
 	c := config.NewConfig()
 
-	js, nc, kv := nats.StartNatsClient(c.Nats)
+	pub, sub := nats.StartNatsClient(c.Nats)
 
-	server := api.NewApi(c.RestApi, js, nc, kv)
+	b := bridge.NewBridge(pub, sub)
+
+	server := api.NewApi(c.RestApi, b)
 
 	server.StartApi()
 

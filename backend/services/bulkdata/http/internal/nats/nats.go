@@ -5,16 +5,13 @@ import (
 	"time"
 
 	"github.com/nats-io/nats.go"
-	"github.com/nats-io/nats.go/jetstream"
 	"github.com/oktopUSP/backend/services/bulkdata/internal/config"
 )
 
-const (
-	BUCKET_NAME        = "devices-auth"
-	BUCKET_DESCRIPTION = "Devices authentication"
-)
-
-func StartNatsClient(c config.Nats) (jetstream.JetStream, *nats.Conn, jetstream.KeyValue) {
+func StartNatsClient(c config.Nats) (
+	func(string, []byte) error,
+	func(string, func(*nats.Msg)) error,
+) {
 
 	var (
 		nc  *nats.Conn
@@ -35,20 +32,27 @@ func StartNatsClient(c config.Nats) (jetstream.JetStream, *nats.Conn, jetstream.
 	}
 	log.Printf("Successfully connected to NATS server %s", c.Url)
 
-	js, err := jetstream.New(nc)
-	if err != nil {
-		log.Fatalf("Failed to create JetStream client: %v", err)
-	}
+	return publisher(nc), subscriber(nc)
+}
 
-	kv, err := js.CreateOrUpdateKeyValue(c.Ctx, jetstream.KeyValueConfig{
-		Bucket:      BUCKET_NAME,
-		Description: BUCKET_DESCRIPTION,
-	})
-	if err != nil {
-		log.Fatalf("Failed to create KeyValue store: %v", err)
+func subscriber(nc *nats.Conn) func(string, func(*nats.Msg)) error {
+	return func(subject string, handler func(*nats.Msg)) error {
+		_, err := nc.Subscribe(subject, handler)
+		if err != nil {
+			log.Printf("error to subscribe to subject %s error: %q", subject, err)
+		}
+		return err
 	}
+}
 
-	return js, nc, kv
+func publisher(nc *nats.Conn) func(string, []byte) error {
+	return func(subject string, payload []byte) error {
+		err := nc.Publish(subject, payload)
+		if err != nil {
+			log.Printf("error to send nats core message: %q", err)
+		}
+		return err
+	}
 }
 
 func defineOptions(c config.Nats) []nats.Option {
