@@ -108,7 +108,8 @@ export const DevicesWiFi = () => {
                                     { item.enable.value != null &&
                                     <FormControlLabel control={<Checkbox defaultChecked={item.enable.value == 1 ? true : false} 
                                     onChange={(e) => {
-                                        let enable = e.target.value == 1 ? "1" : "0"
+                                        let enable = item.enable.value == 1 ? "0" : "1"
+                                        console.log(enable)
                                         applyContent[index].hasChanges = true
                                         applyContent[index].enable = {
                                             value : enable
@@ -145,12 +146,17 @@ export const DevicesWiFi = () => {
                                         disabled={!item.password.writable}
                                         value={item.password.value}
                                         onChange={(e) => {
-                                            applyContent[index].hasChanges = true
+                                            if (e.target.value.length >= 8) {
+                                                applyContent[index].hasChanges = true
+                                            }else{
+                                                applyContent[index].hasChanges = false
+                                            }
                                             applyContent[index].password = {
                                                 value : e.target.value
                                             }
                                             setApplyContent([...applyContent])
                                             item.password.value = e.target.value
+                                            console.log("applyContent: ", applyContent)
                                         }}
                                     />}
                                     {item.standard.value != null &&
@@ -226,107 +232,6 @@ export const DevicesWiFi = () => {
                 })):
                 <CircularProgress />
             }
-            {/* <Card>
-                <CardHeader
-                    title="2.4GHz"
-                    avatar={
-                        <SvgIcon>
-                                <GlobeAltIcon/>
-                        </SvgIcon>
-                    }
-                />
-                <CardContent>
-                    <Stack spacing={3}>
-                        <FormControlLabel control={<Checkbox defaultChecked />} label="Enabled" />
-                        <TextField
-                            fullWidth
-                            label="SSID"
-                            value="wlan0"
-                        />
-                        <TextField
-                            fullWidth
-                            label="Encryption"
-                            value="WPA2-PSK"
-                        />
-                        <TextField
-                            fullWidth
-                            label="Key"
-                            value="password"
-                        />
-                    </Stack>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader
-                    title="5GHz"
-                    avatar={
-                        <SvgIcon>
-                                <GlobeAltIcon/>
-                        </SvgIcon>
-                    }
-                />
-                <CardContent>
-                    <Stack spacing={4}>
-                        <FormControlLabel control={<Checkbox defaultChecked />} label="Enabled" />
-                        <TextField
-                            fullWidth
-                            label="SSID"
-                            value="wlan0"
-                        />
-                            <InputLabel id="demo-simple-select-standard-label">Security</InputLabel>
-                            <Select
-                            labelId="demo-simple-select-standard-label"
-                            id="demo-simple-select-standard"
-                            value={"WPA2-PSK"}
-                            //onChange={handleChange}
-                            label="Security"
-                            >
-                            <MenuItem value={30}>Open</MenuItem>
-                            <MenuItem value={"WPA2-PSK"}>WPA2-PSKnp</MenuItem>
-                            <MenuItem value={20}>WPA3</MenuItem>
-                            </Select>
-                        </FormControl>
-                        <TextField
-                            fullWidth
-                            label="Key"
-                            value="password"
-                        />
-                    </Stack>
-                    <CardActions sx={{display:"flex", justifyContent:"flex-end"}}>
-                    <Button 
-                        variant="contained" 
-                        endIcon={<SvgIcon><Check /></SvgIcon>} 
-                       // onClick={}
-                        sx={{mt:'25px', mb:'-15px'}}
-                        >
-                        Apply
-                    </Button>
-                    </CardActions>
-                </CardContent>
-            </Card> */}
-            {/* <Snackbar
-                open={errorToApplyContent}
-                TransitionComponent={"Slide"}
-                color="red"
-                onClose={() => setErrorToApplyContent(false)}
-                autoHideDuration={1200} 
-            >
-                <SnackbarContent style={{
-                    backgroundColor:theme.palette.warning.main,
-                    }}
-                    message={
-                        <div style={{display:"flex"}}>
-                            <SvgIcon>
-                                <ExclamationTriangleIcon />
-                            </SvgIcon>
-                            <div style={{margin: "5px"}}></div>
-                            <span id="client-snackbar">
-                                No changes to apply
-                            </span>
-                        </div>
-                    }
-                />
-            </Snackbar> */}
         </Stack>
         <Backdrop
             sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
