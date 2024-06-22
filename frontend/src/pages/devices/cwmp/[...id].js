@@ -4,7 +4,9 @@ Tab,
 Tabs,
 SvgIcon,
 Breadcrumbs,
-Link } from '@mui/material';
+Link, 
+Tooltip,
+IconButton} from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useRouter } from 'next/router';
 import { DevicesRPC } from 'src/sections/devices/cwmp/devices-rpc';
@@ -19,6 +21,7 @@ import { DevicesWiFi } from 'src/sections/devices/cwmp/devices-wifi';
 import { DevicesDiagnostic } from 'src/sections/devices/cwmp/devices-diagnostic';
 import { SiteSurvey } from 'src/sections/devices/cwmp/site-survey';
 import { ConnectedDevices } from 'src/sections/devices/cwmp/connecteddevices';
+import InformactionCircleIcon from '@heroicons/react/24/outline/InformationCircleIcon';
 
 
 const Page = () => {
@@ -26,6 +29,7 @@ const Page = () => {
 
     const deviceID = router.query.id[0]
     const section = router.query.id[1]
+    const enterpriseVersion = process.env.NEXT_PUBLIC_ENTERPRISE_VERSION === "true" ? true : false;
 
     const sectionHandler = () => {
         switch(section){
@@ -80,14 +84,43 @@ const Page = () => {
                 <Box sx={{
                     display:'flex',
                     justifyContent:'center',
-                }}>
+                }}>                                        
                     <Tabs value={router.query.id[1]}  aria-label="icon label tabs example">
-                        <Tab icon={<SvgIcon><WifiIcon/></SvgIcon>} iconPosition={"end"} label="Wi-Fi" onClick={()=>{router.push(`/devices/cwmp/${deviceID}/wifi`)}} value={"wifi"}/>
-                        <Tab icon={<SvgIcon><SignalIcon/></SvgIcon>} iconPosition={"end"} label="Site Survey" onClick={()=>{router.push(`/devices/cwmp/${deviceID}/site-survey`)}} value={"site-survey"}/>
-                        <Tab icon={<SvgIcon><DevicePhoneMobile/></SvgIcon>} iconPosition={"end"} label="Connected Devices" onClick={()=>{router.push(`/devices/cwmp/${deviceID}/connected-devices`)}} value={"connected-devices"}/>
+                        <Tab 
+                        icon={<SvgIcon><WifiIcon/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Wi-Fi" 
+                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/wifi`)}} 
+                        value={"wifi"}/>
+                        <Tab 
+                        icon={<SvgIcon><SignalIcon/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Site Survey" 
+                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/site-survey`)}} 
+                        value={"site-survey"} 
+                        disabled={!enterpriseVersion}/>
+                        <Tab 
+                        icon={<SvgIcon><DevicePhoneMobile/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Connected Devices" 
+                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/connected-devices`)}} 
+                        value={"connected-devices"} 
+                        disabled={!enterpriseVersion}
+                        />
                         {/* <Tab value={"discovery"} onClick={()=>{router.push(`/devices/cwmp/${deviceID}/discovery`)}} icon={<SvgIcon><MagnifyingGlassIcon/></SvgIcon>} iconPosition={"end"} label="Discover Parameters" /> */}
-                        <Tab icon={<SvgIcon><WrenchScrewDriverIcon/></SvgIcon>} iconPosition={"end"} label="Diagnostic" onClick={()=>{router.push(`/devices/cwmp/${deviceID}/diagnostic`)}} value={"diagnostic"}/>
-                        <Tab value={"msg"} onClick={()=>{router.push(`/devices/cwmp/${deviceID}/msg`)}} icon={<SvgIcon><EnvelopeIcon/></SvgIcon>} iconPosition={"end"} label="Remote Messages" />
+                        <Tab 
+                        icon={<SvgIcon><WrenchScrewDriverIcon/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Diagnostic" 
+                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/diagnostic`)}} 
+                        value={"diagnostic"} 
+                        disabled={!enterpriseVersion}/>
+                        <Tab 
+                        value={"msg"} 
+                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/msg`)}} 
+                        icon={<SvgIcon><EnvelopeIcon/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Remote Messages" />
                     </Tabs>
                 </Box>
                 {
