@@ -7,6 +7,7 @@ type Device struct {
 	Vendor       string
 	Version      string
 	ProductClass string
+	Alias        string
 	Status       Status
 	Mqtt         Status
 	Stomp        Status

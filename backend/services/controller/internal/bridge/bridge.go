@@ -164,7 +164,7 @@ func NatsReq[T entity.DataType](
 			return nil, err
 		}
 
-		log.Printf("Error message received, msg: %s, code: %d", *errMsg.Msg, errMsg.Code)
+		log.Printf("message received, msg: %s, code: %d", *errMsg.Msg, errMsg.Code)
 		w.WriteHeader(errMsg.Code)
 		w.Write(utils.Marshall(*errMsg.Msg))
 		return nil, errNatsMsgReceivedWithErrorData

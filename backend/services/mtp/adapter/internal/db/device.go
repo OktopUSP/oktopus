@@ -33,6 +33,7 @@ type Device struct {
 	Vendor       string
 	Version      string
 	ProductClass string
+	Alias        string
 	Status       Status
 	Mqtt         Status
 	Stomp        Status
@@ -143,6 +144,11 @@ func (d *Database) RetrieveDevicesCount(filter bson.M) (int64, error) {
 
 func (d *Database) DeleteDevice() {
 
+}
+
+func (d *Database) SetDeviceAlias(sn string, newAlias string) error {
+	err := d.devices.FindOneAndUpdate(d.ctx, bson.D{{"sn", sn}}, bson.D{{"$set", bson.D{{"alias", newAlias}}}}).Err()
+	return err
 }
 
 func (d *Database) DeviceExists(sn string) (bool, error) {

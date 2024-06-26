@@ -58,6 +58,7 @@ func (a *Api) StartApi() {
 	authentication.HandleFunc("/admin/register", a.registerAdminUser).Methods("POST")
 	authentication.HandleFunc("/admin/exists", a.adminUserExists).Methods("GET")
 	iot := r.PathPrefix("/api/device").Subrouter()
+	iot.HandleFunc("/alias", a.setDeviceAlias).Methods("PUT")
 	iot.HandleFunc("/auth", a.deviceAuth).Methods("GET", "POST", "DELETE")
 	iot.HandleFunc("/cwmp/{sn}/getParameterNames", a.cwmpGetParameterNamesMsg).Methods("PUT")
 	iot.HandleFunc("/cwmp/{sn}/getParameterValues", a.cwmpGetParameterValuesMsg).Methods("PUT")
@@ -79,6 +80,8 @@ func (a *Api) StartApi() {
 	if a.enterpise {
 		iot.HandleFunc("/{sn}/sitesurvey", a.deviceSiteSurvey).Methods("GET")
 		iot.HandleFunc("/{sn}/connecteddevices", a.deviceConnectedDevices).Methods("GET")
+		iot.HandleFunc("/{sn}/traceroute", a.deviceTraceRoute).Methods("GET", "PUT")
+		iot.HandleFunc("/{sn}/speedtest", a.deviceSpeedTest).Methods("PUT")
 	}
 	iot.HandleFunc("/{sn}/wifi", a.deviceWifi).Methods("PUT", "GET")
 	dash := r.PathPrefix("/api/info").Subrouter()

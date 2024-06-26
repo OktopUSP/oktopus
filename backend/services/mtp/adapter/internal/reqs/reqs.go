@@ -89,6 +89,22 @@ func StartRequestsListener(ctx context.Context, nc *nats.Conn, db db.Database) {
 		}
 		respondMsg(msg.Respond, 200, productClassCount)
 	})
+
+	nc.Subscribe(local.ADAPTER_SUBJECT+"*.device.alias", func(msg *nats.Msg) {
+		subject := strings.Split(msg.Subject, ".")
+		device := subject[len(subject)-3]
+
+		err := db.SetDeviceAlias(device, string(msg.Data))
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				respondMsg(msg.Respond, 404, "Device not found")
+			} else {
+				respondMsg(msg.Respond, 500, err.Error())
+			}
+			return
+		}
+		respondMsg(msg.Respond, 200, "Alias updated")
+	})
 }
 
 func respondMsg(respond func(data []byte) error, code int, msgData any) {
