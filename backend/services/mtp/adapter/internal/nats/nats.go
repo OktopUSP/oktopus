@@ -18,10 +18,11 @@ const (
 	LORA_STREAM_NAME   = "lora"
 	OPC_STREAM_NAME    = "opc"
 	CWMP_STREAM_NAME   = "cwmp"
-	ADAPTER_SUBJECT    = "adapter" + USP_SUBJECT
 	USP_SUBJECT        = ".usp.v1."
 	BUCKET_NAME        = "devices-auth"
 	BUCKET_DESCRIPTION = "Devices authentication"
+	ADAPTER_SUBJECT    = "adapter" + USP_SUBJECT
+	ADAPTER_QUEUE      = "adapter"
 )
 
 func StartNatsClient(c config.Nats, controller config.Controller) (jetstream.JetStream, *nats.Conn) {
