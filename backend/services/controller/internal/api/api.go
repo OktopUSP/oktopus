@@ -82,6 +82,7 @@ func (a *Api) StartApi() {
 		iot.HandleFunc("/{sn}/connecteddevices", a.deviceConnectedDevices).Methods("GET")
 		iot.HandleFunc("/{sn}/traceroute", a.deviceTraceRoute).Methods("GET", "PUT")
 		iot.HandleFunc("/{sn}/speedtest", a.deviceSpeedTest).Methods("PUT")
+		iot.HandleFunc("/{sn}/ping", a.devicePing).Methods("PUT", "GET")
 	}
 	iot.HandleFunc("/{sn}/wifi", a.deviceWifi).Methods("PUT", "GET")
 	dash := r.PathPrefix("/api/info").Subrouter()

@@ -259,7 +259,7 @@ func NatsEnterpriseInteraction(
 
 	var answer entity.MsgAnswer[[]byte]
 
-	msg, err := nc.Request(subj, body, local.NATS_REQUEST_TIMEOUT)
+	msg, err := nc.Request(subj, body, local.NATS_REQUEST_TIMEOUT+20*time.Second)
 	if err != nil {
 		if err == nats.ErrNoResponders {
 			w.WriteHeader(http.StatusInternalServerError)
