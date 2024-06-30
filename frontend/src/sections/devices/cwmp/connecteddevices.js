@@ -52,7 +52,7 @@ export const ConnectedDevices = () => {
     return (         
     <Stack 
         justifyContent="center" 
-        alignItems={!content &&"center"}
+        alignItems={(!content || interfaces.length == 0) &&"center"}
         >
         {content && interfaces.length > 0 ?
         <Card>
@@ -109,7 +109,9 @@ export const ConnectedDevices = () => {
                     ))
                 }
             </CardContent>
-        </Card>: <CircularProgress/>}
+        </Card>: (
+            content ? <Typography> No connected devices found </Typography> : <CircularProgress/>
+        )}
         </Stack>
     )
 }
