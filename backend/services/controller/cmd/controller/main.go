@@ -26,7 +26,7 @@ func main() {
 
 	db := db.NewDatabase(c.Mongo.Ctx, c.Mongo.Uri)
 
-	api := api.NewApi(c.RestApi, js, nc, bridge, db, kv)
+	api := api.NewApi(c, js, nc, bridge, db, kv)
 	api.StartApi()
 
 	<-done

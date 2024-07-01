@@ -59,24 +59,6 @@ export const Layout = withAuthGuard((props) => {
         <LayoutContainer>
           {children}
         </LayoutContainer>
-        <div style={{
-      position:"fixed", 
-      bottom:"5px", 
-      right:"5px",
-      cursor:"pointer"
-      }}>
-        <Link 
-        href='https://github.com/OktopUSP/oktopus' 
-        target='blank'>
-        <Image 
-        alt="github logo"
-        src="/assets/general/github-mark.png" 
-        width="30"
-        height="30"
-        >
-        </Image>
-        </Link>
-      </div>
       </LayoutRoot>
     </>
   );

@@ -19,7 +19,7 @@ services:
 #/* ------------------------ API REST / USP Controller ----------------------- */
   controller:
     image: 'oktopusp/controller'
-    container_name: controlller
+    container_name: controller
     ports:
     - 8000:8000
     depends_on:

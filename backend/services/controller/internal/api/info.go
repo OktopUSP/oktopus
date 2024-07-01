@@ -21,6 +21,7 @@ type GeneralInfo struct {
 	MqttRtt           string
 	WebsocketsRtt     string
 	StompRtt          string
+	AcsRtt            string
 	ProductClassCount []entity.ProductClassCount
 	StatusCount       StatusCount
 	VendorsCount      []entity.VendorsCount
@@ -80,6 +81,16 @@ func (a *Api) generalInfo(w http.ResponseWriter, r *http.Request) {
 	)
 	if err == nil {
 		result.WebsocketsRtt = time.Until(now).String()
+	}
+
+	now = time.Now()
+	_, err = bridge.NatsReqWithoutHttpSet[time.Duration](
+		local.NATS_CWMP_ADAPTER_SUBJECT_PREFIX+"rtt",
+		[]byte(""),
+		a.nc,
+	)
+	if err == nil {
+		result.AcsRtt = time.Until(now).String()
 	}
 
 	now = time.Now()

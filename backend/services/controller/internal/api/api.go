@@ -17,13 +17,14 @@ import (
 )
 
 type Api struct {
-	port   string
-	js     jetstream.JetStream
-	nc     *nats.Conn
-	bridge bridge.Bridge
-	db     db.Database
-	kv     jetstream.KeyValue
-	ctx    context.Context
+	port      string
+	js        jetstream.JetStream
+	nc        *nats.Conn
+	bridge    bridge.Bridge
+	db        db.Database
+	kv        jetstream.KeyValue
+	ctx       context.Context
+	enterpise bool
 }
 
 const REQUEST_TIMEOUT = time.Second * 30
@@ -33,15 +34,16 @@ const (
 	AdminUser
 )
 
-func NewApi(c config.RestApi, js jetstream.JetStream, nc *nats.Conn, bridge bridge.Bridge, d db.Database, kv jetstream.KeyValue) Api {
+func NewApi(c *config.Config, js jetstream.JetStream, nc *nats.Conn, bridge bridge.Bridge, d db.Database, kv jetstream.KeyValue) Api {
 	return Api{
-		port:   c.Port,
-		js:     js,
-		nc:     nc,
-		ctx:    c.Ctx,
-		bridge: bridge,
-		db:     d,
-		kv:     kv,
+		port:      c.RestApi.Port,
+		js:        js,
+		nc:        nc,
+		ctx:       c.RestApi.Ctx,
+		bridge:    bridge,
+		db:        d,
+		kv:        kv,
+		enterpise: c.Enterprise,
 	}
 }
 
@@ -56,11 +58,14 @@ func (a *Api) StartApi() {
 	authentication.HandleFunc("/admin/register", a.registerAdminUser).Methods("POST")
 	authentication.HandleFunc("/admin/exists", a.adminUserExists).Methods("GET")
 	iot := r.PathPrefix("/api/device").Subrouter()
+	iot.HandleFunc("/alias", a.setDeviceAlias).Methods("PUT")
 	iot.HandleFunc("/auth", a.deviceAuth).Methods("GET", "POST", "DELETE")
 	iot.HandleFunc("/cwmp/{sn}/getParameterNames", a.cwmpGetParameterNamesMsg).Methods("PUT")
 	iot.HandleFunc("/cwmp/{sn}/getParameterValues", a.cwmpGetParameterValuesMsg).Methods("PUT")
 	iot.HandleFunc("/cwmp/{sn}/getParameterAttributes", a.cwmpGetParameterAttributesMsg).Methods("PUT")
 	iot.HandleFunc("/cwmp/{sn}/setParameterValues", a.cwmpSetParameterValuesMsg).Methods("PUT")
+	iot.HandleFunc("/cwmp/{sn}/addObject", a.cwmpAddObjectMsg).Methods("PUT")
+	iot.HandleFunc("/cwmp/{sn}/deleteObject", a.cwmpDeleteObjectMsg).Methods("PUT")
 	iot.HandleFunc("", a.retrieveDevices).Methods("GET")
 	iot.HandleFunc("/{id}", a.retrieveDevices).Methods("GET")
 	iot.HandleFunc("/{sn}/{mtp}/get", a.deviceGetMsg).Methods("PUT")
@@ -71,10 +76,15 @@ func (a *Api) StartApi() {
 	iot.HandleFunc("/{sn}/{mtp}/parameters", a.deviceGetSupportedParametersMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/{mtp}/instances", a.deviceGetParameterInstances).Methods("PUT")
 	iot.HandleFunc("/{sn}/{mtp}/operate", a.deviceOperateMsg).Methods("PUT")
-	iot.HandleFunc("/{sn}/{mtp}/fw_update", a.deviceFwUpdate).Methods("PUT")
+	iot.HandleFunc("/{sn}/{mtp}/fw_update", a.deviceFwUpdate).Methods("PUT") //TODO: put it to work and generalize for usp and cwmp
+	if a.enterpise {
+		iot.HandleFunc("/{sn}/sitesurvey", a.deviceSiteSurvey).Methods("GET")
+		iot.HandleFunc("/{sn}/connecteddevices", a.deviceConnectedDevices).Methods("GET")
+		iot.HandleFunc("/{sn}/traceroute", a.deviceTraceRoute).Methods("GET", "PUT")
+		iot.HandleFunc("/{sn}/speedtest", a.deviceSpeedTest).Methods("PUT")
+		iot.HandleFunc("/{sn}/ping", a.devicePing).Methods("PUT", "GET")
+	}
 	iot.HandleFunc("/{sn}/wifi", a.deviceWifi).Methods("PUT", "GET")
-	// mtp := r.PathPrefix("/api/mtp").Subrouter()
-	// mtp.HandleFunc("", a.mtpInfo).Methods("GET")
 	dash := r.PathPrefix("/api/info").Subrouter()
 	dash.HandleFunc("/vendors", a.vendorsInfo).Methods("GET")
 	dash.HandleFunc("/status", a.statusInfo).Methods("GET")

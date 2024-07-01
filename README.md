@@ -1,13 +1,8 @@
 <p align="center">
 <img src="https://github.com/OktopUSP/oktopus/assets/83298718/fc05c512-951d-448c-8c31-1e0881783460"/></p>
-<br/>
-<ul>
-    <li>
-        <h4>Introduction:</h4>
-    </li>
-</ul>        
+<br/>     
 <p>
-This repository aims to promote the development of a multi-vendor management platform for CPEs and IoTs. Any device that follows the TR-369 protocol can be managed. The main objective is to facilitate and unify device management, which generates countless benefits for the end user and service providers, suppressing the demands that today's technologies require: device interconnection, data collection, speed, availability and more.
+Oktopus is a multi-vendor management platform for CPEs and IoTs. <b>Any device that follows the TR-369 or TR-069 protocol can be managed</b>. The main objective is to facilitate and unify device management, which generates countless benefits for the end user and service providers, suppressing the demands that today's technologies require: device interconnection, data collection, speed, near real time feedback, and scalability.
 </p>
 
 <ul><li><h4>Sponsors:</h4></li></ul>
@@ -18,7 +13,7 @@ This repository aims to promote the development of a multi-vendor management pla
 
 <a href="https://www.inango.com/" target="_blank"><img src="https://github.com/OktopUSP/oktopus/assets/83298718/3b3e65d9-33fa-46c4-8b24-f9e2a84a04a6" width="100px"/></a>
 
-<p>If you'd like to know how to donate above <a href="https://github.com/sponsors/leandrofars">Github Sponsors</a> values, start a partnership or somehow to contribute to the project, email <a href="">leandro@oktopus.app.br</a>, every contribution is welcome, and the resources will help the project to move on. Also, if your company uses this project and you'd like your logo to appear up here, contact us.
+<p>If you'd like to become a sponsor, start a partnership or somehow to contribute to the project, email <a href="">leandro@oktopus.app.br</a>, every contribution is welcome, and the resources will help the project to move on. Also, if your company uses this project and you'd like your logo to appear up here, contact us.
 
 <ul>
     <li>
@@ -33,11 +28,15 @@ This repository aims to promote the development of a multi-vendor management pla
 
 <h1>Controller</h1>
 
-That's Oktopus Core, I's responsable for the devices management. Made by different microservices that can be run indepently and work together to provide the best experience for the user and make available different options for device connetion. Below here you will find some helpfull information about how the software works, the parts of it, the architecture and infrastructure.
+That's Oktopus Core, It's responsable for the devices management. Made by different microservices that can be run indepently and work together to provide the best experience for the user and make available different options for device connetion. Below here you will find some helpfull information about how the software works, the parts of it, the architecture and infrastructure.
 
-<ul><li><h4>Infrastructure:</h4></li></ul>
+<ul><li><h4>Architecture:</h4></li></ul>
 
-![image](https://github.com/OktopUSP/oktopus/assets/83298718/aa6feb7f-ac32-465c-b166-aa6b3ee5b68a)
+![Oktopus-Core drawio](https://github.com/OktopUSP/oktopus/assets/83298718/515b2ac3-4206-4f90-8b54-967a4b2495c3)
+
+<ul><li><h4>Microservices:</h4></li></ul>
+
+![Oktopus-Microservices drawio](https://github.com/OktopUSP/oktopus/assets/83298718/04653478-dafa-4f6e-ae34-af6b270ff4da)
 
 <ul>
     <li>
@@ -59,10 +58,10 @@ user@user-laptop:~/oktopus/deploy/compose$ COMPOSE_PROFILES=nats,controller,cwmp
 </pre>
 Oktopus deployment in <u><b>Kubernetes</b></u> still is in beta phase: <a href="https://github.com/OktopUSP/oktopus/blob/main/deploy/kubernetes/README.md"> Instructions for Kubernetes deployment</a><p></p>
         UI will open at port 3000:
-        <img src="https://github.com/OktopUSP/oktopus/assets/83298718/65f7c5b9-c08d-479a-8a13-fdfc634b5ca2"/>
-<h2>Agent</h2>
+        <img src="https://github.com/OktopUSP/oktopus/assets/83298718/65f7c5b9-c08d-479a-8a13-fdfc634b5ca2"/><br/><br/>
+<h1>Agent</h1>
 
-Agent is a piece of software taht runs on the CPE or IoT device and is responsable for connecting it to the Controller (Oktopus) through CWMP and/or USP.
+Agent is a piece of software that runs on the CPE or IoT device and is responsable for connecting it to the Controller (Oktopus) through CWMP and/or USP.
 
 </li>
     <li>
@@ -76,33 +75,25 @@ Agent is a piece of software taht runs on the CPE or IoT device and is responsab
     </li>
 </ul>
 
+<h2>Roadmap:</h2>  
+<p>
+    The project goals are organized with milestones that have a due date, just like a sprint. Those issues grouped in milestones are done and have their status updated in a kanban board.
+</p>
 <ul>
-    <li>
-        <h4>Roadmap:</h4>
-        <p>
-            The project goals are organized with milestones that have a due date, just like a sprint. Those issues grouped in milestones are done and have their status updated in a kanban board.
-        </p>
-        <ul>
-            <li> 
-            <a href="https://github.com/OktopUSP/oktopus/milestones">Milestones </a>
-            </li>
-            <li> 
-            <a href="https://github.com/orgs/OktopUSP/projects/1/views/2">Kanban Board </a>
-            </li>
-        </ul>
+    <li> 
+    <a href="https://github.com/OktopUSP/oktopus/milestones">Milestones </a>
+    </li>
+    <li> 
+    <a href="https://github.com/orgs/OktopUSP/projects/1/views/2">Kanban Board </a>
     </li>
 </ul>
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
-<p>Are you going to use our project in your company? would like to talk about TR-369 and IoT management, we're online on <a href="https://join.slack.com/t/oktopustr-369/shared_invite/zt-1znmrbr52-3AXgOlSeQTPQW8_Qhn3C4g">Slack</a>.</p>
+<p>Are you going to use our project in your company? would like to talk about TR-369/TR-069 and IoT management, we're online on <a href="https://join.slack.com/t/oktopustr-369/shared_invite/zt-1znmrbr52-3AXgOlSeQTPQW8_Qhn3C4g">Slack</a>.</p>
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
-<ul>
-    <li>
-        <h4>TR-069 ---> TR-369 :</h4>
-    </li>
-</ul>  
+<h2>TR-069 ---> TR-369 :</h2>  
 <p>
 The advent of the Internet of Things brings countless opportunities and challenges for service providers, with over a billion devices across the globe today making use of <a href="https://www.broadband-forum.org/download /TR-069_Amendment-2.pdf">TR-069</a>, what is the future of the protocol and what can we expect ahead?
 </p>

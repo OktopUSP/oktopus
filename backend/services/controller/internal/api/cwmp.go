@@ -3,15 +3,19 @@ package api
 import (
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"io"
 	"net/http"
 
 	"github.com/leandrofars/oktopus/internal/bridge"
 	"github.com/leandrofars/oktopus/internal/cwmp"
+	"github.com/leandrofars/oktopus/internal/entity"
 	n "github.com/leandrofars/oktopus/internal/nats"
 	"github.com/leandrofars/oktopus/internal/utils"
 	"github.com/nats-io/nats.go"
 )
+
+var errDeviceModelNotFound = errors.New("device model not found")
 
 func (a *Api) cwmpGetParameterNamesMsg(w http.ResponseWriter, r *http.Request) {
 	sn := getSerialNumberFromRequest(r)
@@ -85,7 +89,43 @@ func (a *Api) cwmpSetParameterValuesMsg(w http.ResponseWriter, r *http.Request) 
 	w.Write(data)
 }
 
-func cwmpInteraction[T cwmp.SetParameterValuesResponse | cwmp.GetParameterAttributesResponse | cwmp.GetParameterNamesResponse | cwmp.GetParameterValuesResponse](
+func (a *Api) cwmpAddObjectMsg(w http.ResponseWriter, r *http.Request) {
+	sn := getSerialNumberFromRequest(r)
+
+	payload, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(utils.Marshall(err.Error()))
+		return
+	}
+
+	data, _, err := cwmpInteraction[cwmp.AddObjectResponse](sn, payload, w, a.nc)
+	if err != nil {
+		return
+	}
+
+	w.Write(data)
+}
+
+func (a *Api) cwmpDeleteObjectMsg(w http.ResponseWriter, r *http.Request) {
+	sn := getSerialNumberFromRequest(r)
+
+	payload, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(utils.Marshall(err.Error()))
+		return
+	}
+
+	data, _, err := cwmpInteraction[cwmp.DeleteObjectResponse](sn, payload, w, a.nc)
+	if err != nil {
+		return
+	}
+
+	w.Write(data)
+}
+
+func cwmpInteraction[T cwmp.SetParameterValuesResponse | cwmp.DeleteObjectResponse | cwmp.GetParameterAttributesResponse | cwmp.GetParameterNamesResponse | cwmp.GetParameterValuesResponse | cwmp.AddObjectResponse](
 	sn string, payload []byte, w http.ResponseWriter, nc *nats.Conn,
 ) ([]byte, T, error) {
 
@@ -110,4 +150,18 @@ func cwmpInteraction[T cwmp.SetParameterValuesResponse | cwmp.GetParameterAttrib
 		}
 	}
 	return data, response, err
+}
+
+func cwmpGetDeviceModel(device *entity.Device, w http.ResponseWriter) (string, error) {
+	var model string
+	if device.Model != "" {
+		model = device.Model
+	} else if device.ProductClass != "" {
+		model = device.ProductClass
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(utils.Marshall("Couldn't get device model"))
+		return model, errDeviceModelNotFound
+	}
+	return model, nil
 }

@@ -8,17 +8,26 @@ import {
   Card,
   CardActions,
   CardHeader,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
+  Input,
+  InputLabel,
   SvgIcon,
   Table,
   TableBody,
   TableCell,
   TableHead,
-  TableRow
+  TableRow,
+  Tooltip
 } from '@mui/material';
 import { Scrollbar } from 'src/components/scrollbar';
 import { SeverityPill } from 'src/components/severity-pill';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
+import PencilIcon from '@heroicons/react/24/outline/PencilIcon';
 
 const statusMap = {
   1: 'warning',
@@ -38,12 +47,73 @@ const status = (s)=>{
   }
 }
 
+const getDeviceProtocol = (order) => {
+  if (order.Mqtt == 0 && order.Websockets == 0 && order.Stomp == 0) {
+    return "cwmp"
+  }else {
+    return "usp"
+  }
+}
+
 export const OverviewLatestOrders = (props) => {
   const { orders = [], sx } = props;
 
   const router = useRouter()
 
-  return (
+  const [showSetDeviceAlias, setShowSetDeviceAlias] = useState(false);
+  const [deviceAlias, setDeviceAlias] = useState(null);
+  const [deviceToBeChanged, setDeviceToBeChanged] = useState(null);
+
+  const setNewDeviceAlias = async (alias,sn) => {
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", localStorage.getItem("token"));
+
+    var requestOptions = {
+      method: 'PUT',
+      headers: myHeaders,
+      body: alias,
+      redirect: 'follow'
+    };
+
+    let result = await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/device/alias?id=${sn}`, requestOptions)
+    console.log("result:", result)
+    if (result.status === 401){
+      router.push("/auth/login")
+    }else if (result.status != 200){
+      console.log("Status:", result.status)
+      let content = await result.json()
+      console.log("Message:", content)
+      setShowSetDeviceAlias(false)
+      setDeviceAlias(null)
+      setDeviceToBeChanged(null)
+    }else{
+      let content = await result.json()
+      console.log("set alias result:", content)
+      setShowSetDeviceAlias(false)
+      setDeviceAlias(null)
+      orders[deviceToBeChanged].Alias = alias
+      setDeviceToBeChanged(null)
+    }
+    // .then(response => {
+    //   if (response.status === 401) {
+    //     router.push("/auth/login")
+    //   }
+    //   return response.json()
+    // })
+    // .then(result => {
+    //   console.log("alias result:", result)
+    //   setShowSetDeviceAlias(false)
+    //   setDeviceAlias(null)
+    // })
+    // .catch(error => {
+    //   console.log('error:', error)
+    //   setShowSetDeviceAlias(false)
+    //   setDeviceAlias(null)
+    // })
+  }
+
+  return (<div>
     <Card sx={sx}>
       <CardHeader title="Devices" />
       <Scrollbar sx={{ flexGrow: 1 }}>
@@ -53,6 +123,9 @@ export const OverviewLatestOrders = (props) => {
               <TableRow>
                 <TableCell align="center">
                   Serial Number
+                </TableCell>
+                <TableCell>
+                  Alias
                 </TableCell>
                 <TableCell>
                   Model
@@ -66,13 +139,13 @@ export const OverviewLatestOrders = (props) => {
                 <TableCell>
                   Status
                 </TableCell>
-                <TableCell>
-                  Access
+                <TableCell align="center">
+                  Actions
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {orders && orders.map((order) => {
+              {orders && orders.map((order, index) => {
 
                 return (
                   <TableRow
@@ -83,7 +156,10 @@ export const OverviewLatestOrders = (props) => {
                       {order.SN}
                     </TableCell>
                     <TableCell>
-                      {order.Model}
+                      {order.Alias}
+                    </TableCell>
+                    <TableCell>
+                      {order.Model || order.ProductClass}
                     </TableCell>
                     <TableCell>
                       {order.Vendor}
@@ -96,18 +172,49 @@ export const OverviewLatestOrders = (props) => {
                         {status(order.Status)}
                     </SeverityPill>
                     </TableCell>
-                    <TableCell>
-                      { order.Mqtt == 0 && order.Websockets == 0 && order.Stomp == 0 ? <span></span>: <Button
-                      onClick={()=>{
-                        router.push("devices/"+order.SN+"/discovery")
-                        }
-                      }>
-                      <SvgIcon 
-                        fontSize="small" 
-                        sx={{cursor: order.Status == 2 && 'pointer'}} 
-                      >
-                        <ArrowTopRightOnSquareIcon />
-                      </SvgIcon></Button>}
+                    <TableCell align="center">
+                    {order.Status == 2 && 
+                      <Tooltip title="Access the device">
+                        <Button
+                          onClick={()=>{
+                            if (getDeviceProtocol(order) == "usp"){
+                              router.push("devices/"+ getDeviceProtocol(order) +"/"+order.SN+"/discovery")
+                            }else {
+                              router.push("devices/"+ getDeviceProtocol(order) +"/"+order.SN+"/wifi")
+                            }
+                          }}
+                        >
+                          <SvgIcon 
+                            fontSize="small" 
+                            sx={{cursor: 'pointer'}} 
+                          >
+                            <ArrowTopRightOnSquareIcon />
+                          </SvgIcon>
+                        </Button>
+                      </Tooltip>}
+                      <Tooltip title="Edit the device alias">
+                        <Button
+                          onClick={()=>{
+                            setDeviceToBeChanged(index)
+                            setDeviceAlias(order.Alias)
+                            setShowSetDeviceAlias(true)
+                          }}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                              setDeviceToBeChanged(index)
+                              setDeviceAlias(order.Alias)
+                              setShowSetDeviceAlias(true)
+                            }
+                          }}
+                        >
+                          <SvgIcon 
+                            fontSize="small" 
+                            sx={{cursor: 'pointer'}} 
+                          >
+                            <PencilIcon />
+                          </SvgIcon>
+                        </Button>
+                      </Tooltip>
                     </TableCell>
                   </TableRow>
                 );
@@ -132,6 +239,24 @@ export const OverviewLatestOrders = (props) => {
           </Button>
             </CardActions>*/}
     </Card>
+    <Dialog open={showSetDeviceAlias}>
+      <DialogContent>
+        <InputLabel>Device Alias</InputLabel>
+        <Input value={deviceAlias} onChange={(e)=>{setDeviceAlias(e.target.value)}}>
+        </Input>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={()=>{
+          setShowSetDeviceAlias(false)
+          setDeviceAlias(null)
+          setDeviceToBeChanged(null)
+        }}>Cancel</Button>
+        <Button onClick={()=>{
+          setNewDeviceAlias(deviceAlias, orders[deviceToBeChanged].SN)
+        }}>Save</Button>
+      </DialogActions>
+    </Dialog>
+    </div>
   );
 };
 

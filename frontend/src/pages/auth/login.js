@@ -210,7 +210,7 @@ const Page = () => {
                 >
                   Skip authentication
                 </Button> */}
-                <Alert
+                { window.location.host.includes("demo.oktopus") && <Alert
                   color="primary"
                   severity="info"
                   sx={{ mt: 3 }}
@@ -218,7 +218,7 @@ const Page = () => {
                   <div>
                     You can use <b>demo@gmail.com</b> and password <b>demo</b>
                   </div>
-                </Alert>
+                </Alert>}
               </form>
             )}
             {method === 'phoneNumber' && (

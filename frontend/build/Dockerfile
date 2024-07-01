@@ -1,4 +1,4 @@
-FROM node:16.20.2-alpine as builder
+FROM node:18.17.0-alpine as builder
 
 WORKDIR /app
 
@@ -6,11 +6,11 @@ COPY ../ ./
 
 RUN npm install 
 
-RUN NEXT_PUBLIC_REST_ENDPOINT=REST_API_URL NEXT_PUBLIC_WS_ENDPOINT=WS_URL npm run build
+RUN NEXT_PUBLIC_REST_ENDPOINT=REST_API_URL NEXT_PUBLIC_WS_ENDPOINT=WS_URL NEXT_PUBLIC_ENTERPRISE_VERSION=ENTERPRISE_VERSION npm run build
 
 RUN ls -la && echo "Listing directory contents done"
 
-FROM node:16.20.2-alpine as runner
+FROM node:18.17.0-alpine as runner
 
 WORKDIR /app
 

@@ -2,10 +2,13 @@ package api
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
 
+	"github.com/leandrofars/oktopus/internal/bridge"
+	local "github.com/leandrofars/oktopus/internal/nats"
 	"github.com/leandrofars/oktopus/internal/utils"
 	"github.com/nats-io/nats.go/jetstream"
 	"go.mongodb.org/mongo-driver/bson"
@@ -76,11 +79,24 @@ func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
 		skip = 0
 	}
 
-	//TODO: Create filters
-	//TODO: Create sorting
+	//TODO: fix status ordering
+	statusOrder := r.URL.Query().Get("status")
+	if statusOrder != "" {
+		if statusOrder == "asc" {
+			statusOrder = "1"
+		} else if statusOrder == "desc" {
+			statusOrder = "-1"
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode("Status order must be 'asc' or 'desc'")
+			return
+		}
+	}
 
 	sort := bson.M{}
 	sort["status"] = 1
+
+	//TODO: Create filters
 
 	filter := bson.A{
 		//bson.M{"$match": filter},
@@ -229,6 +245,40 @@ func (a *Api) deviceAuth(w http.ResponseWriter, r *http.Request) {
 	} else {
 		log.Println("Unknown method used in device auth api")
 		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+}
+
+func (a *Api) setDeviceAlias(w http.ResponseWriter, r *http.Request) {
+
+	id := r.URL.Query().Get("id")
+	if id == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		utils.MarshallEncoder("No id provided", w)
+		return
+	}
+
+	payload, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		utils.MarshallEncoder("Error to decode payload: "+err.Error(), w)
+		return
+	}
+
+	payloadLen := len(payload)
+	if payloadLen == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		utils.MarshallEncoder("No alias provided", w)
+		return
+	}
+	if payloadLen > 50 {
+		w.WriteHeader(http.StatusBadRequest)
+		utils.MarshallEncoder("Alias too long", w)
+		return
+	}
+
+	_, err = bridge.NatsReq[[]byte](local.NATS_ADAPTER_SUBJECT+id+".device.alias", payload, w, a.nc)
+	if err != nil {
 		return
 	}
 }

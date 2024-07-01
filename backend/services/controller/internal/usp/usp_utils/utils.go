@@ -6,9 +6,11 @@ import (
 	"github.com/leandrofars/oktopus/internal/usp/usp_record"
 )
 
+const VERSION = "1.0"
+
 func NewUspRecord(p []byte, toId string) usp_record.Record {
 	return usp_record.Record{
-		Version:         "0.1",
+		Version:         VERSION,
 		ToId:            toId,
 		FromId:          "oktopusController",
 		PayloadSecurity: usp_record.Record_PLAINTEXT,
