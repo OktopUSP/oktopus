@@ -70,8 +70,8 @@ export const ConnectedDevices = () => {
                     </Select>
                 </Grid>
                 {
-                    content[interfaceValue].map((property) => (
-                        <Card>
+                    content[interfaceValue].map((property,index) => (
+                        <Card key={index}>
                             <CardContent>
                                 <Grid container justifyContent={"center"}>
                                     <Stack direction="row" spacing={5}>
