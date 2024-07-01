@@ -1,3 +1,4 @@
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/OktopUSP/oktopus/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/OktopUSP/oktopus/tree/main)
 <p align="center">
 <img src="https://github.com/OktopUSP/oktopus/assets/83298718/fc05c512-951d-448c-8c31-1e0881783460"/></p>
 <br/>     
