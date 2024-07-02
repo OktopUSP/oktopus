@@ -116,7 +116,7 @@ func (h *Handler) CwmpHandler(w http.ResponseWriter, r *http.Request) {
 			} else if e.KindOf() == "SetParameterValuesResponse" {
 				log.Println("Receive SetParameterValuesResponse from CPE:", cpe.SerialNumber)
 				msgAnswer(cpe.Waiting.Callback, cpe.Waiting.Time, h.acsConfig.DeviceAnswerTimeout, tmp)
-			}else if e.KindOf() == "Fault" {
+			} else if e.KindOf() == "Fault" {
 				log.Println("Receive FaultResponse from CPE:", cpe.SerialNumber)
 				msgAnswer(cpe.Waiting.Callback, cpe.Waiting.Time, h.acsConfig.DeviceAnswerTimeout, tmp)
 				log.Println(body)
@@ -156,9 +156,11 @@ func (h *Handler) ConnectionRequest(cpe CPE) error {
 	ok, err := auth.Auth(h.acsConfig.ConnReqUsername, h.acsConfig.ConnReqPassword, cpe.ConnectionRequestURL)
 	if !ok {
 		cpe.Queue.Dequeue()
-		log.Println("Error while authenticating to CPE: ", err)
+		log.Println("Error while authenticating to CPE, err:", err)
+	} else {
+		log.Println("<-- Successfully authenticated to CPE", cpe.SerialNumber)
 	}
-	log.Println("<-- Successfully authenticated to CPE", cpe.SerialNumber)
+
 	return err
 }
 
