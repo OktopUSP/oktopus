@@ -29,11 +29,6 @@ type Api struct {
 
 const REQUEST_TIMEOUT = time.Second * 30
 
-const (
-	NormalUser = iota
-	AdminUser
-)
-
 func NewApi(c *config.Config, js jetstream.JetStream, nc *nats.Conn, bridge bridge.Bridge, d db.Database, kv jetstream.KeyValue) Api {
 	return Api{
 		port:      c.RestApi.Port,

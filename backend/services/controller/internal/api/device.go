@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/leandrofars/oktopus/internal/bridge"
+	"github.com/leandrofars/oktopus/internal/db"
 	local "github.com/leandrofars/oktopus/internal/nats"
 	"github.com/leandrofars/oktopus/internal/utils"
 	"github.com/nats-io/nats.go/jetstream"
@@ -134,7 +135,7 @@ func (a *Api) deviceAuth(w http.ResponseWriter, r *http.Request) {
 		utils.MarshallEncoder(err, w)
 		return
 	}
-	if user.Level != AdminUser {
+	if user.Level != db.AdminUser {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
