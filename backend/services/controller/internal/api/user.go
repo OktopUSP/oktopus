@@ -51,7 +51,7 @@ func (a *Api) registerUser(w http.ResponseWriter, r *http.Request) {
 
 	//Check if user which is requesting creation has the necessary privileges
 	rUser, err := a.db.FindUser(email)
-	if rUser.Level != db.AdminUser {
+	if rUser.Level != db.AdminUser && rUser.Level != db.OktopusUser {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
@@ -112,7 +112,7 @@ func (a *Api) deleteUser(w http.ResponseWriter, r *http.Request) {
 
 	userEmail := mux.Vars(r)["user"]
 
-	if rUser.Email == userEmail || (rUser.Level == db.AdminUser && rUser.Email != userEmail) { //Admin can delete any account, but admin account can never be deleted
+	if rUser.Email == userEmail || ((rUser.Level == db.AdminUser || rUser.Level == db.OktopusUser) && rUser.Email != userEmail) { //Admin can delete any account, but admin account can never be deleted
 		if err := a.db.DeleteUser(userEmail); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(err)
@@ -138,7 +138,7 @@ func (a *Api) changePassword(w http.ResponseWriter, r *http.Request) {
 	userToChangePasswd := mux.Vars(r)["user"]
 	if userToChangePasswd != "" && userToChangePasswd != email {
 		rUser, _ := a.db.FindUser(email)
-		if rUser.Level != db.AdminUser {
+		if rUser.Level != db.AdminUser && rUser.Level != db.OktopusUser {
 			w.WriteHeader(http.StatusForbidden)
 			return
 		}
@@ -204,7 +204,7 @@ func (a *Api) registerAdminUser(w http.ResponseWriter, r *http.Request) {
 
 func adminUserExists(users []map[string]interface{}) bool {
 	for _, x := range users {
-		if x["level"].(db.UserLevels) == db.AdminUser {
+		if db.UserLevels(x["level"].(int32)) == db.AdminUser {
 			log.Println("Admin exists")
 			return true
 		}
