@@ -176,7 +176,7 @@ func (a *Api) registerAdminUser(w http.ResponseWriter, r *http.Request) {
 			utils.MarshallEncoder(err, w)
 		}
 
-		if !adminUserExists(users) {
+		if !adminUserExists(users, a.enterpise.SupportEmail) {
 			var user db.User
 			err = json.NewDecoder(r.Body).Decode(&user)
 			if err != nil {
@@ -235,14 +235,14 @@ func (a *Api) registerAdminUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func adminUserExists(users []map[string]interface{}) bool {
+func adminUserExists(users []map[string]interface{}, supportEmail string) bool {
 
 	if len(users) == 0 {
 		return false
 	}
 
 	for _, x := range users {
-		if x["level"].(db.UserLevels) == db.AdminUser && x["email"].(string) != "support@oktopus.app.br" {
+		if x["level"].(db.UserLevels) == db.AdminUser && x["email"].(string) != supportEmail {
 			log.Println("Admin exists")
 			return true
 		}
@@ -258,7 +258,7 @@ func (a *Api) adminUserExists(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	adminExits := adminUserExists(users)
+	adminExits := adminUserExists(users, a.enterpise.SupportEmail)
 	json.NewEncoder(w).Encode(adminExits)
 	return
 }

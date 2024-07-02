@@ -14,7 +14,6 @@ type UserLevels int32
 const (
 	NormalUser UserLevels = iota
 	AdminUser
-	OktopusUser
 )
 
 type User struct {

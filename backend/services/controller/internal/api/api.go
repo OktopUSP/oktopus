@@ -24,7 +24,7 @@ type Api struct {
 	db        db.Database
 	kv        jetstream.KeyValue
 	ctx       context.Context
-	enterpise bool
+	enterpise config.Enterprise
 }
 
 const REQUEST_TIMEOUT = time.Second * 30
@@ -43,6 +43,11 @@ func NewApi(c *config.Config, js jetstream.JetStream, nc *nats.Conn, bridge brid
 }
 
 func (a *Api) StartApi() {
+
+	if a.enterpise.SupportPassword != "" && a.enterpise.SupportEmail != "" {
+		go registerEnterpriseSupport(a.enterpise.SupportEmail, a.enterpise.SupportPassword, a.db)
+	}
+
 	r := mux.NewRouter()
 	authentication := r.PathPrefix("/api/auth").Subrouter()
 	authentication.HandleFunc("/login", a.generateToken).Methods("PUT")
@@ -72,7 +77,7 @@ func (a *Api) StartApi() {
 	iot.HandleFunc("/{sn}/{mtp}/instances", a.deviceGetParameterInstances).Methods("PUT")
 	iot.HandleFunc("/{sn}/{mtp}/operate", a.deviceOperateMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/{mtp}/fw_update", a.deviceFwUpdate).Methods("PUT") //TODO: put it to work and generalize for usp and cwmp
-	if a.enterpise {
+	if a.enterpise.Enable {
 		iot.HandleFunc("/{sn}/sitesurvey", a.deviceSiteSurvey).Methods("GET")
 		iot.HandleFunc("/{sn}/connecteddevices", a.deviceConnectedDevices).Methods("GET")
 		iot.HandleFunc("/{sn}/traceroute", a.deviceTraceRoute).Methods("GET", "PUT")
@@ -118,4 +123,29 @@ func (a *Api) StartApi() {
 		}
 	}()
 	log.Println("Running REST API at port", a.port)
+}
+
+func registerEnterpriseSupport(email, password string, d db.Database) {
+
+	user := db.User{
+		Email:    email,
+		Password: password,
+		Name:     "Enterprise Support",
+		Level:    db.AdminUser,
+	}
+
+	for {
+		err := d.RegisterUser(user)
+		if err != nil {
+			if err == db.ErrorUserExists {
+				log.Println("Enterprise support user already registered.")
+				break
+			}
+			log.Println("Error to register enterprise support user:", err)
+			time.Sleep(time.Second * 5)
+			continue
+		}
+		log.Println("Enterprise support user registered successfully.")
+		break
+	}
 }
