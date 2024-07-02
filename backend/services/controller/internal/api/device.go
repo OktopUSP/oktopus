@@ -135,7 +135,7 @@ func (a *Api) deviceAuth(w http.ResponseWriter, r *http.Request) {
 		utils.MarshallEncoder(err, w)
 		return
 	}
-	if user.Level != db.AdminUser && user.Level != db.OktopusUser {
+	if user.Level != db.AdminUser {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}

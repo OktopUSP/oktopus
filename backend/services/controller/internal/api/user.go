@@ -242,7 +242,7 @@ func adminUserExists(users []map[string]interface{}, supportEmail string) bool {
 	}
 
 	for _, x := range users {
-		if x["level"].(db.UserLevels) == db.AdminUser && x["email"].(string) != supportEmail {
+		if db.UserLevels(x["level"].(int32)) == db.AdminUser && x["email"].(string) != supportEmail {
 			log.Println("Admin exists")
 			return true
 		}

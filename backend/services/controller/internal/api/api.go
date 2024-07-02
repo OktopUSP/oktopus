@@ -135,17 +135,21 @@ func registerEnterpriseSupport(email, password string, d db.Database) {
 	}
 
 	for {
+		if err := user.HashPassword(password); err != nil {
+			return
+		}
+
 		err := d.RegisterUser(user)
 		if err != nil {
 			if err == db.ErrorUserExists {
 				log.Println("Enterprise support user already registered.")
-				break
+				return
 			}
 			log.Println("Error to register enterprise support user:", err)
 			time.Sleep(time.Second * 5)
 			continue
 		}
 		log.Println("Enterprise support user registered successfully.")
-		break
+		return
 	}
 }
