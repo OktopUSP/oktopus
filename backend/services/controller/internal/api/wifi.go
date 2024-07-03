@@ -213,7 +213,7 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 
 		if device.Cwmp == entity.Online {
 
-			if a.enterpise {
+			if a.enterpise.Enable {
 				a.getEnterpriseResource("wifi", "get", device, sn, w, []byte{}, "cwmp", "098")
 				return
 			}
@@ -347,7 +347,7 @@ func (a *Api) deviceWifi(w http.ResponseWriter, r *http.Request) {
 
 		if device.Cwmp == entity.Online {
 
-			if a.enterpise {
+			if a.enterpise.Enable {
 				payload, err := io.ReadAll(r.Body)
 				if err != nil {
 					w.WriteHeader(http.StatusInternalServerError)

@@ -42,7 +42,7 @@ export const items = [
   //      <SvgIcon fontSize="small">
   //       <MapIcon/>
   //      </SvgIcon>
-  //    )
+  //    ),
   //  },
   {
     title: 'Credentials',

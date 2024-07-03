@@ -59,7 +59,7 @@ export const DevicesWiFi = () => {
           redirect: 'follow'
         };
 
-        fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/device/${router.query.id[0]}/wifi`, requestOptions)
+        fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/${router.query.id[0]}/wifi`, requestOptions)
         .then(response => {
             if (response.status === 401) {
                 router.push("/auth/login")
@@ -197,7 +197,7 @@ export const DevicesWiFi = () => {
                                                     body: data,
                                                     redirect: 'follow'
                                                 };
-                                                fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/device/${router.query.id[0]}/wifi`, requestOptions)
+                                                fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/${router.query.id[0]}/wifi`, requestOptions)
                                                 .then(response => {
                                                     if (response.status === 401) {
                                                         router.push("/auth/login")

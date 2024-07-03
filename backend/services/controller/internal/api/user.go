@@ -51,7 +51,7 @@ func (a *Api) registerUser(w http.ResponseWriter, r *http.Request) {
 
 	//Check if user which is requesting creation has the necessary privileges
 	rUser, err := a.db.FindUser(email)
-	if rUser.Level != AdminUser {
+	if rUser.Level != db.AdminUser {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
@@ -63,7 +63,7 @@ func (a *Api) registerUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user.Level = NormalUser
+	user.Level = db.NormalUser
 
 	if err := user.HashPassword(user.Password); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -112,7 +112,7 @@ func (a *Api) deleteUser(w http.ResponseWriter, r *http.Request) {
 
 	userEmail := mux.Vars(r)["user"]
 
-	if rUser.Email == userEmail || (rUser.Level == AdminUser && rUser.Email != userEmail) { //Admin can delete any account, but admin account can never be deleted
+	if rUser.Email == userEmail || (rUser.Level == db.AdminUser) { //Admin can delete any account
 		if err := a.db.DeleteUser(userEmail); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(err)
@@ -138,7 +138,7 @@ func (a *Api) changePassword(w http.ResponseWriter, r *http.Request) {
 	userToChangePasswd := mux.Vars(r)["user"]
 	if userToChangePasswd != "" && userToChangePasswd != email {
 		rUser, _ := a.db.FindUser(email)
-		if rUser.Level != AdminUser {
+		if rUser.Level != db.AdminUser {
 			w.WriteHeader(http.StatusForbidden)
 			return
 		}
@@ -168,28 +168,61 @@ func (a *Api) changePassword(w http.ResponseWriter, r *http.Request) {
 
 func (a *Api) registerAdminUser(w http.ResponseWriter, r *http.Request) {
 
+	tokenString := r.Header.Get("Authorization")
+	if tokenString == "" {
+		users, err := a.db.FindAllUsers()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			utils.MarshallEncoder(err, w)
+		}
+
+		if !adminUserExists(users, a.enterpise.SupportEmail) {
+			var user db.User
+			err = json.NewDecoder(r.Body).Decode(&user)
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+
+			user.Level = db.AdminUser
+
+			if err := user.HashPassword(user.Password); err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			if err := a.db.RegisterUser(user); err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+		} else {
+			w.WriteHeader(http.StatusForbidden)
+		}
+
+		return
+	}
+
+	email, err := auth.ValidateToken(tokenString)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	//Check if user which is requesting creation has the necessary privileges
+	rUser, err := a.db.FindUser(email)
+	if rUser.Level != db.AdminUser {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
 	var user db.User
-	err := json.NewDecoder(r.Body).Decode(&user)
+	err = json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	users, err := a.db.FindAllUsers()
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	adminExists := adminUserExists(users)
-	if adminExists {
-		log.Println("There might exist only one admin")
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("There might exist only one admin")
-		return
-	}
-
-	user.Level = AdminUser
+	user.Level = db.AdminUser
 
 	if err := user.HashPassword(user.Password); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -202,9 +235,14 @@ func (a *Api) registerAdminUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func adminUserExists(users []map[string]interface{}) bool {
+func adminUserExists(users []map[string]interface{}, supportEmail string) bool {
+
+	if len(users) == 0 {
+		return false
+	}
+
 	for _, x := range users {
-		if x["level"].(int32) == AdminUser {
+		if db.UserLevels(x["level"].(int32)) == db.AdminUser && x["email"].(string) != supportEmail {
 			log.Println("Admin exists")
 			return true
 		}
@@ -220,7 +258,7 @@ func (a *Api) adminUserExists(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	adminExits := adminUserExists(users)
+	adminExits := adminUserExists(users, a.enterpise.SupportEmail)
 	json.NewEncoder(w).Encode(adminExits)
 	return
 }

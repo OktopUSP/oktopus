@@ -83,7 +83,7 @@ const Page = () => {
         redirect: 'follow',
     };
 
-    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/auth/admin/exists`, requestOptions))
+    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/auth/admin/exists`, requestOptions))
     let content = await result.json()
     console.log("content: ", content)
     if (result.status != 200) {
@@ -131,12 +131,12 @@ const Page = () => {
               <Typography variant="h4">
                 Login
               </Typography>
-              <Typography
+              {!(process.env.NEXT_PUBLIC_ENTERPRISE_VERSION == "true") && <Typography
                 color="text.secondary"
                 variant="body2"
               >
-              This project is open source, reach out at <Link href='https://github.com/OktopUSP/oktopus'>Github</Link> or <Link href='https://join.slack.com/t/oktopustr-369/shared_invite/zt-1znmrbr52-3AXgOlSeQTPQW8_Qhn3C4g'>Slack</Link> 
-              </Typography>
+              This project is open source, reach out at <Link href='https://github.com/OktopUSP/oktopus'>Github</Link> or <Link href='https://join.slack.com/t/oktopustr-369/shared_invite/zt-1znmrbr52-3AXgOlSeQTPQW8_Qhn3C4g'>Slack</Link>
+              </Typography>}
             </Stack>
             {/*<Tabs
               onChange={handleMethodChange}

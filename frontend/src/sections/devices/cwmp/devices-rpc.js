@@ -110,7 +110,7 @@ const handleOpen = () => {
   }
 
  
-  fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/device/cwmp/${router.query.id[0]}/${method}`, requestOptions)
+  fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/cwmp/${router.query.id[0]}/${method}`, requestOptions)
     .then(response => response.text())
     .then(result => {
       if (result.status === 401){

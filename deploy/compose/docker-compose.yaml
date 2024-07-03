@@ -151,10 +151,8 @@ services:
 
 #/* -------------------------------- Frontend -------------------------------- */
   frontend:
-    image: 'oktopusp/frontend'
+    image: 'oktopusp/frontend-ce'
     container_name: frontend
-    env_file:
-      - .env.frontend
     ports:
       - 3000:3000
     networks:
@@ -187,6 +185,21 @@ services:
       usp_network:
         ipv4_address: 172.16.235.16
     profiles: [cwmp]
+  
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - 80:80
+    depends_on:
+      - frontend
+      - controller
+      - socketio
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.17
 
 networks:
    usp_network:

@@ -9,12 +9,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type UserLevels int32
+
+const (
+	NormalUser UserLevels = iota
+	AdminUser
+)
+
 type User struct {
-	Email    string `json:"email"`
-	Name     string `json:"name"`
-	Password string `json:"password,omitempty"`
-	Level    int    `json:"level"`
-	Phone    string `json:"phone"`
+	Email    string     `json:"email"`
+	Name     string     `json:"name"`
+	Password string     `json:"password,omitempty"`
+	Level    UserLevels `json:"level"`
+	Phone    string     `json:"phone"`
 }
 
 var ErrorUserExists = errors.New("User already exists")

@@ -153,7 +153,7 @@ export const SiteSurvey = (props) => {
           redirect: 'follow'
         };
 
-        fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/device/${router.query.id[0]}/sitesurvey`, requestOptions)
+        fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/${router.query.id[0]}/sitesurvey`, requestOptions)
         .then(response => {
             if (response.status === 401) {
                 router.push("/auth/login")
