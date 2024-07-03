@@ -76,7 +76,7 @@ export const OverviewLatestOrders = (props) => {
       redirect: 'follow'
     };
 
-    let result = await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/device/alias?id=${sn}`, requestOptions)
+    let result = await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/alias?id=${sn}`, requestOptions)
     console.log("result:", result)
     if (result.status === 401){
       router.push("/auth/login")
@@ -199,13 +199,6 @@ export const OverviewLatestOrders = (props) => {
                             setDeviceAlias(order.Alias)
                             setShowSetDeviceAlias(true)
                           }}
-                          onKeyDown={e => {
-                            if (e.key === 'Enter') {
-                              setDeviceToBeChanged(index)
-                              setDeviceAlias(order.Alias)
-                              setShowSetDeviceAlias(true)
-                            }
-                          }}
                         >
                           <SvgIcon 
                             fontSize="small" 
@@ -239,10 +232,16 @@ export const OverviewLatestOrders = (props) => {
           </Button>
             </CardActions>*/}
     </Card>
+    {showSetDeviceAlias&&
     <Dialog open={showSetDeviceAlias}>
       <DialogContent>
         <InputLabel>Device Alias</InputLabel>
-        <Input value={deviceAlias} onChange={(e)=>{setDeviceAlias(e.target.value)}}>
+        <Input value={deviceAlias} onChange={(e)=>{setDeviceAlias(e.target.value)}}                          
+        onKeyUp={e => {
+          if (e.key === 'Enter') {
+            setNewDeviceAlias(deviceAlias, orders[deviceToBeChanged].SN)
+          }
+        }}>
         </Input>
       </DialogContent>
       <DialogActions>
@@ -255,7 +254,7 @@ export const OverviewLatestOrders = (props) => {
           setNewDeviceAlias(deviceAlias, orders[deviceToBeChanged].SN)
         }}>Save</Button>
       </DialogActions>
-    </Dialog>
+    </Dialog>}
     </div>
   );
 };

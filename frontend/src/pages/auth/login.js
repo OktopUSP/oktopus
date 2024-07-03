@@ -83,7 +83,7 @@ const Page = () => {
         redirect: 'follow',
     };
 
-    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/auth/admin/exists`, requestOptions))
+    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/auth/admin/exists`, requestOptions))
     let content = await result.json()
     console.log("content: ", content)
     if (result.status != 200) {

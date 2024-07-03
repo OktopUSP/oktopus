@@ -49,7 +49,7 @@ const Page = () => {
       redirect: 'follow'
     }
 
-    return fetch(process.env.NEXT_PUBLIC_REST_ENDPOINT + '/device/auth?id='+id, requestOptions)
+    return fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/auth?id=${id}`, requestOptions)
       .then(response => {
         if (response.status === 401) {
           router.push("/auth/login")
@@ -81,7 +81,7 @@ const Page = () => {
       redirect: 'follow'
     };
 
-    let result = await fetch(process.env.NEXT_PUBLIC_REST_ENDPOINT+"/device/auth", requestOptions)
+    let result = await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/auth`, requestOptions)
 
     if (result.status == 200) {
       console.log("user created: deu boa raça !!")
@@ -134,7 +134,7 @@ const Page = () => {
       redirect: 'follow'
     }
 
-    let url = process.env.NEXT_PUBLIC_REST_ENDPOINT + '/device/auth'
+    let url = `${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/auth`
     if (id !== undefined && id !== "") {
       url += "?id="+id
     }
@@ -224,7 +224,7 @@ const Page = () => {
             <OutlinedInput
             defaultValue=""
             fullWidth
-            placeholder="Search customer"
+            placeholder="Search credentials by username"
             onKeyDownCapture={(e) => {
                 if (e.key === 'Enter') {
                   console.log("Fetch credentials per username: ", e.target.value)

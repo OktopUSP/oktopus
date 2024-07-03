@@ -84,7 +84,7 @@ const handleOpen = () => {
   }
 
  
-  fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/device/${router.query.id[0]}/any/${method}`, requestOptions)
+  fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/${router.query.id[0]}/any/${method}`, requestOptions)
     .then(response => response.text())
     .then(result => {
       if (result.status === 401){

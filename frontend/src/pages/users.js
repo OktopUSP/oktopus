@@ -55,7 +55,7 @@ const Page = () => {
       redirect: 'follow'
     }
 
-    return fetch(process.env.NEXT_PUBLIC_REST_ENDPOINT + '/auth/delete/' + id, requestOptions)
+    return fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/auth/delete/${id}`, requestOptions)
       .then(response => {
         if (response.status === 401) {
           router.push("/auth/login")
@@ -82,7 +82,7 @@ const Page = () => {
       redirect: 'follow'
     }
 
-    return fetch(process.env.NEXT_PUBLIC_REST_ENDPOINT + '/users', requestOptions)
+    return fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/users`, requestOptions)
       .then(response => {
         if (response.status === 401) {
           router.push("/auth/login")
@@ -142,7 +142,7 @@ const Page = () => {
       redirect: 'follow'
     };
 
-    let result = await fetch(process.env.NEXT_PUBLIC_REST_ENDPOINT+"/auth/register", requestOptions)
+    let result = await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/auth/register`, requestOptions)
 
     if (result.status == 200) {
       console.log("user created: deu boa raça !!")

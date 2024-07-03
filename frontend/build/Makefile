@@ -18,48 +18,16 @@ help:
 	@echo "Makefile commands:"
 	@echo ""
 	@echo "build - docker image build"
-	@echo "push - push docker image to registry"
-	@echo "run - create and start docker container with the image"
-	@echo "start - start existent docker container with the image"
-	@echo "stop - stop docker container running the image"
-	@echo "remove - remove docker container running the image"
-	@echo "delete - delete docker image"
-	@echo "logs - show logs of docker container"
-	@echo "bash - access container shell"
 	@echo "release - tag image as latest and push to registry"
-	@echo "tag - tag image as latest"
 
 build:
-	@docker build -t ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG} -f Dockerfile ../
-
-run:
-	@docker run -d --name ${DOCKER_USER}-${DOCKER_APP} ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG}
-
-stop:
-	@docker stop ${DOCKER_USER}-${DOCKER_APP}
-
-remove: stop
-	@docker rm ${DOCKER_USER}-${DOCKER_APP}
-
-delete:
-	@docker rmi ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG}
-
-start:
-	@docker start ${DOCKER_USER}-${DOCKER_APP}
-
-push:
-	@docker push ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG}
-
-logs:
-	@docker logs -f ${DOCKER_USER}-${DOCKER_APP}
-
-bash:
-	@docker exec -it ${DOCKER_USER}-${DOCKER_APP} ${CONTAINER_SHELL}
+	@docker build -t ${DOCKER_USER}/${DOCKER_APP}-ce:${DOCKER_TAG} -f Dockerfile.ce ../
+	@docker build -t ${DOCKER_USER}/${DOCKER_APP}-ee:${DOCKER_TAG} -f Dockerfile.ee ../
 
 release: build
-	@docker push ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG}
-	@docker tag ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG} ${DOCKER_USER}/${DOCKER_APP}:latest
-	@docker push ${DOCKER_USER}/${DOCKER_APP}:latest
-
-tag:
-	docker tag ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG} ${DOCKER_USER}/${DOCKER_APP}:latest
+	@docker push ${DOCKER_USER}/${DOCKER_APP}-ce:${DOCKER_TAG}
+	@docker push ${DOCKER_USER}/${DOCKER_APP}-ee:${DOCKER_TAG}
+	@docker tag ${DOCKER_USER}/${DOCKER_APP}-ce:${DOCKER_TAG} ${DOCKER_USER}/${DOCKER_APP}-ce:latest
+	@docker tag ${DOCKER_USER}/${DOCKER_APP}-ee:${DOCKER_TAG} ${DOCKER_USER}/${DOCKER_APP}-ee:latest
+	@docker push ${DOCKER_USER}/${DOCKER_APP}-ce:latest
+	@docker push ${DOCKER_USER}/${DOCKER_APP}-ee:latest

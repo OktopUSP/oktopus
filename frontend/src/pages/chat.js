@@ -35,7 +35,7 @@ const Page = () => {
             redirect: 'follow'
         };
 
-        fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/users`,requestOptions)
+        fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/users`,requestOptions)
         .then(response => response.json())
         .then(result => {
             // let teste =  JSON.stringify(JSON.parse(result), null, 2)

@@ -96,7 +96,7 @@ const addDeviceObj = async(obj, setShowLoading, router, updateDeviceParameters) 
         body: raw
     };
     setShowLoading(true)
-    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/device/${router.query.id[0]}/any/add`, requestOptions))
+    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/${router.query.id[0]}/any/add`, requestOptions))
     if (result.status != 200) {
         if (result.status === 401){
             router.push("/auth/login")
@@ -131,7 +131,7 @@ const deleteDeviceObj = async(obj, setShowLoading, router, updateDeviceParameter
         body: raw
     };
     setShowLoading(true)
-    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/device/${router.query.id[0]}/any/del`, requestOptions))
+    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/${router.query.id[0]}/any/del`, requestOptions))
     if (result.status != 200) {
         if (result.status === 401){
             router.push("/auth/login")
@@ -481,7 +481,7 @@ const getDeviceParameters = async (raw) =>{
         body: raw
     };
 
-    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/device/${router.query.id[0]}/any/parameters`, requestOptions))
+    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/${router.query.id[0]}/any/parameters`, requestOptions))
     if (result.status != 200) {
         if (result.status === 401){
             router.push("/auth/login")
@@ -505,7 +505,7 @@ const getDeviceParameterInstances = async (raw) =>{
         body: raw
     };
 
-    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/device/${router.query.id[0]}/any/instances`, requestOptions))
+    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/${router.query.id[0]}/any/instances`, requestOptions))
     if (result.status != 200) {
         throw new Error('Please check your email and password');
     }else if (result.status === 401){
@@ -779,7 +779,7 @@ const getDeviceParameterInstances = async (raw) =>{
         body: raw
     };
 
-    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/device/${router.query.id[0]}/any/get`, requestOptions))
+    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/${router.query.id[0]}/any/get`, requestOptions))
     if (result.status != 200) {
         if (result.status === 401){
             router.push("/auth/login")
@@ -1029,7 +1029,7 @@ const getDeviceParameterInstances = async (raw) =>{
 
     setOpen(false)
     setShowLoading(true)
-    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/device/${router.query.id[0]}/any/set`, requestOptions))
+    let result = await (await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/${router.query.id[0]}/any/set`, requestOptions))
     if (result.status != 200) {
         if (result.status === 401){
             router.push("/auth/login")
@@ -1172,7 +1172,7 @@ const getDeviceParameterInstances = async (raw) =>{
                            body: raw
                        };
                        setShowLoading(true)
-                       let result = await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT}/device/${router.query.id[0]}/any/operate`, requestOptions)
+                       let result = await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/${router.query.id[0]}/any/operate`, requestOptions)
                        let content = await result.json()
                        if (result.status != 200) {
                            setShowLoading(false)
