@@ -28,6 +28,22 @@ func (a *Api) getEnterpriseResource(
 	return err
 }
 
+func (a *Api) getMapsResource(
+	action string,
+	w http.ResponseWriter,
+	body []byte,
+) error {
+
+	err := bridge.NatsEnterpriseInteraction("geolocation.v1."+action, body, w, a.nc)
+	return err
+}
+
+func (a *Api) devicesLocation(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		a.getMapsResource("get", w, []byte{})
+	}
+}
+
 func (a *Api) deviceSiteSurvey(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sn := vars["sn"]
