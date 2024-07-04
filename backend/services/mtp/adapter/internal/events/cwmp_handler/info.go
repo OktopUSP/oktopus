@@ -1,6 +1,7 @@
 package cwmp_handler
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"log"
 
@@ -12,6 +13,10 @@ func (h *Handler) HandleDeviceInfo(device string, data []byte, ack func()) {
 	defer ack()
 	log.Printf("Device %s info", device)
 	deviceInfo := parseDeviceInfoMsg(data)
+	if deviceExists, _ := h.db.DeviceExists(deviceInfo.SN); !deviceExists {
+		fmtDeviceInfo, _ := json.Marshal(deviceInfo)
+		h.nc.Publish("device.v1.new", fmtDeviceInfo)
+	}
 	err := h.db.CreateDevice(deviceInfo)
 	if err != nil {
 		log.Printf("Failed to create device: %v", err)

@@ -1,6 +1,7 @@
 package usp_handler
 
 import (
+	"encoding/json"
 	"log"
 
 	"github.com/OktopUSP/oktopus/backend/services/mtp/adapter/internal/db"
@@ -14,6 +15,10 @@ func (h *Handler) HandleDeviceInfo(device, subject string, data []byte, mtp stri
 	defer ack()
 	log.Printf("Device %s info, mtp: %s", device, mtp)
 	deviceInfo := parseDeviceInfoMsg(device, subject, data, getMtp(mtp))
+	if deviceExists, _ := h.db.DeviceExists(deviceInfo.SN); !deviceExists {
+		fmtDeviceInfo, _ := json.Marshal(deviceInfo)
+		h.nc.Publish("device.v1.new", fmtDeviceInfo)
+	}
 	err := h.db.CreateDevice(deviceInfo)
 	if err != nil {
 		log.Printf("Failed to create device: %v", err)
