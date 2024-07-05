@@ -191,15 +191,31 @@ services:
     container_name: nginx
     ports:
       - 80:80
-    depends_on:
-      - frontend
-      - controller
-      - socketio
+    # depends_on:
+      # - frontend
+      # - controller
+      # - socketio
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       usp_network:
         ipv4_address: 172.16.235.17
+  
+  file-server:
+    image: oktopusp/file-server
+    container_name: file-server
+    ports:
+      - 8004:8004
+    volumes:
+      - ./firmwares:/app/firmwares
+      - ./images:/app/images
+    env_file:
+      - .env.file-server
+    networks:
+      usp_network:
+        ipv4_address: 172.16.235.18
 
 networks:
    usp_network:

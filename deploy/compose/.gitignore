@@ -4,3 +4,7 @@ mongo_data/*
 !mongo_data/.gitkeep
 nats_data/*
 !nats_data/.gitkeep
+firmwares/*
+!firmwares/.gitkeep
+images/*
+!images/logo.png

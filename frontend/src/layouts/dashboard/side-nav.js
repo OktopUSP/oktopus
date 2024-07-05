@@ -34,7 +34,6 @@ export const SideNav = (props) => {
     }
 
     return false;
-    //TODO: test frontend with color of the landing page
   }
 
   const content = (
@@ -80,9 +79,9 @@ export const SideNav = (props) => {
               p: '12px'
             }}
           >
-         <Link href="https://oktopus.app.br" target="_blank">
+         <Link href="http://localhost/companylink" target="_blank">
             <div style={{display:'flex',justifyContent:'center'}}>
-              <img src="/assets/oktopus.png" 
+              <img src="http://localhost:8004/images/logo.png" 
               width={'60%'}
               />
             </div>
