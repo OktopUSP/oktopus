@@ -13,10 +13,17 @@ import (
 const LOCAL_ENV = ".env.local"
 
 type Nats struct {
-	Url                string
-	Name               string
-	VerifyCertificates bool
-	Ctx                context.Context
+	Url       string
+	Name      string
+	EnableTls bool
+	Cert      Tls
+	Ctx       context.Context
+}
+
+type Tls struct {
+	CertFile string
+	KeyFile  string
+	CaFile   string
 }
 
 type Mqtt struct {
@@ -42,7 +49,10 @@ func NewConfig() *Config {
 
 	natsUrl := flag.String("nats_url", lookupEnvOrString("NATS_URL", "nats://localhost:4222"), "url for nats server")
 	natsName := flag.String("nats_name", lookupEnvOrString("NATS_NAME", "mqtt-adapter"), "name for nats client")
-	natsVerifyCertificates := flag.Bool("nats_verify_certificates", lookupEnvOrBool("NATS_VERIFY_CERTIFICATES", false), "verify validity of certificates from nats server")
+	natsEnableTls := flag.Bool("nats_enable_tls", lookupEnvOrBool("NATS_ENABLE_TLS", false), "enbale TLS to nats server")
+	clientCrt := flag.String("client_crt", lookupEnvOrString("CLIENT_CRT", "cert.pem"), "client certificate file to TLS connection")
+	clientKey := flag.String("client_key", lookupEnvOrString("CLIENT_KEY", "key.pem"), "client key file to TLS connection")
+	serverCA := flag.String("server_ca", lookupEnvOrString("SERVER_CA", "rootCA.pem"), "server CA file to TLS connection")
 	mqttUrl := flag.String("mqtt_url", lookupEnvOrString("MQTT_URL", "tcp://localhost:1883"), "url for mqtt server")
 	mqttsUrl := flag.String("mqtts_url", lookupEnvOrString("MQTTS_URL", ""), "url for mqtts server")
 	mqttsSkipVerify := flag.Bool("mqtts_skip_verify", lookupEnvOrBool("MQTTS_SKIP_VERIFY", false), "skip verification of server certificate for mqtts")
@@ -69,10 +79,15 @@ func NewConfig() *Config {
 
 	return &Config{
 		Nats: Nats{
-			Url:                *natsUrl,
-			Name:               *natsName,
-			VerifyCertificates: *natsVerifyCertificates,
-			Ctx:                ctx,
+			Url:       *natsUrl,
+			Name:      *natsName,
+			EnableTls: *natsEnableTls,
+			Ctx:       ctx,
+			Cert: Tls{
+				CertFile: *clientCrt,
+				KeyFile:  *clientKey,
+				CaFile:   *serverCA,
+			},
 		},
 		Mqtt: Mqtt{
 			Url:        *mqttUrl,
