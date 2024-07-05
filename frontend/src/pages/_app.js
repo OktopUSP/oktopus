@@ -10,6 +10,7 @@ import { createTheme } from 'src/theme';
 import { createEmotionCache } from 'src/utils/create-emotion-cache';
 import 'simplebar-react/dist/simplebar.min.css';
 import { WsProvider } from 'src/contexts/socketio-context';
+import '../utils/map.css';
 
 const clientSideEmotionCache = createEmotionCache();
 
