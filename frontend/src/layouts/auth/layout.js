@@ -4,8 +4,6 @@ import Link from 'next/link'
 import { Box, Typography, Unstable_Grid2 as Grid } from '@mui/material';
 import { Logo } from 'src/components/logo';
 
-// TODO: Change subtitle text
-
 export const Layout = (props) => {
   const { children } = props;
 
@@ -70,17 +68,12 @@ export const Layout = (props) => {
           }}
         >
           <Box sx={{ p: 3 }}>
-          <Link href="https://oktopus.app.br" target="_blank">
-            <img
-              alt=""
-              src="/assets/oktopus.png"
-            />
-          </Link>
-             <Typography
-              align="center"
-              sx={{ mb: 3 }}
-            >
-            </Typography>
+            <Link href="http://localhost/companylink" target="_blank">
+              <img
+                alt=""
+                src="http://localhost:8004/images/logo.png"
+              />
+            </Link>
           </Box>
         </Grid>
       </Grid>
