@@ -1,1 +1,5 @@
-NATS_URL=nats://msg_broker:4222
+NATS_URL=nats://oktopususer:oktopuspw@msg_broker:4222
+NATS_ENABLE_TLS="true"
+CLIENT_CRT=/tmp/nats/config/cert.pem
+CLIENT_KEY=/tmp/nats/config/key.pem
+SERVER_CA=/tmp/nats/config/rootCA.pem
