@@ -1,38 +1,42 @@
 services:
-
-#/* ----------------------------- Message Broker ----------------------------- */
+  #/* ----------------------------- Message Broker ----------------------------- */
   msg_broker:
-    image: 'nats:latest'
+    image: "nats:latest"
     container_name: nats
     ports:
       - 4222:4222
       - 8222:8222
-    command: -n oktopus -m 8222 -js
+    command: -c /tmp/nats/config/nats.cfg
+    env_file:
+      - .env.nats
     volumes:
       - ./nats_data:/tmp/nats/jetstream
+      - ./nats_config:/tmp/nats/config
     networks:
       usp_network:
         ipv4_address: 172.16.235.2
     profiles: [nats]
-#/* -------------------------------------------------------------------------- */
+  #/* -------------------------------------------------------------------------- */
 
-#/* ------------------------ API REST / USP Controller ----------------------- */
+  #/* ------------------------ API REST / USP Controller ----------------------- */
   controller:
-    image: 'oktopusp/controller'
+    image: "oktopusp/controller"
     container_name: controller
     ports:
-    - 8000:8000
+      - 8000:8000
     depends_on:
-    - mongo_usp
+      - mongo_usp
     env_file:
       - .env.controller
+    volumes:
+      - ./nats_config:/tmp/nats/config
     networks:
       usp_network:
         ipv4_address: 172.16.235.3
     profiles: [controller]
-#/* -------------------------------------------------------------------------- */
+  #/* -------------------------------------------------------------------------- */
 
-#/* ---------------------------- Databases / Cache --------------------------- */
+  #/* ---------------------------- Databases / Cache --------------------------- */
   mongo_usp:
     image: mongo
     container_name: mongo_usp
@@ -43,115 +47,128 @@ services:
         ipv4_address: 172.16.235.4
     volumes:
       - ./mongo_data:/data/db
-    profiles: [controller,adapter]
+    profiles: [controller, adapter]
 
-#/* -------------------------------------------------------------------------- */
+  #/* -------------------------------------------------------------------------- */
 
-#/* ----------------------- Message Transfer Protocols ----------------------- */
+  #/* ----------------------- Message Transfer Protocols ----------------------- */
   mqtt:
-    image: 'oktopusp/mqtt'
+    image: "oktopusp/mqtt"
     container_name: mqtt
     ports:
-    - 1883:1883
-    - 8883:8883
+      - 1883:1883
+      - 8883:8883
     env_file:
       - .env.mqtt
+    volumes:
+      - ./nats_config:/tmp/nats/config
     networks:
       usp_network:
         ipv4_address: 172.16.235.6
     profiles: [mqtt]
 
   ws:
-    image: 'oktopusp/ws'
+    image: "oktopusp/ws"
     container_name: websockets
     ports:
-    - 8080:8080
+      - 8080:8080
     env_file:
       - .env.ws
+    volumes:
+      - ./nats_config:/tmp/nats/config
     networks:
       usp_network:
         ipv4_address: 172.16.235.7
     profiles: [ws]
-  
+
   stomp:
-    image: 'oktopusp/stomp'
+    image: "oktopusp/stomp"
     container_name: stomp
     ports:
-    - 61613:61613
+      - 61613:61613
     networks:
       usp_network:
         ipv4_address: 172.16.235.8
     profiles: [stomp]
-#/* -------------------------------------------------------------------------- */
+  #/* -------------------------------------------------------------------------- */
 
-#/* --------------- Message transfer Protocols Adapters to NATS -------------- */
+  #/* --------------- Message transfer Protocols Adapters to NATS -------------- */
   mqtt-adapter:
-    image: 'oktopusp/mqtt-adapter'
+    image: "oktopusp/mqtt-adapter"
     container_name: mqtt-adapter
     depends_on:
       - mqtt
     env_file:
       - .env.mqtt-adapter
+    volumes:
+      - ./nats_config:/tmp/nats/config
     networks:
       usp_network:
         ipv4_address: 172.16.235.9
     profiles: [mqtt]
-    
 
   ws-adapter:
-    image: 'oktopusp/ws-adapter'
+    image: "oktopusp/ws-adapter"
     container_name: ws-adapter
     depends_on:
       - ws
     env_file:
       - .env.ws-adapter
+    volumes:
+      - ./nats_config:/tmp/nats/config
     networks:
       usp_network:
         ipv4_address: 172.16.235.10
     profiles: [ws]
-  
+
   stomp-adapter:
-    image: 'oktopusp/stomp-adapter'
+    image: "oktopusp/stomp-adapter"
     container_name: stomp-adapter
     depends_on:
       - stomp
     env_file:
       - .env.stomp-adapter
+    volumes:
+      - ./nats_config:/tmp/nats/config
     networks:
       usp_network:
         ipv4_address: 172.16.235.11
     profiles: [stomp]
 
   adapter:
-    image: 'oktopusp/adapter'
+    image: "oktopusp/adapter"
     container_name: adapter
     depends_on:
       - mongo_usp
     env_file:
       - .env.adapter
+    volumes:
+      - ./nats_config:/tmp/nats/config
     networks:
       usp_network:
         ipv4_address: 172.16.235.12
     profiles: [adapter]
-#/* -------------------------------------------------------------------------- */
+  #/* -------------------------------------------------------------------------- */
 
-#/* ------------- SocketIO Real Time Communication With Frontend ------------- */
+  #/* ------------- SocketIO Real Time Communication With Frontend ------------- */
   socketio:
-    image: 'oktopusp/socketio'
+    image: "oktopusp/socketio"
     container_name: socketio
     ports:
-    - 5000:5000
+      - 5000:5000
     env_file:
       - .env.socketio
+    volumes:
+      - ./nats_config:/tmp/nats/config
     networks:
       usp_network:
         ipv4_address: 172.16.235.13
     profiles: [frontend]
-#/* -------------------------------------------------------------------------- */
+  #/* -------------------------------------------------------------------------- */
 
-#/* -------------------------------- Frontend -------------------------------- */
+  #/* -------------------------------- Frontend -------------------------------- */
   frontend:
-    image: 'oktopusp/frontend-ce'
+    image: "oktopusp/frontend-ce"
     container_name: frontend
     ports:
       - 3000:3000
@@ -159,7 +176,7 @@ services:
       usp_network:
         ipv4_address: 172.16.235.14
     profiles: [frontend]
-#/* -------------------------------------------------------------------------- */
+  #/* -------------------------------------------------------------------------- */
 
   portainer:
     image: portainer/portainer-ce:latest
@@ -173,28 +190,30 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./portainer_data:/data
-  
+
   acs:
-    image: oktopusp/acs
+    image: "oktopusp/acs"
     container_name: acs
     ports:
       - 9292:9292
     env_file:
       - .env.acs
+    volumes:
+      - ./nats_config:/tmp/nats/config
     networks:
       usp_network:
         ipv4_address: 172.16.235.16
     profiles: [cwmp]
-  
+
   nginx:
     image: nginx:latest
     container_name: nginx
     ports:
       - 80:80
     # depends_on:
-      # - frontend
-      # - controller
-      # - socketio
+    # - frontend
+    # - controller
+    # - socketio
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
     extra_hosts:
@@ -202,7 +221,7 @@ services:
     networks:
       usp_network:
         ipv4_address: 172.16.235.17
-  
+
   file-server:
     image: oktopusp/file-server
     container_name: file-server
@@ -218,9 +237,9 @@ services:
         ipv4_address: 172.16.235.18
 
 networks:
-   usp_network:
+  usp_network:
     driver: bridge
-    ipam: 
+    ipam:
       driver: default
       config:
         - subnet: 172.16.235.0/24
