@@ -132,6 +132,24 @@ export const SideNav = (props) => {
             })}
           </Stack>
         </Box>
+        <Stack style={{position:"absolute", bottom:"2px", left:"2px"}} direction={"row"} spacing={"1"} zIndex={9999}>  
+        <Typography
+          align="center"
+          color="primary.contrastText"
+          component="footer"
+          variant="body2"
+          sx={{ p: 2 }}
+        >
+          Powered by
+        </Typography>
+      </Stack>
+      <a href='https://oktopus.app.br' style={{position:"absolute", bottom:"10px", left:"100px"}} target='_blank'>
+      <img 
+        src="/assets/logo.png" 
+        alt="Oktopus logo image"
+        width={80}
+        />
+      </a>
       </Box>
     </Scrollbar>
   );
