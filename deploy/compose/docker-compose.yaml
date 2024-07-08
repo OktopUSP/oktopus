@@ -210,10 +210,6 @@ services:
     container_name: nginx
     ports:
       - 80:80
-    depends_on:
-    - frontend
-    - controller
-    - socketio
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
     extra_hosts:
