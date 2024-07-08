@@ -17,6 +17,19 @@ const getColorScheme = async () => {
     location.reload();
     return
   });
+  if (result.status!=200) {
+    console.log('Error fetching colors');
+    sessionStorage.setItem('colors', JSON.stringify({
+      "buttons": "#306d6f",
+      "sidebar_end": "#306d6f",
+      "sidebar_initial": "#306d6f",
+      "tables": "#306d6f",
+      "words_outside_sidebar": "#30596f",
+      "connected_mtps_color": "#f28950"
+    }));
+    location.reload();
+    return
+  }
 
   let response = await result.json();
   let fmtresponse = JSON.stringify(response);
