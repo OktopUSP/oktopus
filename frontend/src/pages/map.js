@@ -193,7 +193,7 @@ const Page = () => {
                   <div>
                     <div>Model: {activeMarkerdata.Model?activeMarkerdata.Model:activeMarkerdata.ProductClass}</div>
                     <div>Alias: {activeMarkerdata.Alias}</div>
-                    <div>Status: {activeMarkerdata.Status == 2 ? <span style={{color:"green"}}>online</span> : <span style={{color:"green"}}>offline</span>}</div>
+                    <div>Status: {activeMarkerdata.Status == 2 ? <span style={{color:"green"}}>online</span> : <span style={{color:"red"}}>offline</span>}</div>
                   </div>
                 </div>
               : <p>no device info found</p>}
