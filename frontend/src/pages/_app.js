@@ -11,21 +11,25 @@ import { createEmotionCache } from 'src/utils/create-emotion-cache';
 import 'simplebar-react/dist/simplebar.min.css';
 import { WsProvider } from 'src/contexts/socketio-context';
 import '../utils/map.css';
+import { useEffect, useState } from 'react';
 
 const clientSideEmotionCache = createEmotionCache();
 
 const SplashScreen = () => null;
 
 const App = (props) => {
+  const [theme, setTheme] = useState(null);
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
 
   useNProgress();
 
   const getLayout = Component.getLayout ?? ((page) => page);
 
-  const theme = createTheme();
+  useEffect(() => {
+    setTheme(createTheme());
+  }, []);
 
-  return (
+  return theme && (
     <CacheProvider value={emotionCache}>
       <Head>
         <title>

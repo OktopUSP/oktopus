@@ -3,9 +3,11 @@ import NextLink from 'next/link';
 import Link from 'next/link'
 import { Box, Typography, Unstable_Grid2 as Grid } from '@mui/material';
 import { Logo } from 'src/components/logo';
+import { useTheme } from '@mui/material'
 
 export const Layout = (props) => {
   const { children } = props;
+  const theme = useTheme();
 
   return (
     <Box
@@ -58,7 +60,7 @@ export const Layout = (props) => {
           lg={6}
           sx={{
             alignItems: 'center',
-            background: 'radial-gradient(50% 50% at 50% 50%, #306D6F 0%, #255355 100%)',
+            background: `radial-gradient(50% 50% at 50% 50%, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark } 100%)`,
             color: 'white',
             display: 'flex',
             justifyContent: 'center',

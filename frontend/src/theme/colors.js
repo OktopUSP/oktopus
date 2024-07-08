@@ -1,5 +1,5 @@
 import { alpha } from '@mui/material/styles';
-
+  
 const withAlphas = (color) => {
   return {
     ...color,
@@ -11,8 +11,16 @@ const withAlphas = (color) => {
   };
 };
 
-export const neutral = {
-  50: '#306d6f',
+export const neutral = (colors) => {
+  console.log("neutral colors:", colors);
+  let parsedColors = JSON.parse(colors);
+
+  let tableColor = parsedColors["tables"]
+  let sidebarColorInitial = parsedColors["sidebar_initial"]
+  let wordsOutsideSidebarColor = parsedColors["words_outside_sidebar"]
+
+  return {
+  50: tableColor,
   100: '#F3F4F6',
   200: '#E5E7EB',
   300: '#D2D6DB',
@@ -20,18 +28,29 @@ export const neutral = {
   500: '#6C737F',
   600: '#4D5761',
   700: '#FFFFFF',
-  800: '#306d6f',
-  900: '#30596f'
+  800: sidebarColorInitial,
+  900: wordsOutsideSidebarColor,
+}
 };
 
-export const indigo = withAlphas({
-  lightest: '#FFFFFF',
-  light: '#306D6F',
-  main: '#306D6F',
-  dark: '#255355',
-  darkest: '#00a0b8',
-  contrastText: '#FFFFFF'
-});
+export const indigo = (colors) => {
+
+  console.log("indigo colors:", colors);
+  let parsedColors = JSON.parse(colors);
+
+  let buttonColor = parsedColors["buttons"]
+  let sidebarColorEnd = parsedColors["sidebar_end"]
+  let mtpsColor = parsedColors["connected_mtps_color"]
+
+  return withAlphas({
+    lightest: '#FFFFFF',
+    light: '#ff3383',
+    main: buttonColor,
+    dark: sidebarColorEnd,
+    darkest: mtpsColor,
+    contrastText: '#FFFFFF'
+  });
+}
 
 export const success = withAlphas({
   lightest: '#F0FDF9',
