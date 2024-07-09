@@ -3,6 +3,7 @@ import { GoogleMap, useLoadScript, Marker, OverlayView } from "@react-google-map
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useEffect, useMemo, useState } from 'react';
 import mapStyles from '../utils/mapStyles.json';
+import { useRouter } from 'next/router';
 
 const getPixelPositionOffset = pixelOffset => (width, height) => ({
   x: -(width / 2) + pixelOffset.x,
@@ -29,10 +30,35 @@ const Page = () => {
 
     const libraries = useMemo(() => ['places'], []);
 
+    const router = useRouter();
+
+    const [mapRef, setMapRef] = useState(null);
+
     const [mapCenter, setMapCenter] = useState(null);
     const [markers, setMarkers] = useState([]);
     const [activeMarker, setActiveMarker] = useState(null);
     const [activeMarkerdata, setActiveMarkerdata] = useState(null);
+    const [zoom, setZoom] = useState(null)
+
+    const handleDragEnd = () => {
+      if (mapRef) {
+        const newCenter = mapRef.getCenter();
+        console.log("newCenter:",newCenter.lat(), newCenter.lng());
+        localStorage.setItem("mapCenter", JSON.stringify({"lat":newCenter.lat(),"lng":newCenter.lng()}))
+      }
+    }
+
+    const handleZoomChange = () => {
+      if (mapRef) {
+        const newZoom = mapRef.getZoom();
+        console.log("new zoom", newZoom)
+        localStorage.setItem("zoom", newZoom)
+      }
+    }
+
+    const handleOnLoad = map => {
+      setMapRef(map);
+    };
 
     const fetchMarkers = async () => {
 
@@ -58,9 +84,8 @@ const Page = () => {
         console.log("taix nem autenticado, sai fora oh")
         return router.push("/auth/login")
       } else {
-        console.log("agora quebrasse ux córno mô quiridu")
-        const content = await result.json()
-        throw new Error(content);
+        setMarkers([])
+        console.log("error to get map markers")
       }    
     }
 
@@ -92,6 +117,24 @@ const Page = () => {
 
     useEffect(()=> {
       fetchMarkers();
+
+      let zoomFromLocalStorage = localStorage.getItem("zoom")
+      if (zoomFromLocalStorage) {
+        setZoom(Number(zoomFromLocalStorage))
+      }else{
+        setZoom(25)
+      }
+
+      let mapCenterFromLocalStorage = localStorage.getItem("mapCenter")
+      if (mapCenterFromLocalStorage){
+        let fmtMapCenter = JSON.parse(localStorage.getItem("mapCenter"))
+        console.log("mapCenterFromLocalStorage:", fmtMapCenter)
+        setMapCenter({
+          lat: Number(fmtMapCenter.lat),
+          lng: Number(fmtMapCenter.lng),
+        })
+        return
+      }
       // Check if geolocation is supported by the browser
       if ("geolocation" in navigator) {
         // Prompt user for permission to access their location
@@ -108,12 +151,12 @@ const Page = () => {
           // Error callback function
           function(error) {
             // Handle errors, e.g. user denied location sharing permissions
-            console.error("Error getting user location:", error);
+            console.log("Error getting user location:", error);
           }
         );
       } else {
         // Geolocation is not supported by the browser
-        console.error("Geolocation is not supported by this browser.");
+        console.log("Geolocation is not supported by this browser, or the user denied access");
       }
     },[])
   
@@ -140,7 +183,7 @@ const Page = () => {
       return <p>Loading...</p>;
     }
     
-    return ( mapCenter && markers &&
+    return ( markers && zoom &&
     <>
       <Head>
         <title>
@@ -149,11 +192,16 @@ const Page = () => {
       </Head>
       <GoogleMap
         options={mapOptions}
-        zoom={14}
-        center={mapCenter}
+        zoom={zoom}
+        center={mapCenter ? mapCenter : {
+          lat: 0.0,
+          lng: 0.0,
+        }}
         mapContainerStyle={{ width: '100%', height: '100%' }}
-        onLoad={() => console.log('Map Component Loaded...')}
+        onLoad={handleOnLoad}
         clickableIcons={false}
+        onDragEnd={handleDragEnd}
+        onZoomChanged={handleZoomChange}
       >
         {
           markers.map((marker, index) => (
