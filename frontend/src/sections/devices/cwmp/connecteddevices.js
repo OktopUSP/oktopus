@@ -114,7 +114,9 @@ export const ConnectedDevices = () => {
                                                     <Tooltip title={getConnectionState(property.rssi)}>
                                                         <Typography display={"flex"} color={() => {
                                                             let rssi = property.rssi
-                                                            if (rssi > -30) {
+                                                            if(rssi == 0){
+                                                                return theme.palette.neutral[900]
+                                                            } else if (rssi > -30) {
                                                                 return theme.palette.success.main
                                                             } else if (rssi > -60) {
                                                                 return theme.palette.success.main
