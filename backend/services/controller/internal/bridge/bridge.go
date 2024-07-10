@@ -263,7 +263,7 @@ func NatsEnterpriseInteraction(
 	if err != nil {
 		if err == nats.ErrNoResponders {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write(utils.Marshall("You have no enterprise license, to get one contact: leandro@oktopus.app.br"))
+			w.Write(utils.Marshall("You have no enterprise license, to get one contact: sales@oktopus.app.br"))
 			return err
 		}
 		w.WriteHeader(http.StatusInternalServerError)
