@@ -160,6 +160,7 @@ export const SiteSurvey = (props) => {
                 theme.palette.primary.main,
                 theme.palette.graphics.light,
                 theme.palette.error.light,
+                theme.palette.error.dark
             ],
             dataLabels: {
                 enabled: false
