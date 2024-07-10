@@ -14,7 +14,7 @@ Oktopus is a multi-vendor management platform for CPEs and IoTs. <b>Any device t
 
 <a href="https://www.inango.com/" target="_blank"><img src="https://github.com/OktopUSP/oktopus/assets/83298718/3b3e65d9-33fa-46c4-8b24-f9e2a84a04a6" width="100px"/></a>
 
-<p>If you'd like to become a sponsor, start a partnership or somehow to contribute to the project, email <a href="">leandro@oktopus.app.br</a>, every contribution is welcome, and the resources will help the project to move on. Also, if your company uses this project and you'd like your logo to appear up here, contact us.
+<p>If you'd like to become a sponsor, start a partnership or somehow to contribute to the project, email <a href="">contact@oktopus.app.br</a>, every contribution is welcome, and the resources will help the project to move on. Also, if your company uses this project and you'd like your logo to appear up here, contact us.
 
 <ul>
     <li>
@@ -23,7 +23,7 @@ Oktopus is a multi-vendor management platform for CPEs and IoTs. <b>Any device t
         <p>
             Our solution has an open-source software license, meaning you can modify/study the code and use it for free. You can perform all the configurations, allocate servers, and set it up on your network with the classic "do it yourself" approach, or save time and money: contact us for a quote and get commercial support.
         </p>
-        <p>Contact <a href="">leandro@oktopus.app.br</a> via email and get a quote.</p>
+        <p>Contact <a href="">sales@oktopus.app.br</a> via email and get a quote.</p>
     </li> 
 </ul>
 

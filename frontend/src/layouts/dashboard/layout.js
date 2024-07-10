@@ -4,8 +4,6 @@ import { styled } from '@mui/material/styles';
 import { withAuthGuard } from 'src/hocs/with-auth-guard';
 import { SideNav } from './side-nav';
 import { TopNav } from './top-nav';
-import Image from 'next/image'
-import { Link } from '@mui/material';
 
 const SIDE_NAV_WIDTH = 280;
 

@@ -1,6 +1,3 @@
-import PropTypes from 'prop-types';
-import ArrowPathIcon from '@heroicons/react/24/solid/ArrowPathIcon';
-import ArrowRightIcon from '@heroicons/react/24/solid/ArrowRightIcon';
 import {
     Button,
     Card,
@@ -22,12 +19,11 @@ import {
     TableHead,
     TableRow,
     TableContainer,
-    Paper,
-    Container,
-    CircularProgress
+    CircularProgress,
+    ToggleButton,
+    ToggleButtonGroup
 } from '@mui/material';
-import { Scrollbar } from 'src/components/scrollbar';
-import { alpha, useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 import { Chart } from 'src/components/chart';
 import ChartBarSquareIcon from '@heroicons/react/24/outline/ChartBarSquareIcon';
 import ListBulletIcon from '@heroicons/react/24/outline/ListBulletIcon';
@@ -35,109 +31,256 @@ import { useRouter } from 'next/router';
 import { Stack } from '@mui/system';
 import { useEffect, useState } from 'react';
 
-const useChartOptions = () => {
-    const theme = useTheme();
-
-    return {
-        chart: {
-            background: 'transparent',
-            stacked: false,
-            toolbar: {
-                show: true
-            }
-        },
-        colors: [
-            theme.palette.graphics.dark,
-            theme.palette.graphics.darkest,
-            theme.palette.graphics.light,
-            theme.palette.graphics.main,
-            theme.palette.graphics.lightest,
-        ],
-        dataLabels: {
-            enabled: false
-        },
-        fill: {
-            opacity: 1,
-            type: 'solid'
-        },
-        grid: {
-            borderColor: theme.palette.divider,
-            strokeDashArray: 2,
-            xaxis: {
-                lines: {
-                    show: false
-                }
-            },
-            yaxis: {
-                lines: {
-                    show: true
-                }
-            }
-        },
-        legend: {
-            show: true
-        },
-        plotOptions: {
-            bar: {
-                columnWidth: '40px'
-            }
-        },
-        stroke: {
-            colors: ['transparent'],
-            show: true,
-            width: 2
-        },
-        theme: {
-            mode: theme.palette.mode
-        },
-        xaxis: {
-            axisBorder: {
-                color: theme.palette.divider,
-                show: true
-            },
-            axisTicks: {
-                color: theme.palette.divider,
-                show: true
-            },
-            categories: [
-                'Jan',
-                'Feb',
-                'Mar',
-                'Apr',
-                'May',
-                'Jun',
-                'Jul',
-                'Aug',
-                'Sep',
-                'Oct',
-                'Nov',
-                'Dec'
-            ],
-            labels: {
-                offsetY: 5,
-                style: {
-                    colors: theme.palette.text.secondary
-                }
-            }
-        },
-        yaxis: {
-            labels: {
-                formatter: (value) => (value > 0 ? `${value}K` : `${value}`),
-                offsetX: -10,
-                style: {
-                    colors: theme.palette.text.secondary
-                }
-            }
-        }
-    };
-};
-
 export const SiteSurvey = (props) => {
-    const chartSeries = [{ name: 'This year', data: [18, 16, 5, 8, 3, 14, 14, 16, 17, 19, 18, 20] }, { name: 'Last year', data: [12, 11, 4, 6, 2, 9, 9, 10, 11, 12, 13, 13] }]
+    
+    // const getMaxChannel = () => {
+    //     if (frequency == "2.4GHz") {
+    //         return 13;
+    //     } else {
+    //         return 128;
+    //     }
+    // }
+
+    // const geMinChannel = () => {
+    //     if (frequency == "2.4GHz") {
+    //         return 0;
+    //     } else {
+    //         return 36;
+    //     }
+    // }
+
+    // const getChannelSpacing = () => {
+    //     if (frequency == "2.4GHz") {
+    //         return 1;
+    //     } else {
+    //         return 4;
+    //     }
+    // }
+
+    // const getChannelAmount = () => {
+    //     if (frequency == "2.4GHz") {
+    //         return 13;
+    //     } else {
+    //         return 20;
+    //     }
+    // }
+
+    const getCategories = () => {
+
+    }
 
     const router = useRouter();
-    const [content, setContent] = useState(null);
+
     const [frequency, setFrequency] = useState("2.4GHz");
+    const [view, setView] = useState("chart");
+    const [content, setContent] = useState(null);
+
+    const getSeries = () => {
+        let series = []
+        content[frequency].map((network) => {
+
+            let data = []
+
+            if (frequency == "2.4GHz") {
+                if (Number(network.bandwidth) == 20) {
+                    data.push({"x": Number(network.channel) -2, "y": -100})
+                    data.push({"x": Number(network.channel), "y": Number(network.signal_level)})
+                    data.push({"x": Number(network.channel) +2, "y": -100})
+                }
+                if (Number(network.bandwidth) == 40) {
+                    data.push({"x": Number(network.channel) -4, "y": -100})
+                    data.push({"x": Number(network.channel), "y": Number(network.signal_level)})
+                    data.push({"x": Number(network.channel) +4, "y": -100})
+                }
+            }else {
+                if (Number(network.bandwidth) == 20) {
+                    data.push({"x": Number(network.channel) -4, "y": -100})
+                    data.push({"x": Number(network.channel), "y": Number(network.signal_level)})
+                    data.push({"x": Number(network.channel) +4, "y": -100})
+                }
+                if (Number(network.bandwidth) == 40) {
+                    data.push({"x": Number(network.channel) -8, "y": -100})
+                    data.push({"x": Number(network.channel), "y": Number(network.signal_level)})
+                    data.push({"x": Number(network.channel) +8, "y": -100})
+                }
+                if (Number(network.bandwidth) == 80) {
+                    data.push({"x": Number(network.channel) -16, "y": -100})
+                    data.push({"x": Number(network.channel), "y": Number(network.signal_level)})
+                    data.push({"x": Number(network.channel) +16, "y": -100})
+                }
+                if (Number(network.bandwidth) == 160) {
+                    data.push({"x": Number(network.channel) -32, "y": -100})
+                    data.push({"x": Number(network.channel), "y": Number(network.signal_level)})
+                    data.push({"x": Number(network.channel) +32, "y": -100})
+                }
+            }
+
+            let ssid = network.ssid
+            if ( ssid == "") {
+                ssid = " "
+            }
+            return series.push({
+                name: ssid,
+                data: data
+            })
+        })
+        return series;
+    }
+
+    const useChartOptions = () => {
+        const theme = useTheme();
+    
+        return {
+            chart: {
+                background: 'transparent',
+                stacked: false,
+                toolbar: {
+                    show: true
+                },
+                zoom: {
+                    enabled: false
+                },
+            },
+            title: {
+                text: 'Site Survey Results',
+            },
+            // markers: {
+            //     size: 5,
+            //     hover: {
+            //       size: 9
+            //     }
+            // },
+            colors: [
+                theme.palette.graphics.dark,
+                theme.palette.warning.main,
+                theme.palette.graphics.darkest,
+                theme.palette.graphics.main,
+                theme.palette.info.light,
+                theme.palette.graphics.lightest,
+                theme.palette.primary.main,
+                theme.palette.graphics.light,
+                theme.palette.error.light,
+                theme.palette.error.dark
+            ],
+            dataLabels: {
+                enabled: false
+            },
+            grid: {
+                //borderColor: theme.palette.divider,
+                strokeDashArray: 2,
+                xaxis: {
+                    lines: {
+                        show: true
+                    }
+                },
+                yaxis: {
+                    lines: {
+                        show: true
+                    },
+                },
+            },
+            legend: {
+                show: true,
+                showForSingleSeries: true,
+            },
+            plotOptions: {
+                area: {
+                    fillTo: 'end',
+                }
+            },
+            stroke: {
+                show: true,
+                curve: 'smooth',
+                lineCap: 'round',
+            },
+            theme: {
+                mode: theme.palette.mode
+            },
+            yaxis: {
+                min: -100,
+                max:  0,
+                labels: {
+                  formatter: function (value) {
+                    return value + ' dBm';
+                  },
+                  //offsetY: -10,
+                  style: {
+                      //colors: theme.palette.text.secondary
+                  }
+                },
+            },
+            // annotations: {
+            //     xaxis: [
+            //         {
+            //         x: 9,
+            //         x2: 10,
+            //         borderColor: '#0b54ff',
+            //         label: {
+            //             style: {
+            //             color: 'black',
+            //             },
+            //             text: 'Channel 10',
+            //             offsetX: 45,
+            //             borderColor: 'transparent',
+            //             style: {
+            //                 background: 'transparent',
+            //                 color:  theme.palette.text.secondary,
+            //                 fontSize: '17px',
+            //             },
+            //         }
+            //         }
+            //     ]
+            // },
+            // annotations: {
+            //     points: [{
+            //       x: 9,
+            //       y: -5,
+            //       label: {
+            //         borderColor: '#775DD0',
+            //         offsetY: 0,
+            //         style: {
+            //           color: '#fff',
+            //           background: '#775DD0',
+            //         },
+            //         rotate: -45,
+            //         text: 'Bananas are good',
+            //       }
+            //     }]
+            //   },
+            xaxis: {
+                // tickPlacement: 'on',
+                // tickAmount: getChannelAmount(),
+                tickPlacement: 'on',
+                labels: {
+                    show: true,
+                    style: {
+                        //colors: theme.palette.text.secondary
+                    },
+                    trim: true,
+                },
+                // max: getMaxChannel(),
+                // min: geMinChannel(),
+                // stepSize: getChannelSpacing(),
+                //type: 'category',
+                //categories: [getCategories()],
+                type: 'numeric',
+                decimalsInFloat: 0,
+            },
+            tooltip: {
+                x: {
+                    show: true,
+                    formatter: (seriesName) => "Channel "+ seriesName,
+                },
+                followCursor: false,
+                intersect: false,
+                shared: true,
+                enabled: true,
+                onDatasetHover: {
+                    highlightDataSeries: true,
+                }
+            }
+        };
+    };
 
     const chartOptions = useChartOptions();
 
@@ -181,23 +324,30 @@ export const SiteSurvey = (props) => {
         <Grid spacing={1}>
             <Grid container>
                 <Card>
-                    <Button
-                        color="inherit"
-                        size="small"
-                        disabled="true"
+                    <ToggleButtonGroup
+                    value={view}
+                    exclusive
+                    onChange={(e, value) => {
+                        setView(value)
+                    }}
                     >
-                        <SvgIcon>
-                            <ChartBarSquareIcon />
-                        </SvgIcon>
-                    </Button>
-                    <Button
-                        color="inherit"
-                        size="small"
-                    >
-                        <SvgIcon>
-                            <ListBulletIcon />
-                        </SvgIcon>
-                    </Button>
+                        <ToggleButton
+                            size="small"
+                            value="chart"
+                        >
+                            <SvgIcon>
+                                <ChartBarSquareIcon />
+                            </SvgIcon>
+                        </ToggleButton>
+                        <ToggleButton
+                            size="small"
+                            value="list"
+                        >
+                            <SvgIcon>
+                                <ListBulletIcon />
+                            </SvgIcon>
+                        </ToggleButton>
+                    </ToggleButtonGroup>
                 </Card>
             </Grid>
             <Box display="flex"
@@ -221,7 +371,7 @@ export const SiteSurvey = (props) => {
                     </RadioGroup>
                 </FormControl>
             </Box>
-            <Card sx={{ height: '100%' }}>
+            {view == "list" && <Card sx={{ height: '100%' }}>
                 <Box sx={{ minWidth: 800, }}>
                     <TableContainer sx={{ maxHeight: 600 }}>
                         <Table exportButton={true}>
@@ -273,31 +423,18 @@ export const SiteSurvey = (props) => {
                         </Table>
                     </TableContainer>
                 </Box>
-                {/* <CardContent>
-                <Chart
-                height={500}
-                options={chartOptions}
-                series={chartSeries}
-                type="bar"
-                width="100%"
-                />
-            </CardContent>
-            <Divider />
-            <CardActions sx={{ justifyContent: 'center' }}>
-            <FormControl xs={2}>
-                <RadioGroup
-                    aria-labelledby="demo-controlled-radio-buttons-group"
-                    name="controlled-radio-buttons-group"
-                    value={"2.4GHz"}
-                >
-                <Grid container>
-                    <FormControlLabel value="2.4GHz" control={<Radio />} label="2.4GHz" />
-                    <FormControlLabel value="5GHz" control={<Radio />} label="5GHz" />
-                </Grid>
-            </RadioGroup>
-            </FormControl>
-            </CardActions> */}
-            </Card>
+            </Card>}
+            {view == "chart" && <Card>
+                <CardContent>
+                    <Chart
+                    height={500}
+                    options={chartOptions}
+                    series={getSeries()}
+                    type="area"
+                    width="100%"
+                    />
+                </CardContent>
+            </Card>}
         </Grid>: <CircularProgress></CircularProgress>}
         </Stack>
     );

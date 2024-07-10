@@ -26,6 +26,7 @@ build-backend:
 	@make build -C ../backend/services/controller/build/ DOCKER_USER=${DOCKER_USER}
 	@make build -C ../backend/services/acs/build/ DOCKER_USER=${DOCKER_USER}
 	@make build -C ../backend/services/utils/socketio/build/ DOCKER_USER=${DOCKER_USER}
+	@make build -C ../backend/services/utils/file-server/build/ DOCKER_USER=${DOCKER_USER}
 	@make build -C ../backend/services/mtp/adapter/build/ DOCKER_USER=${DOCKER_USER}
 	@make build -C ../backend/services/mtp/ws-adapter/build/ DOCKER_USER=${DOCKER_USER}
 	@make build -C ../backend/services/mtp/ws/build/ DOCKER_USER=${DOCKER_USER}
@@ -43,6 +44,7 @@ release-backend:
 	@make release -C ../backend/services/controller/build/ DOCKER_USER=${DOCKER_USER}
 	@make release -C ../backend/services/acs/build/ DOCKER_USER=${DOCKER_USER}
 	@make release -C ../backend/services/utils/socketio/build/ DOCKER_USER=${DOCKER_USER}
+	@make release -C ../backend/services/utils/file-server/build/ DOCKER_USER=${DOCKER_USER}
 	@make release -C ../backend/services/mtp/adapter/build/ DOCKER_USER=${DOCKER_USER}
 	@make release -C ../backend/services/mtp/ws-adapter/build/ DOCKER_USER=${DOCKER_USER}
 	@make release -C ../backend/services/mtp/ws/build/ DOCKER_USER=${DOCKER_USER}

@@ -57,6 +57,13 @@ func (a *Api) StartApi() {
 	authentication.HandleFunc("/password", a.changePassword).Methods("PUT")
 	authentication.HandleFunc("/admin/register", a.registerAdminUser).Methods("POST")
 	authentication.HandleFunc("/admin/exists", a.adminUserExists).Methods("GET")
+	if a.enterpise.Enable {
+		mapRoutes := r.PathPrefix("/api/map").Subrouter()
+		mapRoutes.HandleFunc("", a.devicesLocation).Methods("GET")
+		mapRoutes.Use(func(handler http.Handler) http.Handler {
+			return middleware.Middleware(handler)
+		})
+	}
 	iot := r.PathPrefix("/api/device").Subrouter()
 	iot.HandleFunc("/alias", a.setDeviceAlias).Methods("PUT")
 	iot.HandleFunc("/auth", a.deviceAuth).Methods("GET", "POST", "DELETE")

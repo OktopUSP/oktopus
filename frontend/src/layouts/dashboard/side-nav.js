@@ -2,8 +2,6 @@ import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import PropTypes from 'prop-types';
 import Link from 'next/link'
-import ArrowTopRightOnSquareIcon from '@heroicons/react/24/solid/ArrowTopRightOnSquareIcon';
-import ChevronUpDownIcon from '@heroicons/react/24/solid/ChevronUpDownIcon';
 import {
   Box,
   Button,
@@ -18,11 +16,14 @@ import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
 import { items } from './config';
 import { SideNavItem } from './side-nav-item';
+import { useTheme } from '@mui/material';
 
 export const SideNav = (props) => {
   const { open, onClose } = props;
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
+
+  const theme = useTheme();
 
   const isItemActive = (currentPath, itemPath) => {
     if (currentPath === itemPath) {
@@ -34,7 +35,6 @@ export const SideNav = (props) => {
     }
 
     return false;
-    //TODO: test frontend with color of the landing page
   }
 
   const content = (
@@ -80,9 +80,9 @@ export const SideNav = (props) => {
               p: '12px'
             }}
           >
-         <Link href="https://oktopus.app.br" target="_blank">
+         <Link href="http://localhost/companylink" target="_blank">
             <div style={{display:'flex',justifyContent:'center'}}>
-              <img src="/assets/oktopus.png" 
+              <img src="http://localhost:8004/images/logo.png" 
               width={'60%'}
               />
             </div>
@@ -113,6 +113,9 @@ export const SideNav = (props) => {
             }}
           >
             {items.map((item) => {
+              if (item.title == "Map" && process.env.NEXT_PUBLIC_ENTERPRISE_VERSION != "true"){
+                return
+              }
               const active = isItemActive(pathname, item.path);
 
               return (
@@ -129,7 +132,24 @@ export const SideNav = (props) => {
             })}
           </Stack>
         </Box>
-        <Divider sx={{ borderColor: 'neutral.700' }} />
+        <Stack style={{position:"absolute", bottom:"2px", left:"2px"}} direction={"row"} spacing={"1"} zIndex={9999}>  
+        <Typography
+          align="center"
+          color="primary.contrastText"
+          component="footer"
+          variant="body2"
+          sx={{ p: 2 }}
+        >
+          Powered by
+        </Typography>
+      </Stack>
+      <a href='https://oktopus.app.br' style={{position:"absolute", bottom:"10px", left:"100px"}} target='_blank'>
+      <img 
+        src="/assets/logo.png" 
+        alt="Oktopus logo image"
+        width={80}
+        />
+      </a>
       </Box>
     </Scrollbar>
   );
@@ -141,7 +161,7 @@ export const SideNav = (props) => {
         open
         PaperProps={{
           sx: {
-            backgroundColor: 'neutral.800',
+            background: `linear-gradient(0deg, ${theme.palette.neutral["800"]} 0%, ${theme.palette.primary.dark} 90%);`,
             color: 'common.white',
             width: 280
           }
@@ -160,7 +180,7 @@ export const SideNav = (props) => {
       open={open}
       PaperProps={{
         sx: {
-          backgroundColor: 'neutral.800',
+          background: `linear-gradient(0deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 90%);`,
           color: 'common.white',
           width: 280
         }

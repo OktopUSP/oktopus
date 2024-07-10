@@ -1,13 +1,16 @@
 import PropTypes from 'prop-types';
 import NextLink from 'next/link';
 import Link from 'next/link'
-import { Box, Typography, Unstable_Grid2 as Grid } from '@mui/material';
+import { Box, Typography, Unstable_Grid2 as Grid, Stack } from '@mui/material';
 import { Logo } from 'src/components/logo';
-
-// TODO: Change subtitle text
+import { useTheme, useMediaQuery } from '@mui/material'
 
 export const Layout = (props) => {
   const { children } = props;
+  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
+  const theme = useTheme();
+
+  console.log("logUp", lgUp)
 
   return (
     <Box
@@ -60,7 +63,7 @@ export const Layout = (props) => {
           lg={6}
           sx={{
             alignItems: 'center',
-            background: 'radial-gradient(50% 50% at 50% 50%, #306D6F 0%, #255355 100%)',
+            background: `radial-gradient(50% 50% at 50% 50%, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark } 100%)`,
             color: 'white',
             display: 'flex',
             justifyContent: 'center',
@@ -70,20 +73,32 @@ export const Layout = (props) => {
           }}
         >
           <Box sx={{ p: 3 }}>
-          <Link href="https://oktopus.app.br" target="_blank">
-            <img
-              alt=""
-              src="/assets/oktopus.png"
-            />
-          </Link>
-             <Typography
-              align="center"
-              sx={{ mb: 3 }}
-            >
-            </Typography>
+            <Link href="http://localhost/companylink" target="_blank">
+              <img
+                alt=""
+                src="http://localhost:8004/images/logo.png"
+              />
+            </Link>
           </Box>
         </Grid>
       </Grid>
+      <Stack style={{position:"absolute", bottom:"2px", left:"2px"}} direction={"row"} spacing={"1"}>  
+        <Typography
+          align="center"
+          color={lgUp ? 'neutral[900]' : 'primary.contrastText'}
+          component="footer"
+          variant="body2"
+          sx={{ p: 2 }}
+        >
+          Powered by
+        </Typography>
+      </Stack>
+      <a href='https://oktopus.app.br' style={{position:"absolute", bottom:"10px", left:"100px"}} target='_blank'>
+      <img 
+        src="/assets/logo.png" 
+        alt="Oktopus logo image"
+        width={80}/>
+      </a>
     </Box>
   );
 };

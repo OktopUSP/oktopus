@@ -74,8 +74,10 @@ func defineOptions(c config.Nats) []nats.Option {
 	opts = append(opts, nats.ClosedHandler(func(nc *nats.Conn) {
 		log.Printf("Connection closed. Reason: %q\n", nc.LastError())
 	}))
-	if c.VerifyCertificates {
-		opts = append(opts, nats.RootCAs())
+	if c.EnableTls {
+		log.Printf("Load certificates: %s and %s\n", c.Cert.CertFile, c.Cert.KeyFile)
+		opts = append(opts, nats.RootCAs(c.Cert.CaFile))
+		opts = append(opts, nats.ClientCert(c.Cert.CertFile, c.Cert.KeyFile))
 	}
 
 	return opts

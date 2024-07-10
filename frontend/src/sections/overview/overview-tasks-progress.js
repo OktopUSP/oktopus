@@ -97,7 +97,7 @@ const showIcon = (mtpType) => {
           </Stack>
           <Avatar
             sx={{
-              backgroundColor: '#f28950',
+              backgroundColor: 'primary.darkest',
               height: 56,
               width: 56
             }}

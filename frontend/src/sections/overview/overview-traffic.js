@@ -70,7 +70,6 @@ const useChartOptions = (labels,title) => {
   }
   else{
     options.colors = [
-      theme.palette.primary.main,
       theme.palette.info.main,
       theme.palette.warning.main,
       theme.palette.graphics.lightest, 
