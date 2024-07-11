@@ -82,7 +82,7 @@ export const SideNav = (props) => {
           >
          <Link href="http://localhost/companylink" target="_blank">
             <div style={{display:'flex',justifyContent:'center'}}>
-              <img src="http://localhost:8004/images/logo.png" 
+              <img src="/images/logo.png" 
               width={'60%'}
               />
             </div>
