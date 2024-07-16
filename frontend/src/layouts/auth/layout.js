@@ -76,7 +76,7 @@ export const Layout = (props) => {
             <Link href="http://localhost/companylink" target="_blank">
               <img
                 alt=""
-                src="http://localhost:8004/images/logo.png"
+                src="/images/logo.png"
               />
             </Link>
           </Box>

@@ -27,10 +27,21 @@ RUN apt-get update && apt-get -y install \
         automake \
         libtool \
         libmosquitto-dev \
-        libwebsockets-dev \
         pkg-config \
         make \
+        git \
+        cmake \
+        g++ \
     && apt-get clean
+
+RUN git clone https://github.com/warmcat/libwebsockets.git /tmp/libwebsockets && \
+    cd /tmp/libwebsockets && \
+    mkdir build && \
+    cd build && \
+    cmake .. && \
+    make && \
+    make install && \
+    ldconfig
 
 FROM build-env AS runner
 

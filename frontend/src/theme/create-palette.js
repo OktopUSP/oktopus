@@ -4,7 +4,7 @@ import { error, indigo, info, neutral, success, warning, graphics } from './colo
 
 const getColorScheme = async () => {
 
-  let result = await fetch('http://localhost/custom-frontend/colors').catch((error) => {
+  let result = await fetch('/custom-frontend/colors').catch((error) => {
     console.log('Error fetching colors');
     sessionStorage.setItem('colors', JSON.stringify({
       "buttons": "#306d6f",
