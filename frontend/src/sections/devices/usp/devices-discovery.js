@@ -466,7 +466,105 @@ const [inputArgsValue, setInputArgsValue] = useState({})
 const initialize = async (raw) => {
     let content = await getDeviceParameters(raw)
     setDeviceParameters(content)
-    //initDeviceCommands(content)
+
+    await intitializeDeviceParametersValue(content)
+}
+
+const intitializeDeviceParametersValue = async (content) => {
+    // this is a workaround function to get and set DeviceParametersValue at initialize stage
+    let paramsInfo = {}
+    let commandsInfo = {}
+    let supportedParams = content.req_obj_results[0].supported_objs[0].supported_params //TODO: fixme when more then one supported_objs
+    let supportedCommands = content.req_obj_results[0].supported_objs[0].supported_commands
+    let parametersToFetch = () => {
+        let paramsToFetch = []
+        for (let i =0; i < supportedParams.length ;i++){
+
+            let supported_obj_path = content.req_obj_results[0].supported_objs[0].supported_obj_path.replaceAll("{i}","*")
+            let param = supportedParams[i]
+
+            paramsToFetch.push(supported_obj_path+param.param_name)
+
+            paramsInfo[param.param_name] = {
+                "value_change":param["value_change"],
+                "value_type":param["value_type"],
+                "access": param["access"],
+                "value": "-",
+            }
+        }
+
+        if (supportedCommands === undefined){
+            return paramsToFetch
+        }
+
+        for(let i =0; i < supportedCommands.length; i++){
+            let command = supportedCommands[i]
+            commandsInfo[command.command_name] = {
+                "type":command["command_type"]
+            }
+        }
+
+        return paramsToFetch
+    }
+
+    if (supportedParams === undefined) {
+        return
+    }
+
+    const fetchparameters = parametersToFetch()
+    console.log("parameters to fetch: ", fetchparameters)
+
+    let raw = JSON.stringify({
+        "param_paths": fetchparameters,
+        "max_depth": 1
+    })
+
+    let result = await getDeviceParametersValue(raw)
+    console.log("result:", result)
+    console.log("/-------------------------------------------------------/")
+
+    let values = {}
+    let commands = {}
+
+    console.log("VALUES:",values)
+    result.req_path_results.map((x)=>{
+        if (!x.resolved_path_results){
+            values[x.requested_path] = {}
+            setDeviceParametersValue(values)
+            return
+        }
+
+        let paths = x.requested_path.split(".")
+        if(paths[paths.length -2] == "*"){
+            x.resolved_path_results.map(y=>{
+                let key = Object.keys(y.result_params)[0]
+
+                if (!values[y.resolved_path]){
+                    values[y.resolved_path] = []
+                }
+
+                if (!commands[y.resolved_path]){
+                    commands[y.resolved_path] = []
+                }
+
+                if (y.result_params[key] == ""){
+                    y.result_params[key] = "\"\""
+                }
+
+                values[y.resolved_path].push({[key]:{...paramsInfo[key], value: y.result_params[key]}})
+            })
+        }else{
+            Object.keys(x.resolved_path_results[0].result_params).forEach((key, index) =>{
+                if (x.resolved_path_results[0].result_params[key] != ""){
+                    paramsInfo[key].value = x.resolved_path_results[0].result_params[key]
+                }else{
+                    paramsInfo[key].value = "\"\""
+                }
+                values = paramsInfo
+            })
+        }
+        setDeviceParametersValue(values)
+    })
 }
 
 const getDeviceParameters = async (raw) =>{
@@ -878,11 +976,11 @@ const getDeviceParameterInstances = async (raw) =>{
                         sx={{fontWeight:'bold'}}
                     />
                 </ListItem>
-                {   x.supported_params &&
-                    <ShowParamsWithValues 
-                    x={x} 
-                    deviceParametersValue={deviceParametersValue} 
-                    setOpen={setOpen} 
+                {   x.supported_params && Object.keys(deviceParametersValue).length > 0 &&
+                    <ShowParamsWithValues
+                    x={x}
+                    deviceParametersValue={deviceParametersValue}
+                    setOpen={setOpen}
                     setParameter={setParameter}
                     setParameterValue={setParameterValue}
                     deviceParameters={deviceParameters}
