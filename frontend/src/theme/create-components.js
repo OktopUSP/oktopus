@@ -27,7 +27,11 @@ export function createComponents(config) {
       styleOverrides: {
         root: {
           borderRadius: '12px',
-          textTransform: 'none'
+          textTransform: 'none',
+          '&:hover': {
+            backgroundColor: palette.primary.main,
+            color: palette.primary.contrastText
+          },
         },
         sizeSmall: {
           padding: '6px 16px'
@@ -222,6 +226,15 @@ export function createComponents(config) {
             'border-color',
             'box-shadow'
           ])
+        }
+      }
+    },
+    MuiFab: {
+      styleOverrides: {
+        root: {
+          '&:hover': {
+            backgroundColor: palette.primary.main,
+          },
         }
       }
     },
