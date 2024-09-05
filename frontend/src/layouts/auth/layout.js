@@ -63,7 +63,7 @@ export const Layout = (props) => {
           lg={6}
           sx={{
             alignItems: 'center',
-            background: `radial-gradient(50% 50% at 50% 50%, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark } 100%)`,
+            background: `radial-gradient(50% 50% at 50% 50%, ${theme.palette.primary.dark } 0%, ${theme.palette.neutral[800] } 100%)`,
             color: 'white',
             display: 'flex',
             justifyContent: 'center',
@@ -76,7 +76,7 @@ export const Layout = (props) => {
             <Link href="http://localhost/companylink" target="_blank">
               <img
                 alt=""
-                src="/images/logo.png"
+                src={`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/images/logo.png`}
               />
             </Link>
           </Box>
