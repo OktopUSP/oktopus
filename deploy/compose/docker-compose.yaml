@@ -168,7 +168,7 @@ services:
 
   #/* -------------------------------- Frontend -------------------------------- */
   frontend:
-    image: "oktopusp/frontend-ce"
+    image: "oktopusp/frontend"
     container_name: frontend
     ports:
       - 3000:3000
