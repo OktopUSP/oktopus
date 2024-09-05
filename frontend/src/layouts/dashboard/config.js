@@ -7,6 +7,7 @@ import ArrowDownOnSquareStackIcon from '@heroicons/react/24/solid/ArrowDownOnSqu
 import UserGroupIcon from '@heroicons/react/24/solid/UserGroupIcon'
 import KeyIcon from '@heroicons/react/24/solid/KeyIcon'
 import CpuChip from '@heroicons/react/24/solid/CpuChipIcon';
+import BriefCaseIcon from '@heroicons/react/24/outline/BriefcaseIcon';
 import { SvgIcon } from '@mui/material';
 
 export const items = [
@@ -35,10 +36,12 @@ export const items = [
         <RectangleGroupIcon color='gray'/>
       </SvgIcon>
     ),
+    tooltip: 'Upgrade to Business Plan',
     disabled: true,
     children: [
       {
         title: 'Firmware Update',
+        tooltip: 'Upgrade to Business Plan',
         icon: (
           <SvgIcon fontSize="small">
             <ArrowDownOnSquareStackIcon color='gray'/>
@@ -50,6 +53,7 @@ export const items = [
   },
   {
     title: 'Map',
+    tooltip: 'Upgrade to Business Plan',
     icon: (
       <SvgIcon fontSize="small">
         <MapIcon color='gray'/>

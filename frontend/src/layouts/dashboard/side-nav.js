@@ -133,6 +133,7 @@ export const SideNav = (props) => {
                   title={item.title}
                   children={item?.children}
                   padleft={2}
+                  tooltip={item.tooltip}
                 />
               );
             })}

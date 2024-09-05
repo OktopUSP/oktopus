@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import NextLink from 'next/link';
 import PropTypes from 'prop-types';
-import { Box, ButtonBase, Collapse, SvgIcon } from '@mui/material';
+import { Box, ButtonBase, Collapse, SvgIcon, Tooltip } from '@mui/material';
 import ChevronDownIcon from '@heroicons/react/24/outline/ChevronDownIcon';
 import ChevronUpIcon from '@heroicons/react/24/outline/ChevronUpIcon';
 import { usePathname } from 'next/navigation';
 
 export const SideNavItem = (props) => {
-  const { active = false, disabled, external, icon, path, title, children, padleft } = props;
+  const { active = false, disabled, external, icon, path, title, children, padleft, tooltip } = props;
 
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
@@ -43,6 +43,7 @@ export const SideNavItem = (props) => {
 
   return (
     <li>
+      <Tooltip title={tooltip} placement='bottom-end'>
       <ButtonBase
         sx={{
           alignItems: 'center',
@@ -63,6 +64,7 @@ export const SideNavItem = (props) => {
           }
         }}
       >
+        
         {icon && (
           <Box
             component="span"
@@ -137,6 +139,7 @@ export const SideNavItem = (props) => {
           </Box>
         }
       </ButtonBase>
+      </Tooltip>
       <Collapse in={open}>
         {
             children &&
@@ -153,6 +156,7 @@ export const SideNavItem = (props) => {
                       title={child.title}
                       children={child?.children}
                       padleft={padleft + 2}
+                      tooltip={child.tooltip}
                     />
                   );
                 })
