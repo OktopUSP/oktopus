@@ -30,17 +30,10 @@ type RestApi struct {
 	Ctx  context.Context
 }
 
-type Enterprise struct {
-	Enable          bool
-	SupportPassword string
-	SupportEmail    string
-}
-
 type Config struct {
-	RestApi    RestApi
-	Nats       Nats
-	Mongo      Mongo
-	Enterprise Enterprise
+	RestApi RestApi
+	Nats    Nats
+	Mongo   Mongo
 }
 
 type Tls struct {
@@ -62,9 +55,6 @@ func NewConfig() *Config {
 	serverCA := flag.String("server_ca", lookupEnvOrString("SERVER_CA", "rootCA.pem"), "server CA file to TLS connection")
 	flApiPort := flag.String("api_port", lookupEnvOrString("REST_API_PORT", "8000"), "Rest api port")
 	mongoUri := flag.String("mongo_uri", lookupEnvOrString("MONGO_URI", "mongodb://localhost:27017"), "uri for mongodb server")
-	enterpise := flag.Bool("enterprise", lookupEnvOrBool("ENTERPRISE", false), "enterprise version enable")
-	enterprise_support_password := flag.String("enterprise_support_password", lookupEnvOrString("ENTERPRISE_SUPPORT_PASSWORD", ""), "enterprise support password")
-	enterpise_support_email := flag.String("enterprise_support_email", lookupEnvOrString("ENTERPRISE_SUPPORT_EMAIL", ""), "enterprise support email")
 	flHelp := flag.Bool("help", false, "Help")
 
 	/*
@@ -102,11 +92,6 @@ func NewConfig() *Config {
 		Mongo: Mongo{
 			Uri: *mongoUri,
 			Ctx: ctx,
-		},
-		Enterprise: Enterprise{
-			Enable:          *enterpise,
-			SupportPassword: *enterprise_support_password,
-			SupportEmail:    *enterpise_support_email,
 		},
 	}
 }

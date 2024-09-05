@@ -29,3 +29,15 @@ type StatusCount struct {
 	Status int `bson:"_id" json:"status"`
 	Count  int `bson:"count" json:"count"`
 }
+
+type DevicesList struct {
+	Devices []Device `json:"devices" bson:"documents"`
+	Total   int64    `json:"total"`
+}
+
+type FilterOptions struct {
+	Models         []string `json:"models"`
+	ProductClasses []string `json:"productClasses"`
+	Vendors        []string `json:"vendors"`
+	Versions       []string `json:"versions"`
+}

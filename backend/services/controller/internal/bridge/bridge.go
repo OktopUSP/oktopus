@@ -153,7 +153,6 @@ func NatsReq[T entity.DataType](
 
 	err = json.Unmarshal(msg.Data, &answer)
 	if err != nil {
-
 		var errMsg *entity.MsgAnswer[*string]
 		err = json.Unmarshal(msg.Data, &errMsg)
 

@@ -17,37 +17,30 @@ import (
 )
 
 type Api struct {
-	port      string
-	js        jetstream.JetStream
-	nc        *nats.Conn
-	bridge    bridge.Bridge
-	db        db.Database
-	kv        jetstream.KeyValue
-	ctx       context.Context
-	enterpise config.Enterprise
+	port   string
+	js     jetstream.JetStream
+	nc     *nats.Conn
+	bridge bridge.Bridge
+	db     db.Database
+	kv     jetstream.KeyValue
+	ctx    context.Context
 }
 
 const REQUEST_TIMEOUT = time.Second * 30
 
 func NewApi(c *config.Config, js jetstream.JetStream, nc *nats.Conn, bridge bridge.Bridge, d db.Database, kv jetstream.KeyValue) Api {
 	return Api{
-		port:      c.RestApi.Port,
-		js:        js,
-		nc:        nc,
-		ctx:       c.RestApi.Ctx,
-		bridge:    bridge,
-		db:        d,
-		kv:        kv,
-		enterpise: c.Enterprise,
+		port:   c.RestApi.Port,
+		js:     js,
+		nc:     nc,
+		ctx:    c.RestApi.Ctx,
+		bridge: bridge,
+		db:     d,
+		kv:     kv,
 	}
 }
 
 func (a *Api) StartApi() {
-
-	if a.enterpise.SupportPassword != "" && a.enterpise.SupportEmail != "" {
-		go registerEnterpriseSupport(a.enterpise.SupportEmail, a.enterpise.SupportPassword, a.db)
-	}
-
 	r := mux.NewRouter()
 	authentication := r.PathPrefix("/api/auth").Subrouter()
 	authentication.HandleFunc("/login", a.generateToken).Methods("PUT")
@@ -57,13 +50,6 @@ func (a *Api) StartApi() {
 	authentication.HandleFunc("/password", a.changePassword).Methods("PUT")
 	authentication.HandleFunc("/admin/register", a.registerAdminUser).Methods("POST")
 	authentication.HandleFunc("/admin/exists", a.adminUserExists).Methods("GET")
-	if a.enterpise.Enable {
-		mapRoutes := r.PathPrefix("/api/map").Subrouter()
-		mapRoutes.HandleFunc("", a.devicesLocation).Methods("GET")
-		mapRoutes.Use(func(handler http.Handler) http.Handler {
-			return middleware.Middleware(handler)
-		})
-	}
 	iot := r.PathPrefix("/api/device").Subrouter()
 	iot.HandleFunc("/alias", a.setDeviceAlias).Methods("PUT")
 	iot.HandleFunc("/auth", a.deviceAuth).Methods("GET", "POST", "DELETE")
@@ -74,7 +60,7 @@ func (a *Api) StartApi() {
 	iot.HandleFunc("/cwmp/{sn}/addObject", a.cwmpAddObjectMsg).Methods("PUT")
 	iot.HandleFunc("/cwmp/{sn}/deleteObject", a.cwmpDeleteObjectMsg).Methods("PUT")
 	iot.HandleFunc("", a.retrieveDevices).Methods("GET")
-	iot.HandleFunc("/{id}", a.retrieveDevices).Methods("GET")
+	iot.HandleFunc("/filterOptions", a.filterOptions).Methods("GET")
 	iot.HandleFunc("/{sn}/{mtp}/get", a.deviceGetMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/{mtp}/add", a.deviceCreateMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/{mtp}/del", a.deviceDeleteMsg).Methods("PUT")
@@ -84,13 +70,6 @@ func (a *Api) StartApi() {
 	iot.HandleFunc("/{sn}/{mtp}/instances", a.deviceGetParameterInstances).Methods("PUT")
 	iot.HandleFunc("/{sn}/{mtp}/operate", a.deviceOperateMsg).Methods("PUT")
 	iot.HandleFunc("/{sn}/{mtp}/fw_update", a.deviceFwUpdate).Methods("PUT") //TODO: put it to work and generalize for usp and cwmp
-	if a.enterpise.Enable {
-		iot.HandleFunc("/{sn}/sitesurvey", a.deviceSiteSurvey).Methods("GET")
-		iot.HandleFunc("/{sn}/connecteddevices", a.deviceConnectedDevices).Methods("GET")
-		iot.HandleFunc("/{sn}/traceroute", a.deviceTraceRoute).Methods("GET", "PUT")
-		iot.HandleFunc("/{sn}/speedtest", a.deviceSpeedTest).Methods("PUT")
-		iot.HandleFunc("/{sn}/ping", a.devicePing).Methods("PUT", "GET")
-	}
 	iot.HandleFunc("/{sn}/wifi", a.deviceWifi).Methods("PUT", "GET")
 	dash := r.PathPrefix("/api/info").Subrouter()
 	dash.HandleFunc("/vendors", a.vendorsInfo).Methods("GET")
@@ -130,33 +109,4 @@ func (a *Api) StartApi() {
 		}
 	}()
 	log.Println("Running REST API at port", a.port)
-}
-
-func registerEnterpriseSupport(email, password string, d db.Database) {
-
-	user := db.User{
-		Email:    email,
-		Password: password,
-		Name:     "Enterprise Support",
-		Level:    db.AdminUser,
-	}
-
-	for {
-		if err := user.HashPassword(password); err != nil {
-			return
-		}
-
-		err := d.RegisterUser(user)
-		if err != nil {
-			if err == db.ErrorUserExists {
-				log.Println("Enterprise support user already registered.")
-				return
-			}
-			log.Println("Error to register enterprise support user:", err)
-			time.Sleep(time.Second * 5)
-			continue
-		}
-		log.Println("Enterprise support user registered successfully.")
-		return
-	}
 }
