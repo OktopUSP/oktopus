@@ -2,9 +2,12 @@ import ChartBarIcon from '@heroicons/react/24/solid/ChartBarIcon';
 import CogIcon from '@heroicons/react/24/solid/CogIcon';
 import ChatBubbleLeftRightIcon from '@heroicons/react/24/solid/ChatBubbleLeftRightIcon'
 import MapIcon from '@heroicons/react/24/solid/MapIcon'
+import RectangleGroupIcon from '@heroicons/react/24/solid/RectangleGroupIcon'
+import ArrowDownOnSquareStackIcon from '@heroicons/react/24/solid/ArrowDownOnSquareStackIcon'
 import UserGroupIcon from '@heroicons/react/24/solid/UserGroupIcon'
 import KeyIcon from '@heroicons/react/24/solid/KeyIcon'
 import CpuChip from '@heroicons/react/24/solid/CpuChipIcon';
+import BriefCaseIcon from '@heroicons/react/24/outline/BriefcaseIcon';
 import { SvgIcon } from '@mui/material';
 
 export const items = [
@@ -22,34 +25,48 @@ export const items = [
     path: '/devices',
     icon: (
       <SvgIcon fontSize="small">
-       <CpuChip/>
+        <CpuChip />
       </SvgIcon>
     )
   },
-  // {
-  //   title: 'Chat (beta)',
-  //   path: '/chat',
-  //   icon: (
-  //     <SvgIcon fontSize="small">
-  //      <ChatBubbleLeftRightIcon/>
-  //     </SvgIcon>
-  //   )
-  // },
-   {
-     title: 'Map',
-     path: '/map',
-     icon: (
-       <SvgIcon fontSize="small">
-        <MapIcon/>
-       </SvgIcon>
-     ),
-   },
+  {
+    title: 'Mass Actions',
+    icon: (
+      <SvgIcon fontSize="small">
+        <RectangleGroupIcon color='gray'/>
+      </SvgIcon>
+    ),
+    tooltip: 'Upgrade to Business Plan',
+    disabled: true,
+    children: [
+      {
+        title: 'Firmware Update',
+        tooltip: 'Upgrade to Business Plan',
+        icon: (
+          <SvgIcon fontSize="small">
+            <ArrowDownOnSquareStackIcon color='gray'/>
+          </SvgIcon>
+        ),
+        disabled: true
+      }
+    ]
+  },
+  {
+    title: 'Map',
+    tooltip: 'Upgrade to Business Plan',
+    icon: (
+      <SvgIcon fontSize="small">
+        <MapIcon color='gray'/>
+      </SvgIcon>
+    ),
+    disabled: true
+  },
   {
     title: 'Credentials',
     path: '/credentials',
     icon: (
       <SvgIcon fontSize="small">
-      <KeyIcon/>
+        <KeyIcon />
       </SvgIcon>
     )
   },
@@ -58,10 +75,10 @@ export const items = [
     path: '/users',
     icon: (
       <SvgIcon fontSize="small">
-      <UserGroupIcon/>
+        <UserGroupIcon />
       </SvgIcon>
     )
-   },
+  },
   {
     title: 'Settings',
     path: '/settings',

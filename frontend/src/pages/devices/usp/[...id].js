@@ -2,22 +2,32 @@ import Head from 'next/head';
 import { Box, Stack, Typography, Container, Unstable_Grid2 as Grid,
 Tab, 
 Tabs,
-SvgIcon } from '@mui/material';
+SvgIcon,
+Breadcrumbs,
+Link, 
+CircularProgress,
+Tooltip} from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useRouter } from 'next/router';
 import { DevicesRPC } from 'src/sections/devices/usp/devices-rpc';
 import { DevicesDiscovery } from 'src/sections/devices/usp/devices-discovery';
 import EnvelopeIcon from '@heroicons/react/24/outline/EnvelopeIcon';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
-import WifiIcon from '@heroicons/react/24/solid/WifiIcon';
-import { useEffect, useState } from 'react';
-import { DevicesWiFi } from 'src/sections/devices/usp/devices-wifi';
+import WifiIcon from '@heroicons/react/24/outline/WifiIcon';
+import ServerStackIcon from '@heroicons/react/24/outline/ServerStackIcon';
+import { useState } from 'react';
+import SignalIcon from '@heroicons/react/24/solid/SignalIcon';
+import DevicePhoneMobile from '@heroicons/react/24/solid/DevicePhoneMobileIcon';
+import WrenchScrewDriverIcon from '@heroicons/react/24/outline/WrenchScrewdriverIcon';
+import CommandLineIcon from '@heroicons/react/24/outline/CommandLineIcon';
 
 const Page = () => {
     const router = useRouter()
 
     const deviceID = router.query.id[0]
     const section = router.query.id[1]
+    
+    const [loading, setLoading] = useState(true)
 
     const sectionHandler = () => {
         switch(section){
@@ -25,16 +35,10 @@ const Page = () => {
                 return <DevicesRPC/>
             case "discovery":
                 return <DevicesDiscovery/>
-            // case "wifi":
-            //     return <DevicesWiFi/>
             default:
-                return <p>Hello World</p>
+                router.push(`/devices/usp/${deviceID}/discovery`)
         }
     }
-
-    useEffect(()=>{
-        console.log("deviceid:",deviceID)
-    })
   
     return(
     <>
@@ -52,18 +56,86 @@ const Page = () => {
         >
             <Container maxWidth="lg" >
                 <Stack spacing={3} >
+                    <Breadcrumbs separator="›" aria-label="breadcrumb" sx={{md: 40, mr: 20}}>
+                    {[<Link underline="hover" key="1" color="inherit" href="/devices">
+                        Devices
+                    </Link>,
+                    <Link
+                    underline="none"
+                    key="2"
+                    color="inherit"
+                    hre={`/devices/${deviceID}`}
+                    >
+                    {deviceID}
+                    </Link>]}
+                    </Breadcrumbs>
                 <Box sx={{
                 display:'flex',
                 justifyContent:'center'
                 }}
                 mb={3}>
                     <Tabs value={router.query.id[1]}  aria-label="icon label tabs example">
-                        {/* <Tab icon={<SvgIcon><WifiIcon/></SvgIcon>} iconPosition={"end"} label="Wi-Fi" onClick={()=>{router.push(`/devices/usp/${deviceID}/wifi`)}} value={"wifi"}/> */}
-                        <Tab value={"discovery"} onClick={()=>{router.push(`/devices/usp/${deviceID}/discovery`)}} icon={<SvgIcon><MagnifyingGlassIcon/></SvgIcon>} iconPosition={"end"} label="Discover Parameters" />
-                        <Tab value={"msg"} onClick={()=>{router.push(`/devices/usp/${deviceID}/msg`)}} icon={<SvgIcon><EnvelopeIcon/></SvgIcon>} iconPosition={"end"} label="Remote Messages" />
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tab 
+                        icon={<SvgIcon><WifiIcon/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Wi-Fi" 
+                        style={{cursor:"default", opacity: 0.5}}
+                        value={"wifi"}/>
+                        </Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tab 
+                            icon={<SvgIcon><SignalIcon/></SvgIcon>} 
+                            iconPosition={"end"} 
+                            label="Site Survey" 
+                            style={{cursor:"default", opacity: 0.5}} 
+                            value={"site-survey"} 
+                        />
+                        </Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tab 
+                        icon={<SvgIcon><DevicePhoneMobile/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Connected Devices" 
+                        style={{cursor:"default", opacity: 0.5}}
+                        value={"connected-devices"} 
+                        />
+                        </Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tab 
+                        icon={<SvgIcon><WrenchScrewDriverIcon/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Diagnostic" 
+                        style={{cursor:"default", opacity: 0.5}}
+                        value={"diagnostic"} /></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tab 
+                        icon={<SvgIcon><ServerStackIcon/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Ports" 
+                        style={{cursor:"default", opacity: 0.5}}
+                        value={"ports"} /></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tab 
+                        icon={<SvgIcon><CommandLineIcon/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Actions" 
+                        style={{cursor:"default", opacity: 0.5}}
+                        value={"actions"} /></Tooltip>
+                        <Tab 
+                        value={"discovery"} 
+                        onClick={()=>{router.push(`/devices/usp/${deviceID}/discovery`)}}
+                        icon={<SvgIcon><MagnifyingGlassIcon/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Discover Parameters" />
+                        <Tab 
+                        value={"msg"} 
+                        onClick={()=>{router.push(`/devices/usp/${deviceID}/msg`)}}
+                        icon={<SvgIcon><EnvelopeIcon/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Remote Messages" />
                     </Tabs>
                 </Box>
-
                 {
                    sectionHandler()
                 }

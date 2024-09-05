@@ -87,7 +87,7 @@ export const AuthProvider = (props) => {
       const user = {
         id: '5e86809283e28b96d2d38537',
         avatar: '/assets/avatars/default-avatar.png',
-        name: 'Oktopus',
+        name: window.sessionStorage.getItem('email'),
         email: 'anika.visser@devias.io',
         token: localStorage.getItem("token")
       };
@@ -123,7 +123,7 @@ export const AuthProvider = (props) => {
     const user = {
       id: '5e86809283e28b96d2d38537',
       avatar: '/assets/avatars/default-avatar.png',
-      name: 'Oktopus',
+      name: window.sessionStorage.getItem('email'),
       email: 'anika.visser@devias.io',
     };
 
@@ -169,7 +169,7 @@ export const AuthProvider = (props) => {
     const user = {
       id: '5e86809283e28b96d2d38537',
       avatar: '/assets/avatars/default-avatar.png',
-      name: 'Oktopus',
+      name: window.sessionStorage.getItem('email'),
       email: email,
       token: token
     };

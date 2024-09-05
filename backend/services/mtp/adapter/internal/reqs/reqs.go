@@ -52,18 +52,135 @@ func StartRequestsListener(ctx context.Context, nc *nats.Conn, db db.Database) {
 
 	nc.QueueSubscribe(local.ADAPTER_SUBJECT+"devices.retrieve", local.ADAPTER_QUEUE, func(msg *nats.Msg) {
 
-		var filter bson.A
+		var criteria map[string]interface{}
 
-		err := json.Unmarshal(msg.Data, &filter)
+		err := json.Unmarshal(msg.Data, &criteria)
 		if err != nil {
 			respondMsg(msg.Respond, 500, err.Error())
+		}
+
+		//log.Println(criteria)
+		propertiesFilter := bson.D{{}}
+
+		vendorFilter := criteria["vendor"]
+		if vendorFilter != nil {
+			log.Println("Vendor filter", vendorFilter)
+			propertiesFilter = append(propertiesFilter, bson.E{Key: "vendor", Value: vendorFilter})
+		}
+
+		versionFilter := criteria["version"]
+		if versionFilter != nil {
+			log.Println("Version filter", versionFilter)
+			propertiesFilter = append(propertiesFilter, bson.E{Key: "version", Value: versionFilter})
+		}
+
+		typeFilter := criteria["productClass"]
+		if typeFilter != nil {
+			log.Println("Type filter", typeFilter)
+			propertiesFilter = append(propertiesFilter, bson.E{Key: "productclass", Value: typeFilter})
+		}
+
+		aliasFilter := criteria["alias"]
+		if aliasFilter != nil {
+			log.Println("Type filter", aliasFilter)
+			propertiesFilter = append(propertiesFilter, bson.E{Key: "alias", Value: aliasFilter})
+		}
+
+		modelFilter := criteria["model"]
+		if modelFilter != nil {
+			log.Println("Model filter", modelFilter)
+			propertiesFilter = append(propertiesFilter, bson.E{Key: "model", Value: modelFilter})
+		}
+
+		statusFilter := criteria["status"]
+		if statusFilter != nil {
+			log.Println("Status filter", statusFilter)
+			propertiesFilter = append(propertiesFilter, bson.E{Key: "status", Value: statusFilter})
+		}
+
+		filter := bson.A{
+			bson.D{
+				{"$match",
+					propertiesFilter,
+				},
+			},
+			bson.D{
+				{"$facet",
+					bson.D{
+						{"totalCount",
+							bson.A{
+								bson.D{{"$count", "count"}},
+							},
+						},
+						{"documents",
+							bson.A{
+								bson.D{{"$sort", bson.D{{"status", criteria["status_order"]}}}},
+								bson.D{{"$skip", criteria["skip"]}},
+								bson.D{{"$limit", criteria["limit"]}},
+							},
+						},
+					},
+				},
+			},
+			bson.D{
+				{"$project",
+					bson.D{
+						{"totalCount",
+							bson.D{
+								{"$arrayElemAt",
+									bson.A{
+										"$totalCount.count",
+										0,
+									},
+								},
+							},
+						},
+						{"documents", 1},
+					},
+				},
+			},
 		}
 
 		devicesList, err := db.RetrieveDevices(filter)
 		if err != nil {
 			respondMsg(msg.Respond, 500, err.Error())
 		}
-		respondMsg(msg.Respond, 200, devicesList)
+		respondMsg(msg.Respond, 200, &devicesList)
+	})
+
+	nc.QueueSubscribe(local.ADAPTER_SUBJECT+"devices.delete", local.ADAPTER_QUEUE, func(msg *nats.Msg) {
+
+		var serialNumbersList []string
+
+		err := json.Unmarshal(msg.Data, &serialNumbersList)
+		if err != nil {
+			respondMsg(msg.Respond, 500, err.Error())
+		}
+
+		var criteria bson.A
+
+		for _, sn := range serialNumbersList {
+			criteria = append(criteria, bson.D{{"sn", sn}})
+		}
+
+		// Create the filter with the $or operator
+		filter := bson.D{
+			{"$or", criteria},
+		}
+
+		deletedCount, err := db.DeleteDevices(filter)
+		if err != nil {
+			respondMsg(msg.Respond, 500, err.Error())
+		}
+		respondMsg(msg.Respond, 200, deletedCount)
+	})
+
+	nc.QueueSubscribe(local.ADAPTER_SUBJECT+"devices.filterOptions", local.ADAPTER_QUEUE, func(msg *nats.Msg) {
+		result, err := db.RetrieveDeviceFilterOptions()
+		if err != nil {
+			respondMsg(msg.Respond, 500, err.Error())
+		}
+		respondMsg(msg.Respond, 200, result)
 	})
 
 	nc.QueueSubscribe(local.ADAPTER_SUBJECT+"devices.class", local.ADAPTER_QUEUE, func(msg *nats.Msg) {

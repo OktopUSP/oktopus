@@ -21,13 +21,9 @@ help:
 	@echo "release - tag image as latest and push to registry"
 
 build:
-	@docker build -t ${DOCKER_USER}/${DOCKER_APP}-ce:${DOCKER_TAG} -f Dockerfile.ce ../
-	@docker build -t ${DOCKER_USER}/${DOCKER_APP}-ee:${DOCKER_TAG} -f Dockerfile.ee ../
+	@docker build -t ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG} -f Dockerfile ../
 
 release: build
-	@docker push ${DOCKER_USER}/${DOCKER_APP}-ce:${DOCKER_TAG}
-	@docker push ${DOCKER_USER}/${DOCKER_APP}-ee:${DOCKER_TAG}
-	@docker tag ${DOCKER_USER}/${DOCKER_APP}-ce:${DOCKER_TAG} ${DOCKER_USER}/${DOCKER_APP}-ce:latest
-	@docker tag ${DOCKER_USER}/${DOCKER_APP}-ee:${DOCKER_TAG} ${DOCKER_USER}/${DOCKER_APP}-ee:latest
-	@docker push ${DOCKER_USER}/${DOCKER_APP}-ce:latest
-	@docker push ${DOCKER_USER}/${DOCKER_APP}-ee:latest
+	@docker push ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG}
+	@docker tag ${DOCKER_USER}/${DOCKER_APP}:${DOCKER_TAG} ${DOCKER_USER}/${DOCKER_APP}:latest
+	@docker push ${DOCKER_USER}/${DOCKER_APP}:latest

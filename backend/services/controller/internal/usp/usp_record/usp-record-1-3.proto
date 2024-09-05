@@ -1,0 +1,133 @@
+syntax = "proto3";
+
+//**************************************************************************
+// TR-369 USP Record Protocol Buffer Schema
+//
+//  Copyright (c) 2017-2022, Broadband Forum
+//
+//  The undersigned members have elected to grant the copyright to
+//  their contributed material used in this software:
+//    Copyright (c) 2017-2022 ARRIS Enterprises, LLC.
+//
+//  Redistribution and use in source and binary forms, with or
+//   without modification, are permitted provided that the following
+//   conditions are met:
+//
+//   1. Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//   2. Redistributions in binary form must reproduce the above
+//      copyright notice, this list of conditions and the following
+//      disclaimer in the documentation and/or other materials
+//      provided with the distribution.
+//
+//   3. Neither the name of the copyright holder nor the names of its
+//      contributors may be used to endorse or promote products
+//      derived from this software without specific prior written
+//      permission.
+//
+//   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+//   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+//   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+//   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+//   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+//   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+//   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+//   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+//   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+//   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+//   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//   The above license is used as a license under copyright only.
+//   Please reference the Forum IPR Policy for patent licensing terms
+//   <https://www.broadband-forum.org/ipr-policy>.
+//
+//   Any moral rights which are necessary to exercise under the above
+//   license grant are also deemed granted under this license.
+//
+// BBF software release registry:
+//   https://www.broadband-forum.org/software-releases
+//**************************************************************************
+
+package usp_record;
+
+option go_package="./usp-record";
+
+message Record {
+  string version = 1;
+  string to_id = 2;
+  string from_id = 3;
+  PayloadSecurity payload_security = 4;
+  bytes mac_signature = 5;  //MAC or Signature
+  bytes sender_cert = 6;
+
+  oneof record_type {
+    NoSessionContextRecord no_session_context = 7;
+    SessionContextRecord session_context = 8;
+    WebSocketConnectRecord websocket_connect = 9;
+    MQTTConnectRecord mqtt_connect = 10;
+    STOMPConnectRecord stomp_connect = 11;
+    DisconnectRecord disconnect = 12;
+    UDSConnectRecord uds_connect = 13;
+  }
+
+  enum PayloadSecurity {
+    PLAINTEXT = 0;
+    TLS12 = 1;
+  }
+}
+
+message NoSessionContextRecord {
+  bytes payload = 2;
+}
+
+message SessionContextRecord {
+  uint64 session_id = 1;
+  uint64 sequence_id = 2;
+  uint64 expected_id = 3;
+  uint64 retransmit_id = 4;
+  PayloadSARState payload_sar_state = 5;
+  PayloadSARState payloadrec_sar_state = 6;
+  repeated bytes payload = 7;
+
+  enum PayloadSARState {
+    NONE = 0; 	    //No segmentation
+    BEGIN = 1;      //Begin segmentation
+    INPROCESS = 2;  //Segmentation in process
+    COMPLETE = 3;   //Segmentation is complete
+  }
+}
+
+message WebSocketConnectRecord {
+  // An empty message
+}
+
+message MQTTConnectRecord {
+  MQTTVersion version = 1;
+  string subscribed_topic = 2;
+
+  enum MQTTVersion {
+    V3_1_1 = 0;  // Represents MQTT v3.1.1, a.k.a. v4 in the MQTT Spec
+    V5 = 1;
+  }
+}
+
+message STOMPConnectRecord {
+  STOMPVersion version = 1;
+  string subscribed_destination = 2;
+
+  enum STOMPVersion {
+    V1_2 = 0;
+  }
+}
+
+message UDSConnectRecord {
+  // An empty message
+}
+
+message DisconnectRecord {
+  string reason = 1;
+  fixed32 reason_code = 2;
+}

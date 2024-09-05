@@ -3,7 +3,6 @@ package handler
 import (
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/OktopUSP/oktopus/ws/internal/usp_record"
@@ -203,7 +202,7 @@ func ServeAgent(
 		"Sec-Websocket-Version":  {wsVersion},
 	}
 
-	deviceid := extractDeviceId(r.Header)
+	deviceid := r.URL.Query().Get("eid")
 	if deviceid == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		log.Println("Device id not found")
@@ -244,18 +243,21 @@ func ServeAgent(
 	go client.readPump(cEID)
 }
 
-// gets device id from websockets header
+/*
+   sec-websocket-extensions where deprecated at USP version 1.3
+   https://usp.technology/specification/index.htm#r-ws.10a
+   That is why the function below is commented
+*/
+/*
 func extractDeviceId(header http.Header) string {
-
-	// Header must be like that: bbf-usp-protocol; eid="<endpoint-id>" <endpoint-id> is the same ar the record.FromId/record.ToId
-	// log.Println("Header sec-websocket-extensions:", header.Get("sec-websocket-extensions"))
+	Header must be like that: bbf-usp-protocol; eid="<endpoint-id>" <endpoint-id> is the same ar the record.FromId/record.ToId
+	log.Println("Header sec-websocket-extensions:", header.Get("sec-websocket-extensions"))
 	wsHeaderExtension := header.Get("sec-websocket-extensions")
 
-	// Split the input string by double quotes
+	Split the input string by double quotes
 	deviceid := strings.Split(wsHeaderExtension, "\"")
 	if len(deviceid) < 2 {
 		return ""
 	}
-
 	return deviceid[1]
-}
+}*/

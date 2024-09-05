@@ -464,8 +464,53 @@ const [inputArgsValue, setInputArgsValue] = useState({})
 // }   
 
 const initialize = async (raw) => {
-    let content = await getDeviceParameters(raw)
-    setDeviceParameters(content)
+    // let content = await getDeviceParameters(raw)
+    // console.log("get device parameters content:", content)
+
+    // let parametersToFetch = () => {
+    //     let paramsToFetch = []
+    //     for (let i =0; i < supportedParams.length ;i++){
+            
+    //         let supported_obj_path = content.req_obj_results[0].supported_objs[0].supported_obj_path.replaceAll("{i}","*")
+    //         let param = supportedParams[i]
+            
+    //         paramsToFetch.push(supported_obj_path+param.param_name)
+
+    //         paramsInfo[param.param_name] = {
+    //             "value_change":param["value_change"],
+    //             "value_type":param["value_type"],
+    //             "access": param["access"],
+    //             "value": "-",
+    //         }
+    //     }
+
+    //     if (supportedCommands === undefined){
+    //         return paramsToFetch
+    //     }
+
+    //     for(let i =0; i < supportedCommands.length; i++){
+    //         let command = supportedCommands[i]
+    //         commandsInfo[command.command_name] = {
+    //             "type":command["command_type"]
+    //         }
+    //     }
+
+    //     return paramsToFetch
+    // }
+
+    // const fetchparameters = parametersToFetch()
+    // console.log("parameters to fetch: ", fetchparameters)
+
+    // raw = JSON.stringify({
+    //     "param_paths": fetchparameters,
+    //     "max_depth": 1
+    // })
+
+    // let values = await getDeviceParametersValue(raw),
+    updateDeviceParameters("Device.")
+    // setDeviceParametersValue(values)
+
+    // setDeviceParameters(content)
     //initDeviceCommands(content)
 }
 
@@ -786,10 +831,10 @@ const getDeviceParameterInstances = async (raw) =>{
         }
         throw new Error('Please check your email and password');
     }else if (result.status === 401){
-    router.push("/auth/login")
-}else{
-        return result.json()
-    }
+        router.push("/auth/login")
+    }else{
+            return result.json()
+        }
 
   }
 
@@ -1205,12 +1250,12 @@ const getDeviceParameterInstances = async (raw) =>{
             }}
             open={showLoading}
             >
-            <CircularProgress color="inherit" />
+            <CircularProgress />
         </Backdrop>
     </Card> 
     :
     <Box sx={{display:'flex',justifyContent:'center'}}>
-        <CircularProgress color="inherit" />
+        <CircularProgress />
     </Box>
   )
 };

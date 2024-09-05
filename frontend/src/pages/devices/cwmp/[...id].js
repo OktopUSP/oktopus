@@ -13,15 +13,12 @@ import { DevicesRPC } from 'src/sections/devices/cwmp/devices-rpc';
 import EnvelopeIcon from '@heroicons/react/24/outline/EnvelopeIcon';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import WifiIcon from '@heroicons/react/24/solid/WifiIcon';
-import WrenchScrewDriverIcon from '@heroicons/react/24/solid/WrenchScrewdriverIcon';
+import ServerStackIcon from '@heroicons/react/24/outline/ServerStackIcon';
 import SignalIcon from '@heroicons/react/24/solid/SignalIcon';
 import DevicePhoneMobile from '@heroicons/react/24/solid/DevicePhoneMobileIcon';
-import { useEffect, useState } from 'react';
+import WrenchScrewDriverIcon from '@heroicons/react/24/outline/WrenchScrewdriverIcon';
+import CommandLineIcon from '@heroicons/react/24/outline/CommandLineIcon';
 import { DevicesWiFi } from 'src/sections/devices/cwmp/devices-wifi';
-import { DevicesDiagnostic } from 'src/sections/devices/cwmp/devices-diagnostic';
-import { SiteSurvey } from 'src/sections/devices/cwmp/site-survey';
-import { ConnectedDevices } from 'src/sections/devices/cwmp/connecteddevices';
-import InformactionCircleIcon from '@heroicons/react/24/outline/InformationCircleIcon';
 
 
 const Page = () => {
@@ -29,7 +26,6 @@ const Page = () => {
 
     const deviceID = router.query.id[0]
     const section = router.query.id[1]
-    const enterpriseVersion = process.env.NEXT_PUBLIC_ENTERPRISE_VERSION === "true" ? true : false;
 
     const sectionHandler = () => {
         switch(section){
@@ -37,20 +33,10 @@ const Page = () => {
                 return <DevicesRPC/>
             case "wifi":
                 return <DevicesWiFi/>
-            case "diagnostic":
-                    return <DevicesDiagnostic/>
-            case "connected-devices":
-                return <ConnectedDevices/>
-            case "site-survey":
-                return <SiteSurvey/>
             default:
-                return <p>Hello World</p>
+                router.push(`/devices/cwmp/${deviceID}/wifi`)
         }
     }
-
-    useEffect(()=>{
-        console.log("deviceid:",deviceID)
-    })
   
     return(
     <>
@@ -92,29 +78,47 @@ const Page = () => {
                         label="Wi-Fi" 
                         onClick={()=>{router.push(`/devices/cwmp/${deviceID}/wifi`)}} 
                         value={"wifi"}/>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><SignalIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Site Survey" 
                         onClick={()=>{router.push(`/devices/cwmp/${deviceID}/site-survey`)}} 
                         value={"site-survey"} 
-                        disabled={!enterpriseVersion}/>
+                        style={{opacity:"0.5", cursor:"default"}}/></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><DevicePhoneMobile/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Connected Devices" 
+                        style={{opacity:"0.5", cursor:"default"}}
                         onClick={()=>{router.push(`/devices/cwmp/${deviceID}/connected-devices`)}} 
                         value={"connected-devices"} 
-                        disabled={!enterpriseVersion}
-                        />
-                        {/* <Tab value={"discovery"} onClick={()=>{router.push(`/devices/cwmp/${deviceID}/discovery`)}} icon={<SvgIcon><MagnifyingGlassIcon/></SvgIcon>} iconPosition={"end"} label="Discover Parameters" /> */}
+                        /></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><WrenchScrewDriverIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Diagnostic" 
                         onClick={()=>{router.push(`/devices/cwmp/${deviceID}/diagnostic`)}} 
                         value={"diagnostic"} 
-                        disabled={!enterpriseVersion}/>
+                        style={{opacity:"0.5", cursor:"default"}}/></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tab 
+                        icon={<SvgIcon><ServerStackIcon/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Ports" 
+                        onClick={()=>{router.push(`/devices/usp/${deviceID}/ports`)}}
+                        style={{opacity:"0.5", cursor:"default"}} 
+                        value={"ports"} /></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tab 
+                        icon={<SvgIcon><CommandLineIcon/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Actions" 
+                        onClick={()=>{router.push(`/devices/usp/${deviceID}/actions`)}}
+                        style={{opacity:"0.5", cursor:"default"}} 
+                        value={"actions"} /></Tooltip>
                         <Tab 
                         value={"msg"} 
                         onClick={()=>{router.push(`/devices/cwmp/${deviceID}/msg`)}} 

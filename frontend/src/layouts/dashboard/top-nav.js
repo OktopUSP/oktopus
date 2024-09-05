@@ -124,7 +124,7 @@ export const TopNav = (props) => {
           </Stack>
         </Stack>
       </Box>
-      {call.isReceivingCall && !callAccepted &&
+      {/* {call.isReceivingCall && !callAccepted &&
       <Dialog
         fullWidth={ true } 
         maxWidth={"sm"}
@@ -184,7 +184,7 @@ export const TopNav = (props) => {
           </IconButton>
         </Box>
         </DialogContent>
-      </Dialog>}
+      </Dialog>} */}
       <AccountPopover
         anchorEl={accountPopover.anchorRef.current}
         open={accountPopover.open}

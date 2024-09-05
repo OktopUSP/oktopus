@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -39,6 +40,18 @@ type Device struct {
 	Stomp        Status
 	Websockets   Status
 	Cwmp         Status
+}
+
+type DevicesList struct {
+	Devices []Device `json:"devices" bson:"documents"`
+	Total   int64    `json:"total" bson:"totalCount"`
+}
+
+type FilterOptions struct {
+	Models         []string `json:"models"`
+	ProductClasses []string `json:"productClasses"`
+	Vendors        []string `json:"vendors"`
+	Versions       []string `json:"versions"`
 }
 
 func (d *Database) CreateDevice(device Device) error {
@@ -100,32 +113,86 @@ func (d *Database) CreateDevice(device Device) error {
 	}
 	return err
 }
-func (d *Database) RetrieveDevices(filter bson.A) ([]Device, error) {
+func (d *Database) RetrieveDevices(filter bson.A) (*DevicesList, error) {
 
-	var results []Device
+	var results []DevicesList
 
 	cursor, err := d.devices.Aggregate(d.ctx, filter)
 	if err != nil {
-		return results, err
+		return nil, err
 	}
-
 	if cursor.Err() != nil {
-		return results, cursor.Err()
+		return nil, cursor.Err()
+	}
+	defer cursor.Close(d.ctx)
+	if err := cursor.All(d.ctx, &results); err != nil {
+		log.Println(err)
+		return nil, err
 	}
 
-	for cursor.Next(d.ctx) {
-		var device Device
+	//log.Printf("results: %++v", results)
 
-		err := cursor.Decode(&device)
-		if err != nil {
-			log.Println("Error to decode device info fields")
-			continue
-		}
+	return &results[0], err
+}
 
-		results = append(results, device)
+func (d *Database) RetrieveDeviceFilterOptions() (FilterOptions, error) {
+	filter := bson.A{
+		bson.D{
+			{"$group",
+				bson.D{
+					{"_id", primitive.Null{}},
+					{"vendors", bson.D{{"$addToSet", "$vendor"}}},
+					{"versions", bson.D{{"$addToSet", "$version"}}},
+					{"productClasses", bson.D{{"$addToSet", "$productclass"}}},
+					{"models", bson.D{{"$addToSet", "$model"}}},
+				},
+			},
+		},
+		bson.D{
+			{"$project",
+				bson.D{
+					{"_id", 0},
+					{"vendors", 1},
+					{"versions", 1},
+					{"productClasses", 1},
+					{"models", 1},
+				},
+			},
+		},
 	}
 
-	return results, err
+	var results []FilterOptions
+	cursor, err := d.devices.Aggregate(d.ctx, filter)
+	if err != nil {
+		log.Println(err)
+		return FilterOptions{}, err
+	}
+	defer cursor.Close(d.ctx)
+
+	if err := cursor.All(d.ctx, &results); err != nil {
+		log.Println(err)
+		return FilterOptions{}, err
+	}
+
+	if len(results) > 0 {
+		return results[0], nil
+	} else {
+		return FilterOptions{
+			Models:         []string{},
+			ProductClasses: []string{},
+			Vendors:        []string{},
+			Versions:       []string{},
+		}, nil
+	}
+}
+
+func (d *Database) DeleteDevices(filter bson.D) (int64, error) {
+
+	result, err := d.devices.DeleteMany(d.ctx, filter)
+	if err != nil {
+		log.Println(err)
+	}
+	return result.DeletedCount, err
 }
 
 func (d *Database) RetrieveDevice(sn string) (Device, error) {

@@ -2,50 +2,20 @@ import { common } from '@mui/material/colors';
 import { alpha } from '@mui/material/styles';
 import { error, indigo, info, neutral, success, warning, graphics } from './colors';
 
-const getColorScheme = async () => {
-
-  let result = await fetch('/custom-frontend/colors').catch((error) => {
-    console.log('Error fetching colors');
-    sessionStorage.setItem('colors', JSON.stringify({
-      "buttons": "#306d6f",
-      "sidebar_end": "#306d6f",
-      "sidebar_initial": "#306d6f",
-      "tables": "#306d6f",
-      "words_outside_sidebar": "#30596f",
-      "connected_mtps_color": "#f28950"
-    }));
-    location.reload();
-    return
+const getColorScheme =  () => {
+  return JSON.stringify({
+    "buttons": "#c05521",
+    "sidebar_end": "#305a85",
+    "sidebar_initial": "#173033",
+    "tables": "#214256",
+    "words_outside_sidebar": "#173033",
+    "connected_mtps_color": "#c05521"
   });
-  if (result.status!=200) {
-    console.log('Error fetching colors');
-    sessionStorage.setItem('colors', JSON.stringify({
-      "buttons": "#306d6f",
-      "sidebar_end": "#306d6f",
-      "sidebar_initial": "#306d6f",
-      "tables": "#306d6f",
-      "words_outside_sidebar": "#30596f",
-      "connected_mtps_color": "#f28950"
-    }));
-    location.reload();
-    return
-  }
-
-  let response = await result.json();
-  let fmtresponse = JSON.stringify(response);
-  sessionStorage.setItem('colors', fmtresponse);
-  location.reload();
 }
 
 export function createPalette() {
 
-  let colors = sessionStorage.getItem('colors');
-
-  if (colors !== null) {
-    console.log('colors already fetched');
-  } else {
-    getColorScheme();
-  }
+  let colors = getColorScheme();
   console.log("colors scheme:", colors);
 
   let neutralColors = neutral(colors);

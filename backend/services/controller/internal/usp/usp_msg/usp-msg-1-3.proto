@@ -1,0 +1,596 @@
+syntax = "proto3";
+
+//**************************************************************************
+// TR-369 USP Message Protocol Buffer Schema
+//
+//  Copyright (c) 2017-2022, Broadband Forum
+//
+//  The undersigned members have elected to grant the copyright to
+//  their contributed material used in this software:
+//    Copyright (c) 2017-2018 ARRIS Enterprises, LLC.
+//
+//  Redistribution and use in source and binary forms, with or
+//   without modification, are permitted provided that the following
+//   conditions are met:
+//
+//   1. Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//   2. Redistributions in binary form must reproduce the above
+//      copyright notice, this list of conditions and the following
+//      disclaimer in the documentation and/or other materials
+//      provided with the distribution.
+//
+//   3. Neither the name of the copyright holder nor the names of its
+//      contributors may be used to endorse or promote products
+//      derived from this software without specific prior written
+//      permission.
+//
+//   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+//   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+//   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+//   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+//   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+//   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+//   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+//   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+//   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+//   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+//   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//   The above license is used as a license under copyright only.
+//   Please reference the Forum IPR Policy for patent licensing terms
+//   <https://www.broadband-forum.org/ipr-policy>.
+//
+//   Any moral rights which are necessary to exercise under the above
+//   license grant are also deemed granted under this license.
+//
+// BBF software release registry:
+//   https://www.broadband-forum.org/software-releases
+//**************************************************************************
+
+package usp;
+
+option go_package="./usp-msg";
+
+message Msg {
+  Header header = 1;         // Make required in the protocol
+  Body body = 2;             // Make required in the protocol
+}
+
+
+message Header {
+  string msg_id = 1;         // Make required in the protocol
+  MsgType msg_type = 2;      // Make required in the protocol
+
+  enum MsgType {
+    ERROR = 0;
+    GET = 1;
+    GET_RESP = 2;
+    NOTIFY = 3;
+    SET = 4;
+    SET_RESP = 5;
+    OPERATE = 6;
+    OPERATE_RESP = 7;
+    ADD = 8;
+    ADD_RESP = 9;
+    DELETE = 10;
+    DELETE_RESP = 11;
+    GET_SUPPORTED_DM = 12;
+    GET_SUPPORTED_DM_RESP = 13;
+    GET_INSTANCES = 14;
+    GET_INSTANCES_RESP = 15;
+    NOTIFY_RESP = 16;
+    GET_SUPPORTED_PROTO = 17;
+    GET_SUPPORTED_PROTO_RESP = 18;
+    REGISTER = 19;
+    REGISTER_RESP = 20;
+    DEREGISTER = 21;
+    DEREGISTER_RESP = 22;
+  }
+}
+
+
+message Body {
+  oneof msg_body {
+    Request request = 1;
+    Response response = 2;
+    Error error = 3;
+  }
+}
+
+
+message Request {
+  oneof req_type {
+    Get get = 1;
+    GetSupportedDM get_supported_dm = 2;
+    GetInstances get_instances = 3;
+    Set set = 4;
+    Add add = 5;
+    Delete delete = 6;
+    Operate operate = 7;
+    Notify notify = 8;
+    GetSupportedProtocol get_supported_protocol = 9;
+    Register register = 10;
+    Deregister deregister = 11;
+  }
+}
+
+
+message Response {
+  oneof resp_type {
+    GetResp get_resp = 1;
+    GetSupportedDMResp get_supported_dm_resp = 2;
+    GetInstancesResp get_instances_resp = 3;
+    SetResp set_resp = 4;
+    AddResp add_resp = 5;
+    DeleteResp delete_resp = 6;
+    OperateResp operate_resp = 7;
+    NotifyResp notify_resp = 8;
+    GetSupportedProtocolResp get_supported_protocol_resp = 9;
+    RegisterResp register_resp = 10;
+    DeregisterResp deregister_resp = 11;
+  }
+}
+
+
+message Error {
+  fixed32 err_code = 1;
+  string err_msg = 2;
+  repeated ParamError param_errs = 3;
+
+  message ParamError {
+    string param_path = 1;
+    fixed32 err_code = 2;
+    string err_msg = 3;
+  }
+}
+
+
+message Get {
+  repeated string param_paths = 1;
+  fixed32 max_depth = 2;
+}
+
+message GetResp {
+  repeated RequestedPathResult req_path_results = 1;
+
+  message RequestedPathResult {
+    string requested_path = 1;
+    fixed32 err_code = 2;
+    string err_msg = 3;
+    repeated ResolvedPathResult resolved_path_results = 4;
+  }
+
+  message ResolvedPathResult {
+    string resolved_path = 1;
+    map<string, string> result_params = 2;
+  }
+}
+
+
+
+message GetSupportedDM {
+  repeated string obj_paths = 1;
+  bool first_level_only = 2;
+  bool return_commands = 3;
+  bool return_events = 4;
+  bool return_params = 5;
+}
+
+message GetSupportedDMResp {
+  repeated RequestedObjectResult req_obj_results = 1;
+
+  message RequestedObjectResult {
+    string req_obj_path = 1;
+    fixed32 err_code = 2;
+    string err_msg = 3;
+    string data_model_inst_uri = 4;
+    repeated SupportedObjectResult supported_objs = 5;
+  }
+
+  message SupportedObjectResult {
+    string supported_obj_path = 1;
+    ObjAccessType access = 2;
+    bool is_multi_instance = 3;
+    repeated SupportedCommandResult supported_commands = 4;
+    repeated SupportedEventResult supported_events = 5;
+    repeated SupportedParamResult supported_params = 6;
+    repeated string divergent_paths = 7;
+  }
+
+  message SupportedParamResult {
+    string param_name = 1;
+    ParamAccessType access = 2;
+    ParamValueType value_type = 3;
+    ValueChangeType value_change = 4;
+  }
+
+  message SupportedCommandResult {
+    string command_name = 1;
+    repeated string input_arg_names = 2;
+    repeated string output_arg_names = 3;
+    CmdType command_type = 4;
+  }
+
+  message SupportedEventResult {
+    string event_name = 1;
+    repeated string arg_names = 2;
+  }
+
+  enum ParamAccessType {
+    PARAM_READ_ONLY = 0;
+    PARAM_READ_WRITE = 1;
+    PARAM_WRITE_ONLY = 2;
+  }
+
+  enum ObjAccessType {
+    OBJ_READ_ONLY = 0;
+    OBJ_ADD_DELETE = 1;
+    OBJ_ADD_ONLY = 2;
+    OBJ_DELETE_ONLY = 3;
+  }
+
+  enum ParamValueType {
+    PARAM_UNKNOWN = 0;
+    PARAM_BASE_64 = 1;
+    PARAM_BOOLEAN = 2;
+    PARAM_DATE_TIME = 3;
+    PARAM_DECIMAL = 4;
+    PARAM_HEX_BINARY = 5;
+    PARAM_INT = 6;
+    PARAM_LONG = 7;
+    PARAM_STRING = 8;
+    PARAM_UNSIGNED_INT = 9;
+    PARAM_UNSIGNED_LONG = 10;
+  }
+
+  enum ValueChangeType {
+    VALUE_CHANGE_UNKNOWN = 0;
+    VALUE_CHANGE_ALLOWED = 1;
+    VALUE_CHANGE_WILL_IGNORE = 2;
+  }
+
+  enum CmdType {
+    CMD_UNKNOWN = 0;
+    CMD_SYNC = 1;
+    CMD_ASYNC = 2;
+  }
+}
+
+
+message GetInstances {
+  repeated string obj_paths = 1;
+  bool first_level_only = 2;
+}
+
+message GetInstancesResp {
+  repeated RequestedPathResult req_path_results = 1;
+
+  message RequestedPathResult {
+    string requested_path = 1;
+    fixed32 err_code = 2;
+    string err_msg = 3;
+    repeated CurrInstance curr_insts = 4;
+  }
+
+
+  message CurrInstance {
+    string instantiated_obj_path = 1;
+    map<string, string> unique_keys = 2;
+  }
+}
+
+
+message GetSupportedProtocol {
+  string controller_supported_protocol_versions = 1;
+}
+
+message GetSupportedProtocolResp {
+  string agent_supported_protocol_versions = 1;
+}
+
+
+message Add {
+  bool allow_partial = 1;
+  repeated CreateObject create_objs = 2;
+
+  message CreateObject {
+    string obj_path = 1;
+    repeated CreateParamSetting param_settings = 2;
+  }
+
+  message CreateParamSetting {
+    string param = 1;
+    string value = 2;
+    bool required = 3;
+  }
+}
+
+message AddResp {
+  repeated CreatedObjectResult created_obj_results = 1;
+
+  message CreatedObjectResult {
+    string requested_path = 1;
+    OperationStatus oper_status = 2;
+
+    message OperationStatus {
+      oneof oper_status {
+        OperationFailure oper_failure = 1;
+        OperationSuccess oper_success = 2;
+      }
+
+      message OperationFailure {
+        fixed32 err_code = 1;
+        string err_msg = 2;
+      }
+
+      message OperationSuccess {
+        string instantiated_path = 1;
+        repeated ParameterError param_errs = 2;
+        map<string, string> unique_keys = 3;
+      }
+    }
+  }
+
+  message ParameterError {
+    string param = 1;
+    fixed32 err_code = 2;
+    string err_msg = 3;
+  }
+}
+
+
+message Delete {
+  bool allow_partial = 1;
+  repeated string obj_paths = 2;
+}
+
+message DeleteResp {
+  repeated DeletedObjectResult deleted_obj_results = 1;
+
+  message DeletedObjectResult {
+    string requested_path = 1;
+    OperationStatus oper_status = 2;
+
+    message OperationStatus {
+      oneof oper_status {
+        OperationFailure oper_failure = 1;
+        OperationSuccess oper_success = 2;
+      }
+
+      message OperationFailure {
+        fixed32 err_code = 1;
+        string err_msg = 2;
+      }
+
+      message OperationSuccess {
+        repeated string affected_paths = 1;
+        repeated UnaffectedPathError unaffected_path_errs = 2;
+      }
+    }
+  }
+
+  message UnaffectedPathError {
+    string unaffected_path = 1;
+    fixed32 err_code = 2;
+    string err_msg = 3;
+  }
+}
+
+
+message Set {
+  bool allow_partial = 1;
+  repeated UpdateObject update_objs = 2;
+
+  message UpdateObject {
+    string obj_path = 1;
+    repeated UpdateParamSetting param_settings = 2;
+  }
+
+  message UpdateParamSetting {
+    string param = 1;
+    string value = 2;
+    bool required = 3;
+  }
+}
+
+message SetResp {
+  repeated UpdatedObjectResult updated_obj_results = 1;
+
+  message UpdatedObjectResult {
+    string requested_path = 1;
+    OperationStatus oper_status = 2;
+
+    message OperationStatus {
+      oneof oper_status {
+        OperationFailure oper_failure = 1;
+        OperationSuccess oper_success = 2;
+      }
+
+      message OperationFailure {
+        fixed32 err_code = 1;
+        string err_msg = 2;
+        repeated UpdatedInstanceFailure updated_inst_failures = 3;
+      }
+
+      message OperationSuccess {
+        repeated UpdatedInstanceResult updated_inst_results = 1;
+      }
+    }
+  }
+
+  message UpdatedInstanceFailure {
+    string affected_path = 1;
+    repeated ParameterError param_errs = 2;
+  }
+
+  message UpdatedInstanceResult {
+    string affected_path = 1;
+    repeated ParameterError param_errs = 2;
+    map<string, string> updated_params = 3;
+  }
+
+  message ParameterError {
+    string param = 1;
+    fixed32 err_code = 2;
+    string err_msg = 3;
+  }
+}
+
+message Operate {
+  string command = 1;
+  string command_key = 2;
+  bool send_resp = 3;
+  map<string, string> input_args = 4;
+}
+
+message OperateResp {
+  repeated OperationResult operation_results = 1;
+
+  message OperationResult {
+    string executed_command = 1;
+    oneof operation_resp {
+      string req_obj_path = 2;
+      OutputArgs req_output_args = 3;
+      CommandFailure cmd_failure = 4;
+    }
+
+    message OutputArgs {
+      map<string, string> output_args = 1;
+    }
+
+    message CommandFailure {
+      fixed32 err_code = 1;
+      string err_msg = 2;
+    }
+  }
+}
+
+message Notify {
+  string subscription_id = 1;
+  bool send_resp = 2;
+  oneof notification {
+    Event event = 3;
+    ValueChange value_change = 4;
+    ObjectCreation obj_creation = 5;
+    ObjectDeletion obj_deletion = 6;
+    OperationComplete oper_complete = 7;
+    OnBoardRequest on_board_req = 8;
+  }
+
+  message Event {
+    string obj_path = 1;
+    string event_name = 2;
+    map<string, string> params = 3;
+  }
+
+  message ValueChange {
+    string param_path = 1;
+    string param_value = 2;
+  }
+
+  message ObjectCreation {
+    string obj_path = 1;
+    map<string, string> unique_keys = 2;
+  }
+
+  message ObjectDeletion {
+    string obj_path = 1;
+  }
+
+  message OperationComplete {
+    string obj_path = 1;
+    string command_name = 2;
+    string command_key = 3;
+    oneof operation_resp {
+      OutputArgs req_output_args = 4;
+      CommandFailure cmd_failure = 5;
+    }
+
+    message OutputArgs {
+      map<string, string> output_args = 1;
+    }
+
+    message CommandFailure {
+      fixed32 err_code = 1;
+      string err_msg = 2;
+    }
+  }
+
+  message OnBoardRequest {
+    string oui = 1;
+    string product_class = 2;
+    string serial_number = 3;
+    string agent_supported_protocol_versions = 4;
+  }
+}
+
+message NotifyResp {
+  string subscription_id = 1;
+}
+
+message Register {
+  bool allow_partial = 1;
+  repeated RegistrationPath reg_paths = 2;
+
+  message RegistrationPath {
+    string path = 1;
+  }
+}
+
+message RegisterResp {
+  repeated RegisteredPathResult registered_path_results = 1;
+
+  message RegisteredPathResult {
+    string requested_path = 1;
+    OperationStatus oper_status = 2;
+
+    message OperationStatus {
+      oneof oper_status {
+        OperationFailure oper_failure = 1;
+        OperationSuccess oper_success = 2;
+      }
+
+      message OperationFailure {
+        fixed32 err_code = 1;
+        string err_msg = 2;
+      }
+
+      message OperationSuccess {
+        string registered_path = 1;
+      }
+    }
+  }
+}
+
+message Deregister {
+  repeated string paths = 1;
+}
+
+message DeregisterResp {
+  repeated DeregisteredPathResult deregistered_path_results = 1;
+
+  message DeregisteredPathResult {
+    string requested_path = 1;
+    OperationStatus oper_status = 2;
+
+    message OperationStatus {
+      oneof oper_status {
+        OperationFailure oper_failure = 1;
+        OperationSuccess oper_success = 2;
+      }
+
+      message OperationFailure {
+        fixed32 err_code = 1;
+        string err_msg = 2;
+      }
+
+      message OperationSuccess {
+        repeated string deregistered_path = 1;
+      }
+    }
+  }
+}
