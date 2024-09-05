@@ -7,5 +7,5 @@ Oktopus is an Open Source USP Controller and CWMP compatible multi-vendor manage
 </p>
 
 <h1>Documentation</h1>
-<li><a href="https://oktopus.app.br/#portfolio"> Official Website</a></li>
+<li><a href="https://oktopus.app.br/controller"> Official Website</a></li>
 <li><a href="https://docs.oktopus.app.br"> Official Documentation</a></li>
