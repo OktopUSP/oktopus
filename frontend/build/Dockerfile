@@ -2,14 +2,12 @@ FROM node:18.18.0-alpine as builder
 
 WORKDIR /app
 
-ARG GOOGLE_MAPS_API_KEY 
-
 COPY ../ ./
 RUN rm .env && rm .env.local || true
 
-RUN npm install
+RUN npm install 
 
-RUN NEXT_PUBLIC_ENTERPRISE_VERSION="true" NEXT_PUBLIC_GOOGLE_MAPS_KEY=${GOOGLE_MAPS_API_KEY} npm run build
+RUN npm run build
 
 FROM node:18.18.0-alpine as runner
 

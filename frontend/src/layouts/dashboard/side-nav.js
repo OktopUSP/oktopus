@@ -113,9 +113,6 @@ export const SideNav = (props) => {
             }}
           >
             {items.map((item) => {
-              if (item.title == "Map" && process.env.NEXT_PUBLIC_ENTERPRISE_VERSION != "true"){
-                return
-              }
               const active = isItemActive(pathname, item.path);
 
               return (
