@@ -78,42 +78,47 @@ const Page = () => {
                         label="Wi-Fi" 
                         onClick={()=>{router.push(`/devices/cwmp/${deviceID}/wifi`)}} 
                         value={"wifi"}/>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><SignalIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Site Survey" 
                         onClick={()=>{router.push(`/devices/cwmp/${deviceID}/site-survey`)}} 
                         value={"site-survey"} 
-                        disabled={true}/>
+                        style={{opacity:"0.5", cursor:"default"}}/></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><DevicePhoneMobile/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Connected Devices" 
-                        disabled={true}
+                        style={{opacity:"0.5", cursor:"default"}}
                         onClick={()=>{router.push(`/devices/cwmp/${deviceID}/connected-devices`)}} 
                         value={"connected-devices"} 
-                        />
+                        /></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><WrenchScrewDriverIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Diagnostic" 
                         onClick={()=>{router.push(`/devices/cwmp/${deviceID}/diagnostic`)}} 
                         value={"diagnostic"} 
-                        disabled={true}/>
+                        style={{opacity:"0.5", cursor:"default"}}/></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><ServerStackIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Ports" 
                         onClick={()=>{router.push(`/devices/usp/${deviceID}/ports`)}}
-                        disabled={true} 
-                        value={"ports"} />
+                        style={{opacity:"0.5", cursor:"default"}} 
+                        value={"ports"} /></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><CommandLineIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Actions" 
                         onClick={()=>{router.push(`/devices/usp/${deviceID}/actions`)}}
-                        disabled={true} 
-                        value={"actions"} />
+                        style={{opacity:"0.5", cursor:"default"}} 
+                        value={"actions"} /></Tooltip>
                         <Tab 
                         value={"msg"} 
                         onClick={()=>{router.push(`/devices/cwmp/${deviceID}/msg`)}} 

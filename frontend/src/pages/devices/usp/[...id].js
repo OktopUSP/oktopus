@@ -75,51 +75,53 @@ const Page = () => {
                 }}
                 mb={3}>
                     <Tabs value={router.query.id[1]}  aria-label="icon label tabs example">
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><WifiIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Wi-Fi" 
-                        onClick={()=>{router.push(`/devices/usp/${deviceID}/wifi`)}}
-                        disabled={true} 
+                        style={{cursor:"default", opacity: 0.5}}
                         value={"wifi"}/>
+                        </Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                             icon={<SvgIcon><SignalIcon/></SvgIcon>} 
                             iconPosition={"end"} 
                             label="Site Survey" 
-                            style={{opacity:"0.5"}}
-                            onClick={()=>{router.push(`/devices/usp/${deviceID}/site-survey`)}}
-                            disabled={true} 
+                            style={{cursor:"default", opacity: 0.5}} 
                             value={"site-survey"} 
                         />
+                        </Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><DevicePhoneMobile/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Connected Devices" 
-                        onClick={()=>{router.push(`/devices/usp/${deviceID}/connected-devices`)}}
-                        disabled={true} 
+                        style={{cursor:"default", opacity: 0.5}}
                         value={"connected-devices"} 
                         />
+                        </Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><WrenchScrewDriverIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Diagnostic" 
-                        onClick={()=>{router.push(`/devices/usp/${deviceID}/diagnostic`)}}
-                        disabled={true} 
-                        value={"diagnostic"} />
+                        style={{cursor:"default", opacity: 0.5}}
+                        value={"diagnostic"} /></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><ServerStackIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Ports" 
-                        onClick={()=>{router.push(`/devices/usp/${deviceID}/ports`)}}
-                        disabled={true} 
-                        value={"ports"} />
+                        style={{cursor:"default", opacity: 0.5}}
+                        value={"ports"} /></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><CommandLineIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Actions" 
-                        onClick={()=>{router.push(`/devices/usp/${deviceID}/actions`)}}
-                        disabled={true} 
-                        value={"actions"} />
+                        style={{cursor:"default", opacity: 0.5}}
+                        value={"actions"} /></Tooltip>
                         <Tab 
                         value={"discovery"} 
                         onClick={()=>{router.push(`/devices/usp/${deviceID}/discovery`)}}
