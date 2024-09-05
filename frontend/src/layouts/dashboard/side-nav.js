@@ -5,8 +5,12 @@ import Link from 'next/link'
 import {
   Box,
   Button,
+  Collapse,
   Divider,
   Drawer,
+  List,
+  ListItemButton,
+  ListItemText,
   Stack,
   SvgIcon,
   Typography,
@@ -30,7 +34,7 @@ export const SideNav = (props) => {
       return true;
     }
 
-    if (currentPath.includes(itemPath) && itemPath !== '/') {
+    if (currentPath.includes(itemPath) && itemPath !== '/' && itemPath !== '/mass-actions') {
       return true;
     }
 
@@ -82,7 +86,7 @@ export const SideNav = (props) => {
           >
          <Link href="http://localhost/companylink" target="_blank">
             <div style={{display:'flex',justifyContent:'center'}}>
-              <img src="/images/logo.png" 
+              <img src={`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/images/logo.png`} 
               width={'60%'}
               />
             </div>
@@ -113,6 +117,9 @@ export const SideNav = (props) => {
             }}
           >
             {items.map((item) => {
+              if (item.title == "Map" && process.env.NEXT_PUBLIC_ENTERPRISE_VERSION != "true"){
+                return
+              }
               const active = isItemActive(pathname, item.path);
 
               return (
@@ -124,9 +131,43 @@ export const SideNav = (props) => {
                   key={item.title}
                   path={item.path}
                   title={item.title}
+                  children={item?.children}
+                  padleft={2}
                 />
               );
             })}
+            <Collapse in={open} timeout="auto" unmountOnExit> 
+              <Box
+                component="span"
+                sx={{
+                  color: 'neutral.400',
+                  flexGrow: 1,
+                  fontFamily: (theme) => theme.typography.fontFamily,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  lineHeight: '24px',
+                  whiteSpace: 'nowrap',
+                  ...(true && {
+                    color: 'common.white'
+                  }),
+                  ...(false && {
+                    color: 'neutral.500'
+                  })
+                }}
+              >
+                {""}
+              </Box>
+            </Collapse>
+            {/* <List>
+              <Collapse in={true}>
+                <List disablePadding>
+                <ListItemButton sx={{ pl: 4 }}>
+                  <ListItemText primary="Starred" />
+                  oi
+                </ListItemButton>
+                </List>
+              </Collapse>
+            </List> */}
           </Stack>
         </Box>
         <Stack style={{position:"absolute", bottom:"2px", left:"2px"}} direction={"row"} spacing={"1"} zIndex={9999}>  
@@ -158,8 +199,7 @@ export const SideNav = (props) => {
         open
         PaperProps={{
           sx: {
-            background: `linear-gradient(0deg, ${theme.palette.neutral["800"]} 0%, ${theme.palette.primary.dark} 90%);`,
-            color: 'common.white',
+            background: `linear-gradient(120deg, ${theme.palette.neutral["800"]} 0%, ${theme.palette.primary.dark} 90%);`,
             width: 280
           }
         }}
@@ -177,7 +217,7 @@ export const SideNav = (props) => {
       open={open}
       PaperProps={{
         sx: {
-          background: `linear-gradient(0deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 90%);`,
+          background: `linear-gradient(120deg, ${theme.palette.neutral["800"]} 0%, ${theme.palette.primary.dark}  90%);`,
           color: 'common.white',
           width: 280
         }
