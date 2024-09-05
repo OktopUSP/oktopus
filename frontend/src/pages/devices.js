@@ -426,10 +426,10 @@ const Page = () => {
         }}
       >
         <Container maxWidth="xl" >
-          <Stack spacing={3}>
+          <Stack spacing={1}>
             <Grid
               container
-              spacing={2}
+              spacing={1}
               py={1}
             >
               <Grid xs={4} item>
@@ -698,7 +698,7 @@ const Page = () => {
                             }
                           </Table>
                         </TableContainer>
-                        {(pages.lenght > 0) && total && <TablePagination 
+                        {(pages > 0) && total && <TablePagination 
                           rowsPerPageOptions={rowsPerPageOptions}
                           component="div"
                           count={total}
