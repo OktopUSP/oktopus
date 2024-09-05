@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-stomp/stomp/v3"
-	"github.com/go-stomp/stomp/v3/frame"
 	"github.com/nats-io/nats.go"
 	"github.com/oktopUSP/oktopus/backend/services/mtp/stomp-adapter/internal/config"
+	"github.com/oktopUSP/oktopus/backend/services/mtp/stomp-adapter/internal/stomp"
+	"github.com/oktopUSP/oktopus/backend/services/mtp/stomp-adapter/internal/stomp/frame"
 	"golang.org/x/sys/unix"
 )
 
