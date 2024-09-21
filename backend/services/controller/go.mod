@@ -8,7 +8,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/joho/godotenv v1.5.1
 	github.com/nats-io/nats.go v1.33.1
-	github.com/rs/cors v1.9.0
+	github.com/rs/cors v1.11.0
 	go.mongodb.org/mongo-driver v1.11.3
 	golang.org/x/crypto v0.24.0
 	golang.org/x/net v0.26.0
