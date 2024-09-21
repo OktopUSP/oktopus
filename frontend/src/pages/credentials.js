@@ -352,7 +352,8 @@ const Page = () => {
             }
           }>Cancel</Button>
           <Button onClick={()=>{
-            console.log("new user data: ", newDeviceData)
+            const { password, ...nonSensitiveData } = newDeviceData;
+            console.log("new user data: ", nonSensitiveData)
             if (newDeviceData.id === undefined || newDeviceData.id === "") {
               setIsUsernameEmpty(true)
               return
