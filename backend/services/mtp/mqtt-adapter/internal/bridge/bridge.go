@@ -96,7 +96,7 @@ func (b *Bridge) StartBridge(serverUrl, clientId string) {
 
 	log.Println("MQTT client id:", pahoClientConfig.ClientID)
 	log.Println("MQTT username:", b.Mqtt.Username)
-	log.Println("MQTT password:", b.Mqtt.Password)
+	log.Println("MQTT password: [REDACTED]")
 
 	cm, err := autopaho.NewConnection(b.Ctx, autopahoClientConfig)
 	if err != nil {
