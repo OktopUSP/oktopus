@@ -406,7 +406,7 @@ const Page = () => {
             }
           }>Cancel</Button>
           <Button onClick={()=>{
-            console.log("new user data: ", newUserData)
+            // console.log("new user data: ", newUserData) // Removed to prevent logging sensitive information
             if (newUserData.password === undefined || newUserData.password === "") {
               setIsPasswordEmpty(true)
               return
