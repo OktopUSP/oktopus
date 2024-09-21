@@ -63,7 +63,7 @@ export const CredentialsTable = (props) => {
         ...newData
       }))
     })
-    console.log("showPassword: "+ showPassword)
+    // console.log("showPassword: "+ showPassword)
   },[])
   
   return (
