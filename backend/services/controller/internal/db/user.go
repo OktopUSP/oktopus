@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
+	"regexp"
 )
 
 type UserLevels int32
@@ -41,6 +42,9 @@ func (d *Database) RegisterUser(user User) error {
 }
 
 func (d *Database) UpdatePassword(user User) error {
+	if !validEmail(user.Email) {
+		return errors.New("invalid email format")
+	}
 	_, err := d.users.UpdateOne(d.ctx, bson.D{{"email", user.Email}}, bson.D{{"$set", bson.D{{"password", user.Password}}}})
 	return err
 }
@@ -83,4 +87,10 @@ func (user *User) CheckPassword(providedPassword string) error {
 		return err
 	}
 	return nil
+}
+
+func validEmail(email string) bool {
+	// Simple regex for email validation
+	re := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+	return re.MatchString(email)
 }
