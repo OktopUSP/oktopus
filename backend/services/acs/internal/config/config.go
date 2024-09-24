@@ -83,7 +83,7 @@ func NewConfig() *Config {
 
 	ctx := context.TODO()
 
-	log.Printf("Connection Request User: %q and Password: %q", *connReqUser, *connReqPasswd)
+	log.Printf("Connection Request User: %q", *connReqUser)
 
 	return &Config{
 		Nats: Nats{
