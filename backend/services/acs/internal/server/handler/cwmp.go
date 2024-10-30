@@ -80,6 +80,8 @@ func (h *Handler) CwmpHandler(w http.ResponseWriter, r *http.Request) {
 			h.pub(NATS_CWMP_SUBJECT_PREFIX+sn+".info", tmp)
 		}
 
+		cpe.ConnectionRequestURL = Inform.GetConnectionRequest() // Update connection request URL, in case the CPE changed IP
+
 		log.Printf("Received an Inform from device %s withEventCodes %s", addr, Inform.GetEvents())
 
 		expiration := time.Now().AddDate(0, 0, 1)
