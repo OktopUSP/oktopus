@@ -94,11 +94,10 @@ export const items = [
       },
       {
         title: 'Users',
-        disabled: true,
-        tooltip: 'Upgrade to Business Plan',
+        path: '/access-control/users',
         icon: (
           <SvgIcon fontSize="small">
-           <UserIcon color='gray'/>
+           <UserIcon/>
           </SvgIcon>
         )
       },
