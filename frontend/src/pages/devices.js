@@ -172,7 +172,8 @@ const Page = () => {
   }
 
   const getDeviceProtocol = (order) => {
-    if (order.Cwmp != null) {
+    console.log("order:", order)
+    if (order.Cwmp == 2) {
       return "cwmp"
     } else {
       return "usp"
