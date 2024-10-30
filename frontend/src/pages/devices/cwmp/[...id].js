@@ -19,6 +19,9 @@ import DevicePhoneMobile from '@heroicons/react/24/solid/DevicePhoneMobileIcon';
 import WrenchScrewDriverIcon from '@heroicons/react/24/outline/WrenchScrewdriverIcon';
 import CommandLineIcon from '@heroicons/react/24/outline/CommandLineIcon';
 import { DevicesWiFi } from 'src/sections/devices/cwmp/devices-wifi';
+import ArrowTrendingUpIcon from '@heroicons/react/24/outline/ArrowTrendingUpIcon';
+import DocumentTextIcon from '@heroicons/react/24/outline/DocumentTextIcon';
+import MapPinIcon from '@heroicons/react/24/outline/MapPinIcon';
 
 
 const Page = () => {
@@ -52,7 +55,7 @@ const Page = () => {
                 py: 0,
             }}
         >
-            <Container maxWidth="lg">
+            <Container maxWidth="xg">
             <Stack spacing={3} mb={3}>
                 <Breadcrumbs separator="›" aria-label="breadcrumb" ml={10}>
                 {[<Link underline="hover" key="1" color="inherit" href="/devices">
@@ -79,8 +82,7 @@ const Page = () => {
                         label="Wi-Fi" 
                         onClick={()=>{router.push(`/devices/cwmp/${deviceID}/wifi`)}} 
                         value={"wifi"}
-                        disabled
-                        /></Tooltip>
+                        style={{opacity:"0.5", cursor:"default"}}/></Tooltip>
                         <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><SignalIcon/></SvgIcon>} 
@@ -111,23 +113,47 @@ const Page = () => {
                         icon={<SvgIcon><ServerStackIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Ports" 
-                        onClick={()=>{router.push(`/devices/usp/${deviceID}/ports`)}}
+                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/ports`)}}
                         style={{opacity:"0.5", cursor:"default"}} 
                         value={"ports"} /></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tab 
+                        icon={<SvgIcon><ArrowTrendingUpIcon/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Historic" 
+                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/historic`)}} 
+                        value={"historic"} 
+                        style={{opacity:"0.5", cursor:"default"}}/></Tooltip>
                         <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><CommandLineIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Actions" 
-                        onClick={()=>{router.push(`/devices/usp/${deviceID}/actions`)}}
+                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/actions`)}}
                         style={{opacity:"0.5", cursor:"default"}} 
                         value={"actions"} /></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tab 
+                        icon={<SvgIcon><DocumentTextIcon/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Logs" 
+                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/logs`)}}
+                        style={{opacity:"0.5", cursor:"default"}} 
+                        value={"logs"} /></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tab 
+                        icon={<SvgIcon><MapPinIcon/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Location" 
+                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/location`)}}
+                        style={{opacity:"0.5", cursor:"default"}} 
+                        value={"location"} /></Tooltip>
                         <Tab 
                         value={"msg"} 
                         onClick={()=>{router.push(`/devices/cwmp/${deviceID}/msg`)}} 
                         icon={<SvgIcon><EnvelopeIcon/></SvgIcon>} 
                         iconPosition={"end"} 
-                        label="Remote Messages" />
+                        label="Messages" />
                     </Tabs>
                 </Box>
                 </Stack>
