@@ -61,6 +61,16 @@ func sendUspMsg(msg usp_msg.Msg, sn string, w http.ResponseWriter, nc *nats.Conn
 	}
 
 	body := receivedMsg.Body.GetResponse()
+	if body == nil {
+		errorMsg := receivedMsg.Body.GetError()
+		if errorMsg == nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Println("No response body or error")
+			return nil
+		}
+		w.Write(utils.Marshall(errorMsg))
+		return nil
+	}
 
 	switch body.RespType.(type) {
 	case *usp_msg.Response_GetResp:
