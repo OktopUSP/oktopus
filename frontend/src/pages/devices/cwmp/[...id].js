@@ -80,7 +80,6 @@ const Page = () => {
                         icon={<SvgIcon><WifiIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Wi-Fi" 
-                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/wifi`)}} 
                         value={"wifi"}
                         style={{opacity:"0.5", cursor:"default"}}/></Tooltip>
                         <Tooltip title="Upgrade to Business Plan" placement="bottom">
@@ -88,7 +87,6 @@ const Page = () => {
                         icon={<SvgIcon><SignalIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Site Survey" 
-                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/site-survey`)}} 
                         value={"site-survey"} 
                         style={{opacity:"0.5", cursor:"default"}}/></Tooltip>
                         <Tooltip title="Upgrade to Business Plan" placement="bottom">
@@ -97,7 +95,6 @@ const Page = () => {
                         iconPosition={"end"} 
                         label="Connected Devices" 
                         style={{opacity:"0.5", cursor:"default"}}
-                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/connected-devices`)}} 
                         value={"connected-devices"} 
                         /></Tooltip>
                         <Tooltip title="Upgrade to Business Plan" placement="bottom">
@@ -105,7 +102,6 @@ const Page = () => {
                         icon={<SvgIcon><WrenchScrewDriverIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Diagnostic" 
-                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/diagnostic`)}} 
                         value={"diagnostic"} 
                         style={{opacity:"0.5", cursor:"default"}}/></Tooltip>
                         <Tooltip title="Upgrade to Business Plan" placement="bottom">
@@ -113,7 +109,6 @@ const Page = () => {
                         icon={<SvgIcon><ServerStackIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Ports" 
-                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/ports`)}}
                         style={{opacity:"0.5", cursor:"default"}} 
                         value={"ports"} /></Tooltip>
                         <Tooltip title="Upgrade to Business Plan" placement="bottom">
@@ -121,7 +116,6 @@ const Page = () => {
                         icon={<SvgIcon><ArrowTrendingUpIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Historic" 
-                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/historic`)}} 
                         value={"historic"} 
                         style={{opacity:"0.5", cursor:"default"}}/></Tooltip>
                         <Tooltip title="Upgrade to Business Plan" placement="bottom">
@@ -129,7 +123,6 @@ const Page = () => {
                         icon={<SvgIcon><CommandLineIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Actions" 
-                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/actions`)}}
                         style={{opacity:"0.5", cursor:"default"}} 
                         value={"actions"} /></Tooltip>
                         <Tooltip title="Upgrade to Business Plan" placement="bottom">
@@ -137,7 +130,6 @@ const Page = () => {
                         icon={<SvgIcon><DocumentTextIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Logs" 
-                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/logs`)}}
                         style={{opacity:"0.5", cursor:"default"}} 
                         value={"logs"} /></Tooltip>
                         <Tooltip title="Upgrade to Business Plan" placement="bottom">
@@ -145,7 +137,6 @@ const Page = () => {
                         icon={<SvgIcon><MapPinIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Location" 
-                        onClick={()=>{router.push(`/devices/cwmp/${deviceID}/location`)}}
                         style={{opacity:"0.5", cursor:"default"}} 
                         value={"location"} /></Tooltip>
                         <Tab 
