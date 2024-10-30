@@ -9,9 +9,10 @@ import { useNProgress } from 'src/hooks/use-nprogress';
 import { createTheme } from 'src/theme';
 import { createEmotionCache } from 'src/utils/create-emotion-cache';
 import 'simplebar-react/dist/simplebar.min.css';
-import { WsProvider } from 'src/contexts/socketio-context';
 import '../utils/map.css';
 import { useEffect, useState } from 'react';
+import { BackendProvider } from 'src/contexts/backend-context';
+import { AlertProvider } from 'src/contexts/error-context';
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -33,7 +34,7 @@ const App = (props) => {
     <CacheProvider value={emotionCache}>
       <Head>
         <title>
-          Oktopus | TR-369 Controller
+          Oktopus | Controller
         </title>
         <meta
           name="viewport"
@@ -42,16 +43,22 @@ const App = (props) => {
       </Head>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <AuthProvider>
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
-              <AuthConsumer>
-                {
-                  (auth) => auth.isLoading
-                    ? <SplashScreen />
-                    : getLayout(<Component {...pageProps} />)
-                }
-              </AuthConsumer>
-            </ThemeProvider>
+          {/* <WsProvider> */}
+          <AlertProvider>
+            <BackendProvider>
+                <ThemeProvider theme={theme}>
+                  <CssBaseline />
+                  <AuthConsumer>
+                    {
+                      (auth) => auth.isLoading
+                        ? <SplashScreen />
+                        : getLayout(<Component {...pageProps} />)
+                    }
+                  </AuthConsumer>
+                </ThemeProvider>
+            </BackendProvider>
+          </AlertProvider>
+          {/* </WsProvider> */}
         </AuthProvider>
       </LocalizationProvider>
     </CacheProvider>
