@@ -4,6 +4,8 @@ import { styled } from '@mui/material/styles';
 import { withAuthGuard } from 'src/hocs/with-auth-guard';
 import { SideNav } from './side-nav';
 import { TopNav } from './top-nav';
+import { useAlertContext } from 'src/contexts/error-context';
+import { Alert, AlertTitle, Snackbar } from '@mui/material';
 
 const SIDE_NAV_WIDTH = 280;
 
@@ -27,6 +29,8 @@ export const Layout = withAuthGuard((props) => {
   const { children } = props;
   const pathname = usePathname();
   const [openNav, setOpenNav] = useState(false);
+
+  const {alert, setAlert} = useAlertContext();
 
   const handlePathnameChange = useCallback(
     () => {
@@ -57,6 +61,21 @@ export const Layout = withAuthGuard((props) => {
           {children}
         </LayoutContainer>
       </LayoutRoot>
+      {alert && <Snackbar 
+      open={true} 
+      autoHideDuration={4000} 
+      anchorOrigin={{vertical:'bottom', horizontal: 'right'}}
+      onClose={() => setAlert(null)}
+      >
+        <Alert
+          severity={alert?.severity}
+          variant={alert?.severity == 'success' ? 'standard' : 'filled'}
+          sx={{ width: '100%' }}
+        >
+          {alert?.title && <AlertTitle>{alert.title}</AlertTitle>}
+          {alert?.message}
+        </Alert>
+      </Snackbar>}
     </>
   );
 });
