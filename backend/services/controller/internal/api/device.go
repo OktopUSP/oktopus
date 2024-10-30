@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gorilla/mux"
 	"github.com/leandrofars/oktopus/internal/bridge"
 	"github.com/leandrofars/oktopus/internal/db"
 	"github.com/leandrofars/oktopus/internal/entity"
@@ -366,4 +367,142 @@ func (a *Api) filterOptions(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(resp.Code)
 	w.Write(utils.Marshall(resp.Msg))
+}
+
+func (a *Api) updateTemplate(w http.ResponseWriter, r *http.Request) {
+
+	name := r.URL.Query().Get("name")
+	if name == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		utils.MarshallEncoder("No name provided", w)
+		return
+	}
+
+	payload, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		utils.MarshallEncoder("Error to decode payload: "+err.Error(), w)
+		return
+	}
+
+	payloadLen := len(payload)
+	if payloadLen == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		utils.MarshallEncoder("No payload provided", w)
+		return
+	}
+
+	err = a.db.UpdateTemplate(name, string(payload))
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (a *Api) addTemplate(w http.ResponseWriter, r *http.Request) {
+
+	name := r.URL.Query().Get("name")
+	if name == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		utils.MarshallEncoder("No name provided", w)
+		return
+	}
+
+	payload, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		utils.MarshallEncoder("Error to decode payload: "+err.Error(), w)
+		return
+	}
+
+	payloadLen := len(payload)
+	if payloadLen == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		utils.MarshallEncoder("No payload provided", w)
+		return
+	}
+
+	vars := mux.Vars(r)
+	switch vars["type"] {
+	case "cwmp":
+		err = a.db.AddTemplate(name, "cwmp", string(payload))
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+		return
+	case "usp":
+		err = a.db.AddTemplate(name, "usp", string(payload))
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+		return
+	default:
+		w.WriteHeader(http.StatusBadRequest)
+		utils.MarshallEncoder("Invalid template type", w)
+		return
+	}
+}
+
+func (a *Api) getTemplate(w http.ResponseWriter, r *http.Request) {
+
+	name := r.URL.Query().Get("name")
+	msgType := r.URL.Query().Get("type")
+
+	if name == "" {
+
+		var filter bson.D
+		if msgType == "" {
+			filter = bson.D{}
+		} else {
+			filter = bson.D{{"type", msgType}}
+		}
+
+		result, err := a.db.AllTemplates(filter)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode("Error to get all templates: " + err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(result)
+		return
+	} else {
+		t, err := a.db.FindTemplate(bson.D{{"name", name}})
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode("error to find message: " + err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(t.Value))
+		return
+	}
+
+}
+
+func (a *Api) deleteTemplate(w http.ResponseWriter, r *http.Request) {
+
+	name := r.URL.Query().Get("name")
+	if name == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("needs template name!")
+		return
+	} else {
+		err := a.db.DeleteTemplate(name)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode("error to delete template: " + err.Error())
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}
 }

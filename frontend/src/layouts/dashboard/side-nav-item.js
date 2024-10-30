@@ -9,7 +9,7 @@ import { usePathname } from 'next/navigation';
 export const SideNavItem = (props) => {
   const { active = false, disabled, external, icon, path, title, children, padleft, tooltip } = props;
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const pathname = usePathname();
 
   const isItemActive = (currentPath, itemPath) => {
@@ -64,10 +64,14 @@ export const SideNavItem = (props) => {
           }
         }}
       >
-        
         {icon && (
           <Box
             component="span"
+            onClick={()=>{
+              if (!path){
+                setOpen(!open)
+              }
+            }}
             sx={{
               alignItems: 'center',
               color: 'neutral.400',
@@ -85,6 +89,11 @@ export const SideNavItem = (props) => {
         )}
         <Box
           component="span"
+          onClick={()=>{
+            if (!path){
+              setOpen(!open)
+            }
+          }}
           sx={{
             color: 'neutral.400',
             flexGrow: 1,

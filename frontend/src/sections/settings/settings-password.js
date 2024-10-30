@@ -9,8 +9,14 @@ import {
   Stack,
   TextField
 } from '@mui/material';
+import { useBackendContext } from 'src/contexts/backend-context';
+import { useAlertContext } from 'src/contexts/error-context';
 
 export const SettingsPassword = () => {
+
+  let {httpRequest} = useBackendContext();
+  let {setAlert} = useAlertContext();
+
   const [values, setValues] = useState({
     password: '',
     confirm: ''
@@ -26,15 +32,8 @@ export const SettingsPassword = () => {
     []
   );
 
-  const handleSubmit = useCallback(
-    (event) => {
-      event.preventDefault();
-    },
-    []
-  );
-
   return (
-    <form onSubmit={handleSubmit}>
+    <form>
       <Card>
         <CardHeader
           subheader="Update password"
@@ -66,7 +65,26 @@ export const SettingsPassword = () => {
         </CardContent>
         <Divider />
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button variant="contained">
+          <Button variant="contained"
+            onClick={async ()=>{
+              if (values.password !== values.confirm) {
+                console.log("Passwords do not match")
+                setAlert({
+                  severity: 'error',
+                  message: 'Passwords do not match'
+                });
+                return
+              }
+              let {status} = await httpRequest('/api/auth/password', 'PUT', JSON.stringify({"password": values.password}))
+              if (status === 204) {
+                console.log("Password updated")
+                setAlert({
+                  severity: 'success',
+                  message: 'Password updated'
+                });
+              }
+            }}
+          >
             Update
           </Button>
         </CardActions>

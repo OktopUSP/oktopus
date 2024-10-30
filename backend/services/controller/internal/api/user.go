@@ -135,16 +135,6 @@ func (a *Api) changePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userToChangePasswd := mux.Vars(r)["user"]
-	if userToChangePasswd != "" && userToChangePasswd != email {
-		rUser, _ := a.db.FindUser(email)
-		if rUser.Level != db.AdminUser {
-			w.WriteHeader(http.StatusForbidden)
-			return
-		}
-		email = userToChangePasswd
-	}
-
 	var user db.User
 	err = json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
@@ -153,6 +143,12 @@ func (a *Api) changePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user.Email = email
+
+	if len(user.Password) < 8 {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Password must be at least 8 characters long"))
+		return
+	}
 
 	if err := user.HashPassword(user.Password); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -164,6 +160,7 @@ func (a *Api) changePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (a *Api) registerAdminUser(w http.ResponseWriter, r *http.Request) {

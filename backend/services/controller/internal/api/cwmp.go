@@ -17,6 +17,31 @@ import (
 
 var errDeviceModelNotFound = errors.New("device model not found")
 
+func (a *Api) cwmpGenericMsg(w http.ResponseWriter, r *http.Request) {
+
+	sn := getSerialNumberFromRequest(r)
+
+	payload, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(utils.Marshall(err.Error()))
+		return
+	}
+
+	if len(payload) == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(utils.Marshall("Empty payload"))
+		return
+	}
+
+	data, _, err := cwmpInteraction[cwmp.SoapEnvelope](sn, payload, w, a.nc)
+	if err != nil {
+		return
+	}
+
+	w.Write(data)
+}
+
 func (a *Api) cwmpGetParameterNamesMsg(w http.ResponseWriter, r *http.Request) {
 	sn := getSerialNumberFromRequest(r)
 
@@ -125,7 +150,7 @@ func (a *Api) cwmpDeleteObjectMsg(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
-func cwmpInteraction[T cwmp.SetParameterValuesResponse | cwmp.DeleteObjectResponse | cwmp.GetParameterAttributesResponse | cwmp.GetParameterNamesResponse | cwmp.GetParameterValuesResponse | cwmp.AddObjectResponse](
+func cwmpInteraction[T cwmp.SetParameterValuesResponse | cwmp.SoapEnvelope | cwmp.DeleteObjectResponse | cwmp.GetParameterAttributesResponse | cwmp.GetParameterNamesResponse | cwmp.GetParameterValuesResponse | cwmp.AddObjectResponse](
 	sn string, payload []byte, w http.ResponseWriter, nc *nats.Conn,
 ) ([]byte, T, error) {
 

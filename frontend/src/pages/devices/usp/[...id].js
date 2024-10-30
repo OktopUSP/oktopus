@@ -20,6 +20,9 @@ import SignalIcon from '@heroicons/react/24/solid/SignalIcon';
 import DevicePhoneMobile from '@heroicons/react/24/solid/DevicePhoneMobileIcon';
 import WrenchScrewDriverIcon from '@heroicons/react/24/outline/WrenchScrewdriverIcon';
 import CommandLineIcon from '@heroicons/react/24/outline/CommandLineIcon';
+import CubeTransparentIcon from '@heroicons/react/24/outline/CubeTransparentIcon';
+import MapPin from '@heroicons/react/24/outline/MapPinIcon';
+import ArrowTrendingUp from '@heroicons/react/24/outline/ArrowTrendingUpIcon';
 
 const Page = () => {
     const router = useRouter()
@@ -36,7 +39,7 @@ const Page = () => {
             case "discovery":
                 return <DevicesDiscovery/>
             default:
-                router.push(`/devices/usp/${deviceID}/discovery`)
+                router.replace(`/devices/usp/${deviceID}/discovery`)
         }
     }
   
@@ -44,7 +47,7 @@ const Page = () => {
     <>
         <Head>
             <title>
-                Oktopus | TR-369
+                Oktopus | Controller
             </title>
         </Head>
         <Box
@@ -54,9 +57,9 @@ const Page = () => {
                 py: 0,
             }}
         >
-            <Container maxWidth="lg" >
-                <Stack spacing={3} >
-                    <Breadcrumbs separator="›" aria-label="breadcrumb" sx={{md: 40, mr: 20}}>
+            <Container maxWidth="xg" >
+                <Stack spacing={3} mb={3}>
+                    <Breadcrumbs separator="›" aria-label="breadcrumb"ml={10}>
                     {[<Link underline="hover" key="1" color="inherit" href="/devices">
                         Devices
                     </Link>,
@@ -72,9 +75,8 @@ const Page = () => {
                 <Box sx={{
                 display:'flex',
                 justifyContent:'center'
-                }}
-                mb={3}>
-                    <Tabs value={router.query.id[1]}  aria-label="icon label tabs example">
+                }}>
+                    <Tabs value={router.query.id[1]}  aria-label="icon label tabs example" variant='scrollable'>
                         <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><WifiIcon/></SvgIcon>} 
@@ -117,6 +119,27 @@ const Page = () => {
                         value={"ports"} /></Tooltip>
                         <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
+                        icon={<SvgIcon><ArrowTrendingUp/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Historic" 
+                        style={{cursor:"default", opacity: 0.5}}
+                        value={"historic"} /></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tab 
+                        icon={<SvgIcon><CubeTransparentIcon/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="LCM" 
+                        style={{cursor:"default", opacity: 0.5}}
+                        value={"lcm"} /></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tab 
+                        icon={<SvgIcon><MapPin/></SvgIcon>} 
+                        iconPosition={"end"} 
+                        label="Location" 
+                        style={{cursor:"default", opacity: 0.5}}
+                        value={"location"} /></Tooltip>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tab 
                         icon={<SvgIcon><CommandLineIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Actions" 
@@ -127,15 +150,19 @@ const Page = () => {
                         onClick={()=>{router.push(`/devices/usp/${deviceID}/discovery`)}}
                         icon={<SvgIcon><MagnifyingGlassIcon/></SvgIcon>} 
                         iconPosition={"end"} 
-                        label="Discover Parameters" />
+                        label="Parameters" />
                         <Tab 
                         value={"msg"} 
                         onClick={()=>{router.push(`/devices/usp/${deviceID}/msg`)}}
                         icon={<SvgIcon><EnvelopeIcon/></SvgIcon>} 
                         iconPosition={"end"} 
-                        label="Remote Messages" />
+                        label="Messages" />
                     </Tabs>
                 </Box>
+                </Stack>
+            </Container>
+            <Container maxWidth="lg">
+                <Stack spacing={3}>
                 {
                    sectionHandler()
                 }

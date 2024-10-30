@@ -204,15 +204,10 @@ const Page = () => {
   useEffect(() => {
     getColumns()
     setLoading(true)
-    if (auth.user.token) {
-      console.log("auth.user.token =", auth.user.token)
-    } else {
-      auth.user.token = localStorage.getItem("token")
-    }
 
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("Authorization", auth.user.token);
+    myHeaders.append("Authorization", localStorage.getItem("token"));
 
     var requestOptions = {
       method: 'GET',
@@ -293,8 +288,9 @@ const Page = () => {
       console.log("set alias result:", content)
       setShowSetDeviceAlias(false)
       setDeviceAlias(null)
-      orders[deviceToBeChanged].Alias = alias
+      devices[deviceToBeChanged].Alias = alias
       setDeviceToBeChanged(null)
+      setDevices([...devices])
     }
     // .then(response => {
     //   if (response.status === 401) {
@@ -415,7 +411,7 @@ const Page = () => {
     <>
       <Head>
         <title>
-          Oktopus | TR-369
+          Oktopus | Controller
         </title>
       </Head>
 
@@ -651,7 +647,7 @@ const Page = () => {
                                             </SvgIcon>
                                           </Button>
                                         </Tooltip>}
-                                      {/* <Tooltip title="Edit the device alias">
+                                      <Tooltip title="Edit the device alias">
                                     <Button
                                       onClick={()=>{
                                         setDeviceToBeChanged(index)
@@ -667,7 +663,7 @@ const Page = () => {
                                       </SvgIcon>
                                     </Button>
                                   </Tooltip>
-                                  <Tooltip title="Edit device labels">
+                                  {/* <Tooltip title="Edit device labels">
                                     <Button
                                       onClick={()=>{
                                         setDeviceToBeChanged(index)
@@ -724,7 +720,7 @@ const Page = () => {
                         <Input value={deviceAlias} onChange={(e) => { setDeviceAlias(e.target.value) }}
                           onKeyUp={e => {
                             if (e.key === 'Enter') {
-                              setNewDeviceAlias(deviceAlias, orders[deviceToBeChanged].SN)
+                              setNewDeviceAlias(deviceAlias, devices[deviceToBeChanged].SN)
                             }
                           }}>
                         </Input>
@@ -736,7 +732,7 @@ const Page = () => {
                           setDeviceToBeChanged(null)
                         }}>Cancel</Button>
                         <Button onClick={() => {
-                          setNewDeviceAlias(deviceAlias, orders[deviceToBeChanged].SN)
+                          setNewDeviceAlias(deviceAlias, devices[deviceToBeChanged].SN)
                         }}>Save</Button>
                       </DialogActions>
                     </Dialog>}

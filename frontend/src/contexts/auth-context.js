@@ -211,6 +211,8 @@ export const AuthProvider = (props) => {
   };
 
   const signOut = () => {
+    router.push("/auth/login")
+    localStorage.removeItem("token")
     dispatch({
       type: HANDLERS.SIGN_OUT
     });

@@ -82,6 +82,13 @@ func (d *Database) CreateDevice(device Device) error {
 			return err
 		}
 	}
+
+	/* ------------------------- Do not overwrite alias ------------------------- */
+	if deviceExistent.Alias != "" {
+		device.Alias = deviceExistent.Alias
+	}
+	/* -------------------------------------------------------------------------- */
+
 	/* -------------------------------------------------------------------------- */
 
 	callback := func(sessCtx mongo.SessionContext) (interface{}, error) {
