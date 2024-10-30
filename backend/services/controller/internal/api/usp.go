@@ -1,6 +1,7 @@
 package api
 
 import (
+	"io"
 	"log"
 	"net/http"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/leandrofars/oktopus/internal/usp/usp_utils"
 	"github.com/leandrofars/oktopus/internal/utils"
 	"github.com/nats-io/nats.go"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -84,6 +86,44 @@ func sendUspMsg(msg usp_msg.Msg, sn string, w http.ResponseWriter, nc *nats.Conn
 	}
 
 	return nil
+}
+
+func (a *Api) deviceGenericMessage(w http.ResponseWriter, r *http.Request) {
+
+	sn := getSerialNumberFromRequest(r)
+	mtp, err := getMtpFromRequest(r, w)
+	if err != nil {
+		return
+	}
+
+	if mtp == "" {
+		var ok bool
+		mtp, ok = deviceStateOK(w, a.nc, sn)
+		if !ok {
+			return
+		}
+	}
+
+	payload, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(utils.Marshall(err.Error()))
+		return
+	}
+
+	var msg usp_msg.Msg
+
+	err = protojson.Unmarshal(payload, &msg)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(utils.Marshall(err.Error()))
+		return
+	}
+
+	err = sendUspMsg(msg, sn, w, a.nc, mtp)
+	if err != nil {
+		return
+	}
 }
 
 func (a *Api) deviceGetMsg(w http.ResponseWriter, r *http.Request) {

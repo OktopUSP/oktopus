@@ -10,9 +10,10 @@ import (
 )
 
 type Database struct {
-	client *mongo.Client
-	users  *mongo.Collection
-	ctx    context.Context
+	client   *mongo.Client
+	users    *mongo.Collection
+	template *mongo.Collection
+	ctx      context.Context
 }
 
 func NewDatabase(ctx context.Context, mongoUri string) Database {
@@ -36,6 +37,16 @@ func NewDatabase(ctx context.Context, mongoUri string) Database {
 	db.users = client.Database("account-mngr").Collection("users")
 	indexField := bson.M{"email": 1}
 	_, err = db.users.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys:    indexField,
+		Options: options.Index().SetUnique(true),
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	db.template = client.Database("general").Collection("templates")
+	indexField = bson.M{"name": 1}
+	_, err = db.template.Indexes().CreateOne(ctx, mongo.IndexModel{
 		Keys:    indexField,
 		Options: options.Index().SetUnique(true),
 	})
