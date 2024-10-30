@@ -31,10 +31,10 @@ const Page = () => {
         switch(section){
             case "msg":
                 return <DevicesRPC/>
-            case "wifi":
-                return <DevicesWiFi/>
+            /* case "wifi":
+                return <DevicesWiFi/> */
             default:
-                router.push(`/devices/cwmp/${deviceID}/wifi`)
+                router.replace(`/devices/cwmp/${deviceID}/msg`)
         }
     }
   
@@ -42,7 +42,7 @@ const Page = () => {
     <>
         <Head>
             <title>
-                Oktopus | TR-369
+                Oktopus | Controller
             </title>
         </Head>
         <Box
@@ -52,9 +52,9 @@ const Page = () => {
                 py: 0,
             }}
         >
-            <Container maxWidth="lg" >
-            <Stack spacing={3} >
-                <Breadcrumbs separator="›" aria-label="breadcrumb" sx={{md: 40, mr: 20}}>
+            <Container maxWidth="lg">
+            <Stack spacing={3} mb={3}>
+                <Breadcrumbs separator="›" aria-label="breadcrumb" ml={10}>
                 {[<Link underline="hover" key="1" color="inherit" href="/devices">
                     Devices
                 </Link>,
@@ -71,13 +71,16 @@ const Page = () => {
                     display:'flex',
                     justifyContent:'center',
                 }}>                                        
-                    <Tabs value={router.query.id[1]}  aria-label="icon label tabs example">
+                    <Tabs value={router.query.id[1]}  aria-label="icon label tabs example" variant='scrollable'>
+                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><WifiIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Wi-Fi" 
                         onClick={()=>{router.push(`/devices/cwmp/${deviceID}/wifi`)}} 
-                        value={"wifi"}/>
+                        value={"wifi"}
+                        disabled
+                        /></Tooltip>
                         <Tooltip title="Upgrade to Business Plan" placement="bottom">
                         <Tab 
                         icon={<SvgIcon><SignalIcon/></SvgIcon>} 
@@ -127,6 +130,10 @@ const Page = () => {
                         label="Remote Messages" />
                     </Tabs>
                 </Box>
+                </Stack>
+            </Container>
+            <Container maxWidth="lg">
+                <Stack spacing={3}>
                 {
                    sectionHandler()
                 }

@@ -39,7 +39,7 @@ const Page = () => {
             case "discovery":
                 return <DevicesDiscovery/>
             default:
-                router.push(`/devices/usp/${deviceID}/discovery`)
+                router.replace(`/devices/usp/${deviceID}/discovery`)
         }
     }
   
@@ -47,7 +47,7 @@ const Page = () => {
     <>
         <Head>
             <title>
-                Oktopus | TR-369
+                Oktopus | Controller
             </title>
         </Head>
         <Box

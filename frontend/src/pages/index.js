@@ -129,7 +129,7 @@ const Page = () => {
   <>
     <Head>
       <title>
-        Oktopus | TR-369
+        Oktopus | Controller
       </title>
     </Head>
     <Box
