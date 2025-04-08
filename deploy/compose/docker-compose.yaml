@@ -38,7 +38,7 @@ services:
 
   #/* ---------------------------- Databases / Cache --------------------------- */
   mongo_usp:
-    image: mongo
+    image: mongo:4.4
     container_name: mongo_usp
     ports:
       - 27017:27017
