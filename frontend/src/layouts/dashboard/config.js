@@ -11,6 +11,9 @@ import FolderIcon from '@heroicons/react/24/solid/FolderIcon';
 import ShieldCheckIcon from '@heroicons/react/24/solid/ShieldCheckIcon';
 import EnvelopeIcon from '@heroicons/react/24/solid/EnvelopeIcon';
 import UserIcon from '@heroicons/react/24/solid/UserIcon';
+import BuildingOffice2Icon from '@heroicons/react/24/solid/BuildingOffice2Icon';
+import BookOpenIcon from '@heroicons/react/24/solid/BookOpenIcon';
+import CommandLineIcon from '@heroicons/react/24/solid/CommandLineIcon';
 
 export const items = [
   {
@@ -38,12 +41,10 @@ export const items = [
         <RectangleGroupIcon color='gray'/>
       </SvgIcon>
     ),
-    tooltip: 'Upgrade to Business Plan',
     disabled: true,
     children: [
       {
         title: 'Firmware Update',
-        tooltip: 'Upgrade to Business Plan',
         icon: (
           <SvgIcon fontSize="small">
             <ArrowDownOnSquareStackIcon color='gray'/>
@@ -53,7 +54,6 @@ export const items = [
       },
       {
         title: 'Message',
-        tooltip: 'Upgrade to Business Plan',
         disabled: true,
         icon: (
           <SvgIcon fontSize="small">
@@ -62,6 +62,15 @@ export const items = [
         )
       },
     ]
+  },
+  {
+    title: 'Scripts',
+    disabled: true,
+    icon: (
+      <SvgIcon fontSize="small">
+        <CommandLineIcon color='gray'/>
+      </SvgIcon>
+    )
   },
   {
     title: 'Credentials',
@@ -75,7 +84,6 @@ export const items = [
   {
     title: 'Access Control',
     disabled: true,
-    tooltip: 'Upgrade to Business Plan',
     icon: (
       <SvgIcon fontSize="small">
         <UserGroupIcon color='gray'/>
@@ -83,9 +91,17 @@ export const items = [
     ),
     children: [
       {
+        title: 'Tenants',
+        disabled: true,
+        icon: (
+          <SvgIcon fontSize="small">
+            <BuildingOffice2Icon color='gray'/>
+          </SvgIcon>
+        )
+      },
+      {
         title: 'Roles',
         disabled: true,
-        tooltip: 'Upgrade to Business Plan',
         icon: (
           <SvgIcon fontSize="small">
             <ShieldCheckIcon color='gray'/>
@@ -105,7 +121,6 @@ export const items = [
    },
   {
     title: 'File  Server',
-    tooltip: 'Upgrade to Business Plan',
     disabled: true,
     icon: (
       <SvgIcon fontSize="small">
@@ -121,6 +136,16 @@ export const items = [
         <CogIcon />
       </SvgIcon>
     )
+  },
+  {
+    title: 'Docs',
+    path: 'https://docs.oktopus.app.br',
+    icon: (
+      <SvgIcon fontSize="small">
+        <BookOpenIcon />
+      </SvgIcon>
+    ),
+    external: true,
   },
 ];
 
