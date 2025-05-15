@@ -1,4 +1,4 @@
-FROM golang:1.22.2@sha256:450e3822c7a135e1463cd83e51c8e2eb03b86a02113c89424e6f0f8344bb4168 as builder
+FROM golang:1.23 as builder
 WORKDIR /app
 COPY ../ .
 RUN CGO_ENABLED=0 GOOS=linux go build -o acs cmd/acs/main.go
