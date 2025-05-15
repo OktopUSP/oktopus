@@ -39,7 +39,8 @@ import {
   Select,
   DialogContentText,
   TableContainer,
-  TablePagination
+  TablePagination,
+  Typography
 } from '@mui/material';
 
 import ViewColumnsIcon from '@heroicons/react/24/outline/ViewColumnsIcon';
@@ -95,8 +96,10 @@ const Page = () => {
   const [rowsPerPage, setRowsPerPage] = useState(20);
 
   const [showSetDeviceAlias, setShowSetDeviceAlias] = useState(false);
+  const [showSetDeviceToBeRemoved, setShowSetDeviceToBeRemoved] = useState(false);
   const [deviceAlias, setDeviceAlias] = useState(null);
   const [deviceToBeChanged, setDeviceToBeChanged] = useState(null);
+  const [deviceToBeRemoved, setDeviceToBeRemoved] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
   const [selected, setSelected] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -259,6 +262,38 @@ const Page = () => {
       });
 
   }, [auth.user]);
+
+  const removeDevice = async (sn) => {
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", localStorage.getItem("token"));
+
+    var requestOptions = {
+      method: 'DELETE',
+      headers: myHeaders,
+      redirect: 'follow'
+    };
+
+    let result = await fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device?id=${sn}`, requestOptions)
+    console.log("result:", result)
+    if (result.status === 401) {
+      router.push("/auth/login")
+    } else if (result.status != 200) {
+      console.log("Status:", result.status)
+      let content = await result.json()
+      console.log("Message:", content)
+      setShowSetDeviceToBeRemoved(false)
+      setDeviceToBeRemoved(null)
+    } else {
+      let content = await result.json()
+      console.log("remove device result:", content)
+      setShowSetDeviceToBeRemoved(false)
+      setDeviceToBeRemoved(null)
+      devices.splice(deviceToBeRemoved, 1)
+      setDevices([...devices])
+    }
+
+  }
 
   const setNewDeviceAlias = async (alias, sn) => {
     var myHeaders = new Headers();
@@ -663,6 +698,21 @@ const Page = () => {
                                       </SvgIcon>
                                     </Button>
                                   </Tooltip>
+                                  <Tooltip title="Delete device">
+                                    <Button
+                                      onClick={()=>{
+                                        setDeviceToBeRemoved(index)
+                                        setShowSetDeviceToBeRemoved(true)
+                                      }}
+                                    >
+                                      <SvgIcon 
+                                        fontSize="small" 
+                                        sx={{cursor: 'pointer'}} 
+                                      >
+                                        <TrashIcon />
+                                      </SvgIcon>
+                                    </Button>
+                                  </Tooltip>
                                   {/* <Tooltip title="Edit device labels">
                                     <Button
                                       onClick={()=>{
@@ -734,6 +784,23 @@ const Page = () => {
                         <Button onClick={() => {
                           setNewDeviceAlias(deviceAlias, devices[deviceToBeChanged].SN)
                         }}>Save</Button>
+                      </DialogActions>
+                    </Dialog>}
+                    {showSetDeviceToBeRemoved &&
+                    <Dialog open={showSetDeviceToBeRemoved}>
+                      <DialogContent>
+                        <DialogContentText>Are you sure you want to remove <b>{devices[deviceToBeRemoved].SN}</b> device?</DialogContentText>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={() => {
+                          setShowSetDeviceToBeRemoved(false)
+                          setDeviceToBeRemoved(null)
+                        }}>Cancel</Button>
+                        <Button 
+                          endIcon={<SvgIcon><TrashIcon /></SvgIcon>}
+                          onClick={() => {
+                          removeDevice(devices[deviceToBeRemoved].SN)
+                        }}>Apply</Button>
                       </DialogActions>
                     </Dialog>}
                 </div>

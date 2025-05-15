@@ -77,7 +77,7 @@ const Page = () => {
                 justifyContent:'center'
                 }}>
                     <Tabs value={router.query.id[1]}  aria-label="icon label tabs example" variant='scrollable'>
-                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tooltip placement="bottom">
                         <Tab 
                         icon={<SvgIcon><WifiIcon/></SvgIcon>} 
                         iconPosition={"end"} 
@@ -85,7 +85,7 @@ const Page = () => {
                         style={{cursor:"default", opacity: 0.5}}
                         value={"wifi"}/>
                         </Tooltip>
-                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tooltip placement="bottom">
                         <Tab 
                             icon={<SvgIcon><SignalIcon/></SvgIcon>} 
                             iconPosition={"end"} 
@@ -94,7 +94,7 @@ const Page = () => {
                             value={"site-survey"} 
                         />
                         </Tooltip>
-                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tooltip placement="bottom">
                         <Tab 
                         icon={<SvgIcon><DevicePhoneMobile/></SvgIcon>} 
                         iconPosition={"end"} 
@@ -103,42 +103,42 @@ const Page = () => {
                         value={"connected-devices"} 
                         />
                         </Tooltip>
-                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tooltip placement="bottom">
                         <Tab 
                         icon={<SvgIcon><WrenchScrewDriverIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Diagnostic" 
                         style={{cursor:"default", opacity: 0.5}}
                         value={"diagnostic"} /></Tooltip>
-                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tooltip placement="bottom">
                         <Tab 
                         icon={<SvgIcon><ServerStackIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Ports" 
                         style={{cursor:"default", opacity: 0.5}}
                         value={"ports"} /></Tooltip>
-                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tooltip placement="bottom">
                         <Tab 
                         icon={<SvgIcon><ArrowTrendingUp/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Historic" 
                         style={{cursor:"default", opacity: 0.5}}
                         value={"historic"} /></Tooltip>
-                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tooltip placement="bottom">
                         <Tab 
                         icon={<SvgIcon><CubeTransparentIcon/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="LCM" 
                         style={{cursor:"default", opacity: 0.5}}
                         value={"lcm"} /></Tooltip>
-                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tooltip placement="bottom">
                         <Tab 
                         icon={<SvgIcon><MapPin/></SvgIcon>} 
                         iconPosition={"end"} 
                         label="Location" 
                         style={{cursor:"default", opacity: 0.5}}
                         value={"location"} /></Tooltip>
-                        <Tooltip title="Upgrade to Business Plan" placement="bottom">
+                        <Tooltip placement="bottom">
                         <Tab 
                         icon={<SvgIcon><CommandLineIcon/></SvgIcon>} 
                         iconPosition={"end"} 

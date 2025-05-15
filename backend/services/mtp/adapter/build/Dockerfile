@@ -1,4 +1,4 @@
-FROM golang:1.22@sha256:82e07063a1ac3ee59e6f38b1222e32ce88469e4431ff6496cc40fb9a0fc18229 as builder
+FROM golang:1.23 as builder
 WORKDIR /app
 COPY ../ .
 RUN CGO_ENABLED=0 GOOS=linux go build -o adapter cmd/adapter/main.go

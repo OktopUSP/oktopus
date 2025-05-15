@@ -64,7 +64,7 @@ func (a *Api) StartApi() {
 	iot.HandleFunc("/cwmp/{sn}/setParameterValues", a.cwmpSetParameterValuesMsg).Methods("PUT")
 	iot.HandleFunc("/cwmp/{sn}/addObject", a.cwmpAddObjectMsg).Methods("PUT")
 	iot.HandleFunc("/cwmp/{sn}/deleteObject", a.cwmpDeleteObjectMsg).Methods("PUT")
-	iot.HandleFunc("", a.retrieveDevices).Methods("GET")
+	iot.HandleFunc("", a.retrieveDevices).Methods("GET", "DELETE")
 	iot.HandleFunc("/filterOptions", a.filterOptions).Methods("GET")
 	iot.HandleFunc("/{sn}/{mtp}/generic", a.deviceGenericMessage).Methods("PUT")
 	iot.HandleFunc("/{sn}/{mtp}/get", a.deviceGetMsg).Methods("PUT")
