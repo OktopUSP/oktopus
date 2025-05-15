@@ -2,6 +2,7 @@ package listeners
 
 import (
 	"broker/internal/config"
+	"broker/internal/listeners/health"
 	"broker/internal/listeners/http"
 	broker "broker/internal/listeners/mqtt"
 	"broker/internal/listeners/ws"
@@ -16,7 +17,7 @@ func StartServers(c config.Config) {
 	server := mqtt.New(&mqtt.Options{})
 
 	var wg sync.WaitGroup
-	wg.Add(3)
+	wg.Add(4)
 
 	go func() {
 		mqttServer := newMqttServer(c)
@@ -28,6 +29,14 @@ func StartServers(c config.Config) {
 		if c.WsEnable {
 			wsServer := newWsServer(c)
 			wsServer.Start(server)
+		}
+		wg.Done()
+	}()
+
+	go func() {
+		if c.HttpHealthCheckEnable {
+			healhCheckServer := NewHTTPHealthCheckServer(c)
+			healhCheckServer.Start(server)
 		}
 		wg.Done()
 	}()
@@ -78,5 +87,11 @@ func newWsServer(c config.Config) *ws.Ws {
 func newHttpServer(c config.Config) *http.Http {
 	return &http.Http{
 		HttpPort: c.HttpPort,
+	}
+}
+
+func NewHTTPHealthCheckServer(c config.Config) *health.HttpHealth {
+	return &health.HttpHealth{
+		HttpPort: c.HttpHealthCheckPort,
 	}
 }

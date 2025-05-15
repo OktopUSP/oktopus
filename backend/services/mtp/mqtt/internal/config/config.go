@@ -13,22 +13,24 @@ import (
 const LOCAL_ENV = ".env.local"
 
 type Config struct {
-	MqttPort      string
-	NoTls         bool
-	Tls           bool
-	MqttTlsPort   string
-	Fullchain     string
-	Privkey       string
-	AuthEnable    bool
-	RedisEnable   bool
-	RedisAddr     string
-	RedisPassword string
-	WsEnable      bool
-	WsPort        string
-	HttpEnable    bool
-	HttpPort      string
-	LogLevel      int
-	Nats          Nats
+	MqttPort              string
+	NoTls                 bool
+	Tls                   bool
+	MqttTlsPort           string
+	Fullchain             string
+	Privkey               string
+	AuthEnable            bool
+	RedisEnable           bool
+	RedisAddr             string
+	RedisPassword         string
+	WsEnable              bool
+	WsPort                string
+	HttpEnable            bool
+	HttpPort              string
+	HttpHealthCheckEnable bool
+	HttpHealthCheckPort   string
+	LogLevel              int
+	Nats                  Nats
 }
 
 type Nats struct {
@@ -68,6 +70,8 @@ func NewConfig() Config {
 	redisPassword := flag.String("redis_passwd", lookupEnvOrString("REDIS_PASSWD", ""), "redis db password")
 	wsEnable := flag.Bool("ws_enable", lookupEnvOrBool("WS_ENABLE", false), "enable/disable Websocket listener")
 	wsPort := flag.String("ws_port", lookupEnvOrString("WS_PORT", ":80"), "port for Websocket listener")
+	httpHealthCheckEnable := flag.Bool("http_health_check_enable", lookupEnvOrBool("HTTP_HEALTH_CHECK_ENABLE", true), "enable/disable HTTP health check")
+	httpHealthCheckPort := flag.String("http_health_check_port", lookupEnvOrString("HTTP_HEALTH_CHECK_PORT", ":8884"), "port for HTTP health check")
 	httpEnable := flag.Bool("http_enable", lookupEnvOrBool("HTTP_ENABLE", false), "enable/disable HTTP listener of mqtt metrics")
 	httpPort := flag.String("http_port", lookupEnvOrString("HTTP_PORT", ":8080"), "port for HTTP listener of mqtt metrics")
 	logLevel := flag.Int("log_level", lookupEnvOrInt("LOG_LEVEL", 1), "0=DEBUG, 1=INFO, 2=WARNING, 3=ERROR")
@@ -93,21 +97,23 @@ func NewConfig() Config {
 	ctx := context.TODO()
 
 	conf := Config{
-		MqttPort:      *mqttPort,
-		MqttTlsPort:   *mqttTlsPort,
-		NoTls:         *noTls,
-		Tls:           *tls,
-		Fullchain:     *fullchain,
-		Privkey:       *privkey,
-		AuthEnable:    *authEnable,
-		RedisEnable:   *redisEnable,
-		RedisAddr:     *redisAddr,
-		RedisPassword: *redisPassword,
-		WsEnable:      *wsEnable,
-		WsPort:        *wsPort,
-		HttpEnable:    *httpEnable,
-		HttpPort:      *httpPort,
-		LogLevel:      *logLevel,
+		MqttPort:              *mqttPort,
+		MqttTlsPort:           *mqttTlsPort,
+		NoTls:                 *noTls,
+		Tls:                   *tls,
+		Fullchain:             *fullchain,
+		Privkey:               *privkey,
+		AuthEnable:            *authEnable,
+		RedisEnable:           *redisEnable,
+		RedisAddr:             *redisAddr,
+		RedisPassword:         *redisPassword,
+		WsEnable:              *wsEnable,
+		WsPort:                *wsPort,
+		HttpEnable:            *httpEnable,
+		HttpPort:              *httpPort,
+		LogLevel:              *logLevel,
+		HttpHealthCheckEnable: *httpHealthCheckEnable,
+		HttpHealthCheckPort:   *httpHealthCheckPort,
 		Nats: Nats{
 			Url:       *natsUrl,
 			Name:      *natsName,
