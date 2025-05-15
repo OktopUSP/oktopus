@@ -5,6 +5,7 @@ import { Box, ButtonBase, Collapse, SvgIcon, Tooltip } from '@mui/material';
 import ChevronDownIcon from '@heroicons/react/24/outline/ChevronDownIcon';
 import ChevronUpIcon from '@heroicons/react/24/outline/ChevronUpIcon';
 import { usePathname } from 'next/navigation';
+import ArrowTopRightOnSquareIcon from '@heroicons/react/24/solid/ArrowTopRightOnSquareIcon';
 
 export const SideNavItem = (props) => {
   const { active = false, disabled, external, icon, path, title, children, padleft, tooltip } = props;
@@ -112,7 +113,13 @@ export const SideNavItem = (props) => {
           }}
           {...linkProps}
         >
-          {title}
+          {title} {
+            external && (
+              <SvgIcon fontSize='8px' sx={{ml: 1}}>
+                <ArrowTopRightOnSquareIcon />
+              </SvgIcon>
+            )
+          }
         </Box>
         { children &&
             <Box
@@ -144,7 +151,7 @@ export const SideNavItem = (props) => {
           <SvgIcon fontSize='8px'>
             <ChevronUpIcon />
           </SvgIcon>
-    }
+          }
           </Box>
         }
       </ButtonBase>
@@ -158,7 +165,7 @@ export const SideNavItem = (props) => {
                     <SideNavItem
                       active={isItemActive(pathname, child.path)}
                       disabled={child.disabled}
-                      external={false}
+                      external={child.external ? true : false}
                       icon={child.icon}
                       key={child.title}
                       path={child.path}
