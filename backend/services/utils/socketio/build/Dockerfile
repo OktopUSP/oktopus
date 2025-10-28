@@ -2,10 +2,10 @@ FROM node:16.20.2-alpine
 
 WORKDIR /app
 
-COPY ../package*.json ./
+COPY ./package*.json ./
 
 RUN npm install
 
-COPY ../ .
+COPY ./ .
 
 CMD ["node", "server.js"]
