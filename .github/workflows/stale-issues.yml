@@ -27,6 +27,9 @@ jobs:
           # Labels
           stale-issue-label: 'stale'
           
+          # Ignore updates from the stale action itself
+          ignore-updates: true
+          
           # Messages
           stale-issue-message: |
             This issue has been automatically marked as stale because it has not had any activity in the last 30 days.
