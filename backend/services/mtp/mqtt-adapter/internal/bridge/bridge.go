@@ -11,12 +11,14 @@ import (
 	"time"
 
 	"github.com/OktopUSP/oktopus/backend/services/mqtt-adapter/internal/config"
+	"github.com/OktopUSP/oktopus/backend/services/mqtt-adapter/internal/usp/usp_record"
 	"github.com/eclipse/paho.golang/autopaho"
 	"github.com/eclipse/paho.golang/paho"
 	"github.com/google/uuid"
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
 	"golang.org/x/sys/unix"
+	"google.golang.org/protobuf/proto"
 )
 
 const (
@@ -169,7 +171,20 @@ func (b *Bridge) mqttMessageHandler(status, controller, apiMsg chan *paho.Publis
 		case d := <-status:
 			b.Pub(NATS_MQTT_SUBJECT_PREFIX+getDeviceFromTopic(d.Topic)+".status", d.Payload)
 		case c := <-controller:
-			b.Pub(NATS_MQTT_SUBJECT_PREFIX+getDeviceFromTopic(c.Topic)+".info", c.Payload)
+			device := getDeviceFromTopic(c.Topic)
+			// Unsolicited notifications are published to the controller's base
+			// topic ("oktopus/usp/v1/controller"), whose last segment is
+			// "controller" rather than a device ID. In that case the only
+			// reliable sender identifier is the USP record's from_id field.
+			if device == "controller" {
+				if from := getDeviceFromRecord(c.Payload); from != "" {
+					b.Pub(NATS_MQTT_SUBJECT_PREFIX+from+".notify", c.Payload)
+				} else {
+					log.Printf("Dropping controller-topic message: could not resolve sender from_id")
+				}
+				continue
+			}
+			b.Pub(NATS_MQTT_SUBJECT_PREFIX+device+".info", c.Payload)
 		case a := <-apiMsg:
 			b.Pub(DEVICE_SUBJECT_PREFIX+getDeviceFromTopic(a.Topic)+".api", a.Payload)
 		}
@@ -180,6 +195,19 @@ func getDeviceFromTopic(topic string) string {
 	paths := strings.Split(topic, "/")
 	device := paths[len(paths)-1]
 	return device
+}
+
+// getDeviceFromRecord extracts the sender endpoint ID (from_id) from a USP
+// record. Notifications arriving on the controller base topic carry no device
+// ID in the MQTT topic, response topic, or user properties, so from_id is the
+// only reliable source. Returns "" if the payload cannot be parsed.
+func getDeviceFromRecord(payload []byte) string {
+	var record usp_record.Record
+	if err := proto.Unmarshal(payload, &record); err != nil {
+		log.Printf("Failed to unmarshal USP record from controller topic: %v", err)
+		return ""
+	}
+	return record.GetFromId()
 }
 
 func subscribe(ctx context.Context, qos int, c *autopaho.ConnectionManager) {
@@ -194,6 +222,15 @@ func subscribe(ctx context.Context, qos int, c *autopaho.ConnectionManager) {
 				QoS:   byte(qos),
 			},
 			{
+				// USP agents publish unsolicited notifications (OperationComplete,
+				// ValueChange, etc.) to the controller's base topic, which has no
+				// trailing device-ID segment (e.g. "oktopus/usp/v1/controller").
+				// This 4-segment subscription captures them; the 5-segment pattern
+				// above only matches request/response traffic addressed per-device.
+				Topic: MQTT_TOPIC_PREFIX + "+/controller",
+				QoS:   byte(qos),
+			},
+			{
 				Topic: MQTT_TOPIC_PREFIX + "+/status/+",
 				QoS:   byte(qos),
 			},
@@ -203,6 +240,7 @@ func subscribe(ctx context.Context, qos int, c *autopaho.ConnectionManager) {
 	}
 
 	log.Printf("Subscribed to %s", MQTT_TOPIC_PREFIX+"+/controller/+")
+	log.Printf("Subscribed to %s", MQTT_TOPIC_PREFIX+"+/controller")
 	log.Printf("Subscribed to %s", MQTT_TOPIC_PREFIX+"+/status/+")
 	log.Printf("Subscribed to %s", MQTT_TOPIC_PREFIX+"+/api/+")
 }
