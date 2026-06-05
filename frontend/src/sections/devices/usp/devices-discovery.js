@@ -214,7 +214,8 @@ function ShowParamsWithValues({
     setParameterValue, deviceParameters, 
     setShowLoading, router,
     updateDeviceParameters, deviceCommands,
-    openCommandDialog
+    openCommandDialog, setDeviceCommandToExecute,
+    setOpenCommandDialog
 }) {
     console.log("HEY jow:", deviceParametersValue)
     let paths = x.supported_obj_path.split(".")
@@ -324,7 +325,17 @@ function ShowParamsWithValues({
                             pl: 4 
                         }}
                         secondaryAction={
-                            <IconButton>
+                            <IconButton onClick={()=>{
+                                setDeviceCommandToExecute(
+                                    {
+                                        [paramKey+commando]:
+                                        {"input_arg_names":
+                                            deviceCommands[commando].input_arg_names
+                                        }
+                                    }
+                                )
+                                setOpenCommandDialog(true)
+                                }}>
                                 <SvgIcon>
                                     <PlayCircleIcon>
                                     </PlayCircleIcon>
@@ -404,7 +415,17 @@ function ShowParamsWithValues({
                             pl: 4 
                         }}
                         secondaryAction={
-                            <IconButton>
+                            <IconButton onClick={()=>{
+                                setDeviceCommandToExecute(
+                                    {
+                                        [x.supported_obj_path+commando]:
+                                        {"input_arg_names":
+                                            deviceCommands[commando].input_arg_names
+                                        }
+                                    }
+                                )
+                                setOpenCommandDialog(true)
+                                }}>
                                 <SvgIcon>
                                     <PlayCircleIcon>
                                     </PlayCircleIcon>
@@ -727,7 +748,8 @@ const getDeviceParameterInstances = async (raw) =>{
         for(let i =0; i < supportedCommands.length; i++){
             let command = supportedCommands[i]
             commandsInfo[command.command_name] = {
-                "type":command["command_type"]
+                "type":command["command_type"],
+                "input_arg_names": command["input_arg_names"]
             }
         }
 
@@ -936,6 +958,8 @@ const getDeviceParameterInstances = async (raw) =>{
                     updateDeviceParameters={updateDeviceParameters}
                     deviceCommands={deviceCommands}
                     openCommandDialog={openCommandDialog}
+                    setDeviceCommandToExecute={setDeviceCommandToExecute}
+                    setOpenCommandDialog={setOpenCommandDialog}
                     />
                 }
                 { x.supported_commands && Object.keys(deviceCommands).length == 0 &&
