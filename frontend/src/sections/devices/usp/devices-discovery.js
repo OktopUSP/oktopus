@@ -984,9 +984,7 @@ const getDeviceParameterInstances = async (raw) =>{
                                         {
                                             [x.supported_obj_path+y.command_name]:
                                             {"input_arg_names":
-                                                [
-                                                    y.input_arg_names
-                                                ]
+                                                y.input_arg_names
                                             }
                                         }
                                     )
