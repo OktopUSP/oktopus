@@ -48,7 +48,24 @@ func parseDeviceInfoMsg(sn, subject string, data []byte, mtp db.MTP) db.Device {
         return db.Device{}
     }
 
-    err = proto.Unmarshal(record.GetNoSessionContext().Payload, &message)
+    noSessionCtx := record.GetNoSessionContext()
+    if noSessionCtx == nil || noSessionCtx.Payload == nil {
+        log.Printf("Record has no NoSessionContext payload (record type: %T) - registering device with basic info", record.RecordType)
+        var device db.Device
+        device.SN = sn
+        switch db.MTP(mtp) {
+        case db.MQTT:
+            device.Mqtt = db.Online
+        case db.WEBSOCKETS:
+            device.Websockets = db.Online
+        case db.STOMP:
+            device.Stomp = db.Online
+        }
+        device.Status = db.Online
+        return device
+    }
+
+    err = proto.Unmarshal(noSessionCtx.Payload, &message)
     if err != nil {
         log.Println("Error unmarshaling USP Message:", err)
         return db.Device{}
