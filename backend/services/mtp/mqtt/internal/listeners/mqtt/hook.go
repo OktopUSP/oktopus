@@ -49,6 +49,8 @@ func (h *MyHook) OnDisconnect(cl *mqtt.Client, err error, expire bool) {
 	var clUser string
 	if len(cl.Properties.Props.User) > 0 {
 		clUser = cl.Properties.Props.User[0].Val
+	} else {
+		clUser = cl.ID // MQTT 3.1.1 fallback: no User Properties, use client ID
 	}
 
 	if clUser != "" {
@@ -66,6 +68,8 @@ func (h *MyHook) OnSubscribed(cl *mqtt.Client, pk packets.Packet, reasonCodes []
 
 		if len(cl.Properties.Props.User) > 0 {
 			clUser = cl.Properties.Props.User[0].Val
+		} else {
+			clUser = cl.ID // MQTT 3.1.1 fallback: no User Properties, use client ID
 		}
 
 		if clUser != "" {
