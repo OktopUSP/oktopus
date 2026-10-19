@@ -2,7 +2,7 @@ FROM node:18.18.0-alpine as builder
 
 WORKDIR /app
 
-COPY ../ ./
+COPY ./ .
 RUN rm .env && rm .env.local || true
 
 RUN npm install 
