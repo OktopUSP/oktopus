@@ -119,6 +119,9 @@ func (i *CWMPInform) GetHardwareVersion() string {
 }
 
 func (i *CWMPInform) GetDataModelType() string {
+	if len(i.ParameterList) == 0 {
+		return "TR181"
+	}
 	if strings.HasPrefix(i.ParameterList[0].Name, "InternetGatewayDevice") {
 		return "TR098"
 	} else if strings.HasPrefix(i.ParameterList[0].Name, "Device") {
