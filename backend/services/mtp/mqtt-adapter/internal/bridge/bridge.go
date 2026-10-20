@@ -114,7 +114,7 @@ func (b *Bridge) natsMessageHandler(cm *autopaho.ConnectionManager) {
 		log.Printf("Received message on info subject")
 		cm.Publish(b.Ctx, &paho.Publish{
 			QoS:     byte(b.Mqtt.Qos),
-			Topic:   MQTT_TOPIC_PREFIX + "v1/agent/" + getDeviceFromSubject(m.Subject),
+			Topic:   resolveAgentTopic(getDeviceFromSubject(m.Subject)),
 			Payload: m.Data,
 			Properties: &paho.PublishProperties{
 				ResponseTopic: "oktopus/usp/v1/controller/" + getDeviceFromSubject(m.Subject),
@@ -126,12 +126,17 @@ func (b *Bridge) natsMessageHandler(cm *autopaho.ConnectionManager) {
 	b.Sub(NATS_MQTT_ADAPTER_SUBJECT_PREFIX+"*.api", func(m *nats.Msg) {
 
 		log.Printf("Received message on api subject")
+		// MQTT 3.1.1 agents cannot see the MQTT5 ResponseTopic property, so
+		// also embed it as a reply-to= topic suffix; obuspa parses that and
+		// publishes its response onto the api path instead of the controller
+		// topic (which would route to .info and never reach the API waiter).
+		apiRespTopic := "oktopus/usp/v1/api/" + getDeviceFromSubject(m.Subject)
 		cm.Publish(b.Ctx, &paho.Publish{
 			QoS:     byte(b.Mqtt.Qos),
-			Topic:   MQTT_TOPIC_PREFIX + "v1/agent/" + getDeviceFromSubject(m.Subject),
+			Topic:   resolveAgentTopic(getDeviceFromSubject(m.Subject)) + "/reply-to=" + url.QueryEscape(apiRespTopic),
 			Payload: m.Data,
 			Properties: &paho.PublishProperties{
-				ResponseTopic: "oktopus/usp/v1/api/" + getDeviceFromSubject(m.Subject),
+				ResponseTopic: apiRespTopic,
 			},
 		})
 
@@ -165,13 +170,27 @@ func getDeviceFromSubject(subject string) string {
 	return device
 }
 
+// resolveAgentTopic maps a NATS-subject device segment to the MQTT agent
+// topic. MQTT 3.1.1 agents encode their response topic as a
+// "reply-to=<url-encoded topic>" segment (no MQTT5 Response Topic
+// property); decode it instead of publishing to a literal reply-to= topic.
+func resolveAgentTopic(device string) string {
+	if strings.HasPrefix(device, "reply-to=") {
+		decoded, err := url.QueryUnescape(strings.TrimPrefix(device, "reply-to="))
+		if err == nil {
+			return decoded
+		}
+	}
+	return MQTT_TOPIC_PREFIX + "v1/agent/" + device
+}
+
 func (b *Bridge) mqttMessageHandler(status, controller, apiMsg chan *paho.Publish) {
 	for {
 		select {
 		case d := <-status:
-			b.Pub(NATS_MQTT_SUBJECT_PREFIX+getDeviceFromTopic(d.Topic)+".status", d.Payload)
+			b.Pub(NATS_MQTT_SUBJECT_PREFIX+resolveDeviceFromTopic(d.Topic)+".status", d.Payload)
 		case c := <-controller:
-			device := getDeviceFromTopic(c.Topic)
+			device := resolveDeviceFromTopic(c.Topic)
 			// Unsolicited notifications are published to the controller's base
 			// topic ("oktopus/usp/v1/controller"), whose last segment is
 			// "controller" rather than a device ID. In that case the only
@@ -186,7 +205,7 @@ func (b *Bridge) mqttMessageHandler(status, controller, apiMsg chan *paho.Publis
 			}
 			b.Pub(NATS_MQTT_SUBJECT_PREFIX+device+".info", c.Payload)
 		case a := <-apiMsg:
-			b.Pub(DEVICE_SUBJECT_PREFIX+getDeviceFromTopic(a.Topic)+".api", a.Payload)
+			b.Pub(DEVICE_SUBJECT_PREFIX+resolveDeviceFromTopic(a.Topic)+".api", a.Payload)
 		}
 	}
 }
@@ -208,6 +227,21 @@ func getDeviceFromRecord(payload []byte) string {
 		return ""
 	}
 	return record.GetFromId()
+}
+
+// resolveDeviceFromTopic extracts the clean endpoint ID from an incoming
+// MQTT topic whose last segment may be an MQTT 3.1.1
+// "reply-to=<url-encoded agent topic>" marker.
+func resolveDeviceFromTopic(topic string) string {
+	device := getDeviceFromTopic(topic)
+	if strings.HasPrefix(device, "reply-to=") {
+		decoded, err := url.QueryUnescape(strings.TrimPrefix(device, "reply-to="))
+		if err == nil {
+			parts := strings.Split(decoded, "/")
+			return parts[len(parts)-1]
+		}
+	}
+	return device
 }
 
 func subscribe(ctx context.Context, qos int, c *autopaho.ConnectionManager) {
@@ -232,6 +266,17 @@ func subscribe(ctx context.Context, qos int, c *autopaho.ConnectionManager) {
 			},
 			{
 				Topic: MQTT_TOPIC_PREFIX + "+/status/+",
+				QoS:   byte(qos),
+			},
+			// MQTT 3.1.1 agents append a "/reply-to=<encoded topic>" level to
+			// the topics they publish responses on, one level deeper than the
+			// filters above — subscribe those too or agent replies are lost.
+			{
+				Topic: MQTT_TOPIC_PREFIX + "+/api/+/+",
+				QoS:   byte(qos),
+			},
+			{
+				Topic: MQTT_TOPIC_PREFIX + "+/controller/+/+",
 				QoS:   byte(qos),
 			},
 		},
