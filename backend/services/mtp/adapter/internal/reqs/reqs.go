@@ -114,7 +114,7 @@ func StartRequestsListener(ctx context.Context, nc *nats.Conn, db db.Database) {
 						},
 						{"documents",
 							bson.A{
-								bson.D{{"$sort", bson.D{{"status", criteria["status_order"]}}}},
+								bson.D{{"$sort", bson.D{{"status", criteria["status_order"]}, {"sn", 1}, {"_id", 1}}}},
 								bson.D{{"$skip", criteria["skip"]}},
 								bson.D{{"$limit", criteria["limit"]}},
 							},

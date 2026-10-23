@@ -127,7 +127,7 @@ func (a *Api) retrieveDevices(w http.ResponseWriter, r *http.Request) {
 		page_size = PAGE_SIZE_DEFAULT
 	}
 
-	skip := page_number * (page_size - 1)
+	skip := page_number * page_size
 
 	filter := map[string]interface{}{
 		"status_order": statusOrder,
