@@ -1067,7 +1067,7 @@ const getDeviceParameterInstances = async (raw) =>{
     let parameterToChange;
     console.log("params",params)
     parameterToChange = params.pop()
-    objToChange = params.join(".")
+    objToChange = params.join(".") + "."
 
     var requestOptions = {
         method: 'PUT',
