@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/mochi-co/mqtt/v2"
-	"github.com/mochi-co/mqtt/v2/hooks/auth"
 	"github.com/mochi-co/mqtt/v2/packets"
 	"github.com/nats-io/nats.go/jetstream"
 )
@@ -160,31 +159,42 @@ func (h *NatsAuthHook) OnACLCheck(cl *mqtt.Client, topic string, write bool) boo
 		return true
 	}
 
-	if !write {
-		deviceAllowedTopics := []string{
-			"oktopus/usp/v1/agent/" + username,
-		}
-		for _, allowedTopic := range deviceAllowedTopics {
-			_, ok := auth.MatchTopic(allowedTopic, topic)
-			if ok {
-				return true
-			}
-		}
+	endpointID := clientEndpointID(cl)
+	if !endpointBelongsTo(endpointID, username) {
+		log.Println("endpoint id does not match user, blocked user:", username, "endpoint id:", endpointID)
 		return false
 	}
 
-	if write {
-		deviceAllowedTopics := []string{
-			"oktopus/usp/v1/controller",
-			"oktopus/usp/v1/api/" + username,
-		}
-		for _, allowedTopic := range deviceAllowedTopics {
-			_, ok := auth.MatchTopic(allowedTopic, topic)
-			if ok {
-				return true
-			}
-		}
+	agentTopic := "oktopus/usp/v1/agent/" + endpointID
+	if !write {
+		return topic == agentTopic || strings.HasPrefix(topic, agentTopic+"/")
 	}
 
-	return false
+	return topic == "oktopus/usp/v1/controller" ||
+		topic == "oktopus/usp/v1/controller/"+endpointID ||
+		topic == "oktopus/usp/v1/api/"+username
+}
+
+func clientEndpointID(cl *mqtt.Client) string {
+	for _, prop := range cl.Properties.Props.User {
+		if prop.Key == "usp-endpoint-id" {
+			return prop.Val
+		}
+	}
+	if len(cl.Properties.Props.User) > 0 {
+		return cl.Properties.Props.User[0].Val
+	}
+	return ""
+}
+
+func endpointBelongsTo(endpointID string, username string) bool {
+	if username == "" || !strings.HasSuffix(endpointID, username) {
+		return false
+	}
+	prefix := endpointID[:len(endpointID)-len(username)]
+	if prefix == "" {
+		return false
+	}
+	last := prefix[len(prefix)-1]
+	return last < '0' || last > '9'
 }
