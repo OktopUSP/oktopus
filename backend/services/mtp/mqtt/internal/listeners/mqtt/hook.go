@@ -23,6 +23,18 @@ type NatsAuthHook struct {
 	kv jetstream.KeyValue
 }
 
+// uspEndpointID returns the USP Endpoint ID the agent declared in the
+// "usp-endpoint-id" MQTT v5 user property of its CONNECT packet, or an empty
+// string when it was not sent.
+func uspEndpointID(cl *mqtt.Client) string {
+	for _, prop := range cl.Properties.Props.User {
+		if prop.Key == "usp-endpoint-id" {
+			return prop.Val
+		}
+	}
+	return ""
+}
+
 func (h *MyHook) ID() string {
 	return "events-controller"
 }
@@ -46,10 +58,8 @@ func (h *MyHook) OnClientExpired(cl *mqtt.Client) {
 }
 
 func (h *MyHook) OnDisconnect(cl *mqtt.Client, err error, expire bool) {
-	var clUser string
-	if len(cl.Properties.Props.User) > 0 {
-		clUser = cl.Properties.Props.User[0].Val
-	} else {
+	clUser := uspEndpointID(cl)
+	if clUser == "" {
 		clUser = cl.ID // MQTT 3.1.1 fallback: no User Properties, use client ID
 	}
 
@@ -64,11 +74,8 @@ func (h *MyHook) OnDisconnect(cl *mqtt.Client, err error, expire bool) {
 func (h *MyHook) OnSubscribed(cl *mqtt.Client, pk packets.Packet, reasonCodes []byte) {
 	//Verifies if it's a device who is subscribed
 	if strings.Contains(pk.Filters[0].Filter, "oktopus/usp/v1/agent") {
-		var clUser string
-
-		if len(cl.Properties.Props.User) > 0 {
-			clUser = cl.Properties.Props.User[0].Val
-		} else {
+		clUser := uspEndpointID(cl)
+		if clUser == "" {
 			clUser = cl.ID // MQTT 3.1.1 fallback: no User Properties, use client ID
 		}
 
@@ -90,10 +97,7 @@ func (h *MyHook) OnSubscribed(cl *mqtt.Client, pk packets.Packet, reasonCodes []
 }
 
 func (h *MyHook) OnPacketEncode(cl *mqtt.Client, pk packets.Packet) packets.Packet {
-	var clUser string
-	if len(cl.Properties.Props.User) > 0 {
-		clUser = cl.Properties.Props.User[0].Val
-	}
+	clUser := uspEndpointID(cl)
 	if pk.FixedHeader.Type == packets.Connack {
 		pk.Properties.User = []packets.UserProperty{{Key: "subscribe-topic", Val: "oktopus/usp/v1/agent/" + clUser}}
 	}
@@ -125,7 +129,7 @@ func (h *NatsAuthHook) OnConnectAuthenticate(cl *mqtt.Client, pk packets.Packet)
 
 	username := string(pk.Connect.Username)
 
-	entry, err := h.kv.Get(context.TODO(), username)
+	entry, err := h.kv.Get(context.TODO(), nats.EncodeKVKey(username))
 	if err != nil {
 		if err == jetstream.ErrKeyNotFound {
 			log.Println("user access not found, blocked user:", username)
@@ -146,7 +150,7 @@ func (h *NatsAuthHook) OnACLCheck(cl *mqtt.Client, topic string, write bool) boo
 
 	username := string(cl.Properties.Username)
 
-	_, err := h.kv.Get(context.TODO(), username)
+	_, err := h.kv.Get(context.TODO(), nats.EncodeKVKey(username))
 	if err != nil {
 		if err == jetstream.ErrKeyNotFound {
 			log.Println("user access not found, blocked user:", username)

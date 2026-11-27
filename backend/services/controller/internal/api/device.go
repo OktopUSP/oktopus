@@ -218,7 +218,7 @@ func (a *Api) deviceAuth(w http.ResponseWriter, r *http.Request) {
 
 		id := r.URL.Query().Get("id")
 		if id != "" {
-			entry, err := a.kv.Get(r.Context(), id)
+			entry, err := a.kv.Get(r.Context(), utils.EncodeKVKey(id))
 			if err != nil {
 				if err == jetstream.ErrKeyNotFound {
 					w.WriteHeader(http.StatusNotFound)
@@ -255,7 +255,7 @@ func (a *Api) deviceAuth(w http.ResponseWriter, r *http.Request) {
 			/*listOfKeys = append(listOfKeys, map[string]string{
 				key: string(entry.Value()),
 			})*/
-			listOfKeys[key] = string(entry.Value())
+			listOfKeys[utils.DecodeKVKey(key)] = string(entry.Value())
 		}
 
 		utils.MarshallEncoder(listOfKeys, w)
@@ -264,7 +264,7 @@ func (a *Api) deviceAuth(w http.ResponseWriter, r *http.Request) {
 
 		id := r.URL.Query().Get("id")
 		if id != "" {
-			err := a.kv.Purge(r.Context(), id)
+			err := a.kv.Purge(r.Context(), utils.EncodeKVKey(id))
 			if err != nil {
 				if err == jetstream.ErrKeyNotFound {
 					w.WriteHeader(http.StatusNotFound)
@@ -291,12 +291,13 @@ func (a *Api) deviceAuth(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if deviceAuth.User != "" {
-			_, err := a.kv.Get(r.Context(), deviceAuth.User)
+			key := utils.EncodeKVKey(deviceAuth.User)
+			_, err := a.kv.Get(r.Context(), key)
 
 			if err != nil {
 
 				if err == jetstream.ErrKeyNotFound {
-					_, err = a.kv.PutString(r.Context(), deviceAuth.User, deviceAuth.Password)
+					_, err = a.kv.PutString(r.Context(), key, deviceAuth.Password)
 					if err != nil {
 						w.WriteHeader(http.StatusInternalServerError)
 						utils.MarshallEncoder(err, w)

@@ -49,7 +49,7 @@ const Page = () => {
       redirect: 'follow'
     }
 
-    return fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/auth?id=${id}`, requestOptions)
+    return fetch(`${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/auth?id=${encodeURIComponent(id)}`, requestOptions)
       .then(response => {
         if (response.status === 401) {
           router.push("/auth/login")
@@ -136,7 +136,7 @@ const Page = () => {
 
     let url = `${process.env.NEXT_PUBLIC_REST_ENDPOINT || ""}/api/device/auth`
     if (id !== undefined && id !== "") {
-      url += "?id="+id
+      url += "?id="+encodeURIComponent(id)
     }
 
     return fetch(url, requestOptions)

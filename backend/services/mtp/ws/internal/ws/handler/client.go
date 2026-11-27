@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/OktopUSP/oktopus/ws/internal/nats"
 	"github.com/OktopUSP/oktopus/ws/internal/usp_record"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
@@ -157,7 +158,7 @@ func ServeController(
 	kv jetstream.KeyValue,
 ) {
 	if authEnable {
-		entry, err := kv.Get(r.Context(), cEID)
+		entry, err := kv.Get(r.Context(), nats.EncodeKVKey(cEID))
 		if err != nil {
 			if err == jetstream.ErrKeyNotFound {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -211,7 +212,7 @@ func ServeAgent(
 	}
 
 	if authEnable {
-		entry, err := kv.Get(r.Context(), deviceid)
+		entry, err := kv.Get(r.Context(), nats.EncodeKVKey(deviceid))
 		if err != nil {
 			if err == jetstream.ErrKeyNotFound {
 				w.WriteHeader(http.StatusUnauthorized)
